@@ -1,0 +1,26 @@
+function BizClientsScreen() {
+  const store = useAppStore();
+  const [q, setQ] = React.useState('');
+  const [filter, setFilter] = React.useState('הכל');
+  const [adding, setAdding] = React.useState(false);
+  const [name, setName] = React.useState('');
+  const [phone, setPhone] = React.useState('');
+  const [error, setError] = React.useState('');
+  const [selected, setSelected] = React.useState(null);
+  const list = store.clients.filter((c) => (c.name.includes(q) || (c.phone || '').includes(q)) && (filter === 'הכל' || filter === 'קבועים' && c.visits >= 10 || filter === 'VIP' && c.tag === 'VIP' || filter === 'לא חזרו 3 חודשים' && c.inactive));
+  function add() {
+    if (!name.trim() || !phoneSchema.safeParse(phone).success) { setError('מלאו שם ומספר נייד תקין.'); return; }
+    if (store.clients.some((c) => c.phone === phone.replace(/[ -]/g,''))) { setError('כבר קיים לקוח עם המספר הזה.'); return; }
+    store.addClient({ name: name.trim(), phone: phone.replace(/[ -]/g,''), visits: 0, last: 'חדש/ה', tag: '' }); setAdding(false); setName(''); setPhone(''); setError('');
+  }
+  return <div style={{ background:'var(--surface-page)',minHeight:'100%' }}>
+    <TopBar title="לקוחות" subtitle={`${store.clients.length} לקוחות רשומים`} sticky={false} actions={<IconButton icon="user-plus" label="לקוח חדש" variant="outline" onClick={() => setAdding(true)} />} />
+    <div style={{padding:'4px 20px 110px',display:'grid',gridTemplateColumns:'minmax(0,1fr)',gap:14}}>
+      <Input icon="search" aria-label="חיפוש לקוחות" placeholder="חיפוש לפי שם או טלפון" value={q} onChange={(e) => setQ(e.target.value)} />
+      <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>{['הכל','קבועים','VIP','לא חזרו 3 חודשים'].map((f) => <Tag key={f} selected={filter === f} onSelect={() => setFilter(f)}>{f}</Tag>)}</div>
+      {!list.length ? <EmptyState title="לא נמצאו לקוחות" description="נסו שם אחר או מספר טלפון." action={<Button variant="ghost" size="sm" onClick={() => {setQ('');setFilter('הכל');}}>נקה חיפוש</Button>} /> : <div style={{display:'grid',gap:10}}>{list.map((c,i) => <Card key={c.name+i} elevation="flat" style={{display:'flex',gap:12,alignItems:'center'}}><Avatar name={c.name} /><button onClick={() => setSelected(c)} style={{display:'grid',gap:3,flex:1,minWidth:0,textAlign:'start'}}><span style={{display:'flex',gap:7,alignItems:'center'}}><span style={{font:'var(--type-body-strong)',color:'var(--text-strong)'}}>{c.name}</span>{c.tag && <Badge tone={c.tag === 'VIP' ? 'gradient' : 'brand'}>{c.tag}</Badge>}</span><span style={{font:'var(--type-caption)',color:'var(--text-muted)'}}>{c.visits} ביקורים · {c.last}</span></button><IconButton icon="phone" label={`פרטי קשר: ${c.name}`} variant="outline" size="sm" onClick={() => setSelected(c)} /></Card>)}</div>}
+    </div>
+    {adding && <Sheet title="לקוח חדש" onClose={() => setAdding(false)} actions={<Button block onClick={add}>שמירת לקוח</Button>}><div style={{display:'grid',gap:12}}><Input label="שם מלא" value={name} onChange={(e) => setName(e.target.value)} maxLength={100} /><Input label="טלפון" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />{error && <p role="alert" style={{color:'var(--text-danger)'}}>{error}</p>}</div></Sheet>}
+    {selected && <Sheet title={selected.name} onClose={() => setSelected(null)}><p>{selected.visits} ביקורים · {selected.last}</p>{selected.phone ? <a href={`tel:${selected.phone}`}>{selected.phone}</a> : <p>ללקוח לדוגמה אין מספר טלפון שמור.</p>}</Sheet>}
+  </div>;
+}

@@ -1,0 +1,2027 @@
+@font-face {
+  font-family: "Google Sans";
+  src: url("/assets/fonts/google-sans-400.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Google Sans";
+  src: url("/assets/fonts/google-sans-500.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Google Sans";
+  src: url("/assets/fonts/google-sans-600.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Google Sans";
+  src: url("/assets/fonts/google-sans-700.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+.tori-lp h1,
+.tori-lp h2,
+.tori-lp h3 {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.tori-lp h1 {
+  letter-spacing: -0.03em;
+}
+@keyframes tori-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--r, 0deg));
+  }
+  50% {
+    transform: translateY(-9px) rotate(var(--r, 0deg));
+  }
+}
+@keyframes tori-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.tori-lp .tori-a11y-fab {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  border: 1.5px solid rgba(23, 22, 22, 0.55);
+  padding: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  background: #1557d0;
+  color: #fff;
+  box-shadow:
+    0 12px 30px rgba(21, 87, 208, 0.34),
+    0 3px 10px rgba(23, 22, 22, 0.16);
+  display: grid;
+  place-items: center;
+  transition:
+    transform 0.2s cubic-bezier(0.34, 1.42, 0.64, 1),
+    box-shadow 0.2s;
+}
+.tori-lp .tori-a11y-fab:hover {
+  transform: translateY(-3px) scale(1.05);
+}
+.tori-lp .tori-a11y-fab:active {
+  transform: scale(0.93);
+}
+.tori-lp .tori-a11y-panel {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(18px) scale(0.95);
+  transform-origin: 100% 100%;
+  transition:
+    opacity 0.3s,
+    transform 0.38s cubic-bezier(0.22, 0.61, 0.36, 1),
+    visibility 0.38s;
+}
+.tori-lp .tori-a11y.is-open .tori-a11y-panel {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+.tori-lp .tori-a11y-tile {
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  padding: 13px 8px;
+  border-radius: 14px;
+  border: 1px solid rgba(23, 22, 22, 0.12);
+  background: #fff;
+  color: var(--ink-800);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.25;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background 0.18s,
+    border-color 0.18s,
+    color 0.18s,
+    transform 0.14s;
+}
+.tori-lp .tori-a11y-tile:hover {
+  border-color: #1557d0;
+  color: #1557d0;
+  transform: translateY(-1px);
+}
+.tori-lp .tori-a11y-tile:active {
+  transform: scale(0.96);
+}
+.tori-lp .tori-a11y-tile[aria-pressed="true"] {
+  background: #1557d0;
+  border-color: #1557d0;
+  color: #fff;
+}
+.tori-lp .tori-a11y-step {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(23, 22, 22, 0.14);
+  background: #fff;
+  color: var(--ink-900);
+  font: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition:
+    background 0.18s,
+    color 0.18s,
+    transform 0.14s;
+}
+.tori-lp .tori-a11y-step:hover {
+  background: #1557d0;
+  color: #fff;
+  border-color: #1557d0;
+}
+.tori-lp .tori-a11y-step:active {
+  transform: scale(0.92);
+}
+.tori-lp.a11y-contrast > *:not(.tori-a11y) {
+  filter: contrast(1.38) saturate(1.1);
+}
+.tori-lp.a11y-gray > *:not(.tori-a11y) {
+  filter: grayscale(1);
+}
+.tori-lp.a11y-contrast.a11y-gray > *:not(.tori-a11y) {
+  filter: grayscale(1) contrast(1.38);
+}
+.tori-lp.a11y-invert > *:not(.tori-a11y) {
+  filter: invert(1) hue-rotate(180deg);
+}
+.tori-lp.a11y-links a {
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+  outline: 2px dashed currentColor;
+  outline-offset: 2px;
+}
+.tori-lp.a11y-readable,
+.tori-lp.a11y-readable * {
+  font-family: Arial, "Helvetica Neue", sans-serif !important;
+  letter-spacing: 0.01em;
+}
+.tori-lp.a11y-stop *,
+.tori-lp.a11y-stop *::before,
+.tori-lp.a11y-stop *::after {
+  animation: none !important;
+  transition: none !important;
+}
+.tori-lp.a11y-focus
+  :is(a, button, input, select, textarea, summary, details):focus-visible,
+.tori-lp.a11y-focus :is(a, button, input, summary):focus {
+  outline: 3px solid #1557d0 !important;
+  outline-offset: 3px !important;
+  border-radius: 6px;
+}
+.tori-lp.a11y-space * {
+  line-height: 1.9 !important;
+  letter-spacing: 0.04em !important;
+  word-spacing: 0.12em !important;
+}
+@media (max-width: 560px) {
+  .tori-lp .tori-a11y {
+    bottom: 14px !important;
+    right: 14px !important;
+  }
+  .tori-lp .tori-a11y-fab {
+    width: 54px;
+    height: 54px;
+  }
+}
+@keyframes tori-chat-halo {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  70%,
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+@keyframes tori-chat-dot {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.35;
+  }
+  30% {
+    transform: translateY(-5px);
+    opacity: 1;
+  }
+}
+@keyframes tori-chat-in {
+  from {
+    opacity: 0;
+    transform: translateY(9px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes tori-chat-shine {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+.tori-lp .tori-chat {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-130px);
+  transition:
+    opacity 0.3s,
+    transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1),
+    visibility 0.6s;
+}
+.tori-lp .tori-chat.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+.tori-lp .tori-chat-fab {
+  position: relative;
+  width: 66px;
+  height: 66px;
+  border: 1.5px solid rgba(23, 22, 22, 0.55);
+  padding: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  background: linear-gradient(135deg, #bfff51, #6bff85, #0cffbe);
+  background-size: 200% 200%;
+  animation: tori-chat-shine 6s linear infinite alternate;
+  box-shadow:
+    0 14px 34px rgba(12, 255, 190, 0.34),
+    0 3px 10px rgba(23, 22, 22, 0.16);
+  display: grid;
+  place-items: center;
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.42, 0.64, 1),
+    box-shadow 0.22s;
+}
+.tori-lp .tori-chat-fab:hover {
+  transform: translateY(-3px) scale(1.05);
+}
+.tori-lp .tori-chat-fab:active {
+  transform: scale(0.93);
+}
+.tori-lp .tori-chat-fab::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(12, 255, 190, 0.55);
+  animation: tori-chat-halo 2.8s ease-out infinite;
+  z-index: -1;
+}
+.tori-lp .tori-chat-fab img {
+  width: 38px;
+  height: 38px;
+  pointer-events: none;
+  transition: transform 0.3s cubic-bezier(0.34, 1.42, 0.64, 1);
+}
+.tori-lp .tori-chat-fab:hover img {
+  transform: rotate(-8deg) scale(1.06);
+}
+.tori-lp .tori-chat-x {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transform: rotate(-90deg);
+  transition:
+    opacity 0.2s,
+    transform 0.3s cubic-bezier(0.34, 1.42, 0.64, 1);
+}
+.tori-lp .tori-chat.is-open .tori-chat-fab img {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.6);
+}
+.tori-lp .tori-chat.is-open .tori-chat-x {
+  opacity: 1;
+  transform: none;
+}
+.tori-lp .tori-chat.is-open .tori-chat-fab::before {
+  display: none;
+}
+.tori-lp .tori-chat-teaser {
+  transform-origin: 0 100%;
+  transition:
+    opacity 0.35s,
+    transform 0.35s cubic-bezier(0.34, 1.42, 0.64, 1);
+}
+.tori-lp .tori-chat.is-open .tori-chat-teaser,
+.tori-lp .tori-chat.is-dismissed .tori-chat-teaser {
+  opacity: 0;
+  transform: translateY(6px) scale(0.9);
+  pointer-events: none;
+}
+.tori-lp .tori-chat-panel {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(18px) scale(0.95);
+  transform-origin: 0 100%;
+  transition:
+    opacity 0.3s,
+    transform 0.38s cubic-bezier(0.22, 0.61, 0.36, 1),
+    visibility 0.38s;
+}
+.tori-lp .tori-chat.is-open .tori-chat-panel {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+.tori-lp .tori-chat-scroll {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(23, 22, 22, 0.16) transparent;
+}
+.tori-lp .tori-chat-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.tori-lp .tori-chat-scroll::-webkit-scrollbar-thumb {
+  background: rgba(23, 22, 22, 0.16);
+  border-radius: 99px;
+}
+.tori-lp .tori-chat-chip {
+  border: 1px solid rgba(23, 22, 22, 0.14);
+  background: var(--white);
+  color: var(--ink-800);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    color 0.2s,
+    transform 0.14s cubic-bezier(0.34, 1.42, 0.64, 1);
+}
+.tori-lp .tori-chat-chip:hover {
+  background: var(--ink-900);
+  border-color: var(--ink-900);
+  color: var(--white);
+  transform: translateY(-1px);
+}
+.tori-lp .tori-chat-chip:active {
+  transform: scale(0.94);
+}
+.tori-lp .tori-chat-send {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 12px;
+  background: var(--ink-900);
+  color: #bfff51;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    transform 0.14s;
+}
+.tori-lp .tori-chat-send:hover {
+  background: linear-gradient(135deg, #bfff51, #0cffbe);
+  color: var(--ink-900);
+}
+.tori-lp .tori-chat-send:active {
+  transform: scale(0.9);
+}
+.tori-lp .tori-chat-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink-900);
+  outline: none;
+}
+.tori-lp .tori-chat-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink-400);
+  animation: tori-chat-dot 1.1s ease-in-out infinite;
+}
+@media (max-width: 560px) {
+  .tori-lp .tori-chat {
+    bottom: 14px !important;
+    left: 14px !important;
+  }
+  .tori-lp .tori-chat-fab {
+    width: 58px;
+    height: 58px;
+  }
+  .tori-lp .tori-chat-fab img {
+    width: 33px;
+    height: 33px;
+  }
+}
+.tori-lp .tori-nav-bar {
+  max-width: 1180px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 16px 24px;
+  border-radius: 0;
+  background: rgba(248, 248, 246, 0);
+  border: 1px solid rgba(23, 22, 22, 0);
+  box-shadow: 0 0 0 rgba(23, 22, 22, 0);
+  backdrop-filter: blur(0);
+  -webkit-backdrop-filter: blur(0);
+  transition:
+    max-width 0.55s cubic-bezier(0.22, 0.61, 0.36, 1),
+    padding 0.55s cubic-bezier(0.22, 0.61, 0.36, 1),
+    margin 0.55s cubic-bezier(0.22, 0.61, 0.36, 1),
+    border-radius 0.55s cubic-bezier(0.22, 0.61, 0.36, 1),
+    background 0.4s,
+    box-shadow 0.4s,
+    border-color 0.4s,
+    backdrop-filter 0.4s;
+}
+.tori-lp .tori-nav.is-scrolled .tori-nav-bar {
+  max-width: 1000px;
+  width: calc(100% - 32px);
+  margin: 12px auto 0;
+  padding: 8px 10px 8px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  border-color: rgba(23, 22, 22, 0.07);
+  box-shadow:
+    0 12px 40px rgba(23, 22, 22, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.7) inset;
+  backdrop-filter: blur(18px) saturate(1.6);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+}
+.tori-lp .tori-nav-logo {
+  transform-origin: 100% 50%;
+  transition: transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+@keyframes tori-logo-bump {
+  0% {
+    transform: translateX(0) rotate(0);
+  }
+  34% {
+    transform: translateX(-13px) rotate(-3.5deg);
+  }
+  68% {
+    transform: translateX(3px) rotate(1deg);
+  }
+  100% {
+    transform: translateX(0) rotate(0);
+  }
+}
+.tori-lp .tori-nav-mark {
+  position: relative;
+  overflow: hidden;
+  flex: 0 0 auto;
+  display: block;
+  width: 0;
+  height: 38px;
+  opacity: 0;
+  margin-inline-end: 0;
+  transform: translateX(30px) scale(0.55) rotate(-22deg);
+  transition:
+    width 0.45s cubic-bezier(0.34, 1.42, 0.64, 1),
+    margin 0.45s cubic-bezier(0.34, 1.42, 0.64, 1),
+    opacity 0.28s,
+    transform 0.6s cubic-bezier(0.34, 1.42, 0.64, 1);
+}
+.tori-lp .tori-nav.is-scrolled .tori-nav-mark {
+  width: 38px;
+  opacity: 1;
+  margin-inline-end: 10px;
+  transform: none;
+  overflow: visible;
+}
+.tori-lp .tori-nav.is-scrolled .tori-nav-word {
+  animation: tori-logo-bump 0.62s cubic-bezier(0.34, 1.42, 0.64, 1) both;
+}
+.tori-lp .tori-hero-mark {
+  position: relative;
+  display: inline-block;
+  overflow: visible;
+  width: 0.92em;
+  height: 0.92em;
+  vertical-align: -0.14em;
+  margin: 0 0.06em;
+}
+.tori-lp .tori-hero-mark video {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 2.32em;
+  height: 1.74em;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.tori-lp .tori-nav-mark video {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100px;
+  height: 75px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  filter: contrast(1.12);
+}
+.tori-lp .tori-nav-logo img {
+  transition: filter 0.3s;
+}
+.tori-lp .tori-nav-logo:hover img:first-child {
+  filter: drop-shadow(0 0 10px rgba(12, 255, 190, 0.7));
+}
+.tori-lp .tori-nav.is-scrolled .tori-nav-logo {
+  transform: scale(0.84);
+}
+.tori-lp .tori-nav-links a {
+  position: relative;
+  z-index: 1;
+  color: var(--ink-600);
+  padding: 9px 13px;
+  border-radius: 999px;
+  transition:
+    color 0.22s,
+    background 0.22s,
+    transform 0.13s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.tori-lp .tori-nav-links a::after {
+  content: "";
+  position: absolute;
+  inset-inline: 13px;
+  bottom: 4px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--gradient-brand);
+  transform: scaleX(0);
+  transition: transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.tori-lp .tori-nav-links a:hover {
+  color: var(--ink-900);
+}
+.tori-lp .tori-nav-links a:hover::after {
+  transform: scaleX(1);
+}
+.tori-lp .tori-nav-links a:active {
+  transform: scale(0.9);
+  background: rgba(191, 255, 81, 0.38);
+  color: var(--ink-900);
+  transition-duration: 0.07s;
+}
+.tori-lp .tori-nav-cta {
+  background: var(--white);
+  border: 1px solid var(--ink-900);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition:
+    background 0.28s,
+    border-color 0.28s,
+    box-shadow 0.22s,
+    transform 0.16s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.tori-lp .tori-nav-cta::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.75),
+    rgba(255, 255, 255, 0)
+  );
+  transform: translateX(-160%) skewX(-18deg);
+  pointer-events: none;
+}
+.tori-lp .tori-nav.is-scrolled .tori-nav-cta {
+  background: linear-gradient(135deg, #bfff51, #6bff85, #0cffbe);
+  border-color: transparent;
+  box-shadow: var(--shadow-brand);
+}
+.tori-lp .tori-nav-cta:hover::after {
+  animation: tori-sheen 0.85s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.tori-lp .tori-nav-cta:active {
+  transform: scale(0.94);
+  transition-duration: 0.08s;
+}
+.tori-lp .tori-nav-cta-arrow {
+  transition: transform 0.3s cubic-bezier(0.34, 1.42, 0.64, 1);
+}
+.tori-lp .tori-nav-cta:hover .tori-nav-cta-arrow {
+  transform: translateX(-3px) rotate(-12deg);
+}
+.tori-lp .tori-nav-cta:active .tori-nav-cta-arrow {
+  transform: translateX(-3px) rotate(-190deg) scale(0.9);
+}
+.tori-lp .tori-nav.is-hidden .tori-nav-bar {
+  transform: translateY(-120%);
+}
+@media (max-width: 760px) {
+  .tori-lp .tori-nav-links {
+    display: none !important;
+  }
+}
+
+@keyframes tori-reveal {
+  from {
+    transform: translateY(112%);
+  }
+  to {
+    transform: none;
+  }
+}
+.tori-lp .tori-word {
+  color: var(--ink-900);
+  background-image: linear-gradient(100deg, #bfff51, #6bff85, #0cffbe);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 38%;
+}
+.tori-lp .tori-word-line {
+  color: var(--white);
+  background-image: linear-gradient(100deg, #bfff51, #6bff85, #0cffbe);
+  background-repeat: no-repeat;
+  background-position: 0 92%;
+  background-size: 100% 6px;
+  padding-bottom: 0.06em;
+}
+.tori-lp .tori-panel {
+  animation: tori-panel-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes tori-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(26px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes tori-push-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-130%) scale(0.94);
+  }
+  5%,
+  27% {
+    opacity: 1;
+    transform: none;
+  }
+  33%,
+  100% {
+    opacity: 0;
+    transform: translateY(-130%) scale(0.94);
+  }
+}
+@keyframes tori-slot-pick {
+  0%,
+  2% {
+    background: var(--ink-50);
+    color: var(--ink-700);
+    transform: none;
+    box-shadow: none;
+  }
+  8%,
+  26% {
+    background: linear-gradient(135deg, #bfff51, #6bff85, #0cffbe);
+    color: var(--ink-900);
+    transform: scale(1.07);
+    box-shadow: 0 6px 16px rgba(0, 177, 131, 0.32);
+  }
+  34%,
+  100% {
+    background: var(--ink-50);
+    color: var(--ink-700);
+    transform: none;
+    box-shadow: none;
+  }
+}
+@keyframes tori-confirm-pulse {
+  0%,
+  4% {
+    transform: none;
+    box-shadow: 0 0 0 0 rgba(12, 255, 190, 0);
+  }
+  10% {
+    transform: scale(1.03);
+    box-shadow: 0 0 0 7px rgba(12, 255, 190, 0.28);
+  }
+  18%,
+  100% {
+    transform: none;
+    box-shadow: 0 0 0 0 rgba(12, 255, 190, 0);
+  }
+}
+@keyframes tori-shine {
+  0% {
+    transform: translateX(-160%) skewX(-16deg);
+  }
+  55%,
+  100% {
+    transform: translateX(320%) skewX(-16deg);
+  }
+}
+@keyframes tori-badge {
+  0%,
+  60% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  68%,
+  92% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+@keyframes tori-load {
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes tori-wipe {
+  0% {
+    transform: translateY(102%) skewY(2.5deg) scale(1.04);
+  }
+  40%,
+  52% {
+    transform: translateY(0) skewY(0deg) scale(1);
+  }
+  100% {
+    transform: translateY(-102%) skewY(-2.5deg) scale(1.04);
+  }
+}
+@keyframes tori-wipe-sheen {
+  0%,
+  34% {
+    opacity: 0;
+    transform: translateX(-120%) skewX(-18deg);
+  }
+  52% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(180%) skewX(-18deg);
+  }
+}
+@keyframes tori-loader-hide {
+  0%,
+  42% {
+    background: #f7f7f7;
+    visibility: visible;
+  }
+  43%,
+  99% {
+    background: transparent;
+    visibility: visible;
+  }
+  100% {
+    background: transparent;
+    visibility: hidden;
+  }
+}
+@keyframes tori-inner-out {
+  0% {
+    opacity: 1;
+    transform: none;
+  }
+  34% {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.94);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.94);
+  }
+}
+.tori-lp .tori-loader.is-out {
+  pointer-events: none;
+  animation: tori-loader-hide 1.25s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+.tori-lp .tori-loader.is-out .tori-loader-inner {
+  animation: tori-inner-out 1.25s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+.tori-lp .tori-loader.is-out .tori-wipe {
+  animation: tori-wipe 1.25s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+.tori-lp .tori-loader.is-out .tori-wipe span {
+  animation: tori-wipe-sheen 1.25s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+@keyframes tori-bub1 {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) rotate(-4deg) scale(0.95);
+  }
+  9%,
+  50% {
+    opacity: 1;
+    transform: translateY(0) rotate(-4deg) scale(1);
+  }
+  62%,
+  100% {
+    opacity: 0;
+    transform: translateY(-12px) rotate(-4deg) scale(0.98);
+  }
+}
+@keyframes tori-bub2 {
+  0%,
+  20% {
+    opacity: 0;
+    transform: translateY(22px) rotate(3deg) scale(0.93);
+  }
+  30%,
+  60% {
+    opacity: 1;
+    transform: translateY(0) rotate(3deg) scale(1);
+  }
+  72%,
+  100% {
+    opacity: 0;
+    transform: translateY(-10px) rotate(3deg) scale(0.98);
+  }
+}
+@keyframes tori-cancel {
+  0% {
+    opacity: 0;
+    transform: translateY(28px) rotate(-3deg);
+  }
+  11%,
+  84% {
+    opacity: 1;
+    transform: translateY(0) rotate(-3deg);
+  }
+  95%,
+  100% {
+    opacity: 0;
+    transform: translateY(-14px) rotate(-3deg);
+  }
+}
+@keyframes tori-strike {
+  0%,
+  24% {
+    transform: scaleX(0);
+  }
+  36%,
+  88% {
+    transform: scaleX(1);
+  }
+  96%,
+  100% {
+    transform: scaleX(0);
+  }
+}
+@keyframes tori-loss {
+  0%,
+  36% {
+    opacity: 0;
+    transform: scale(0.55);
+  }
+  44% {
+    opacity: 1;
+    transform: scale(1.14);
+  }
+  50%,
+  86% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  94%,
+  100% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+@keyframes tori-queue {
+  0% {
+    opacity: 0;
+    transform: translateY(28px) rotate(var(--qr, 0deg)) scale(0.97);
+  }
+  14%,
+  74% {
+    opacity: 1;
+    transform: translateY(0) rotate(var(--qr, 0deg)) scale(1);
+  }
+  90%,
+  100% {
+    opacity: 0;
+    transform: translateY(-16px) rotate(var(--qr, 0deg)) scale(0.98);
+  }
+}
+@keyframes tori-ring {
+  0%,
+  56% {
+    transform: rotate(0);
+  }
+  60% {
+    transform: rotate(15deg);
+  }
+  64% {
+    transform: rotate(-12deg);
+  }
+  68% {
+    transform: rotate(8deg);
+  }
+  72% {
+    transform: rotate(-5deg);
+  }
+  76%,
+  100% {
+    transform: rotate(0);
+  }
+}
+.tori-lp .tori-bub1 {
+  animation: tori-bub1 7s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+}
+.tori-lp .tori-bub2 {
+  animation: tori-bub2 7s cubic-bezier(0.34, 1.42, 0.64, 1) infinite;
+}
+.tori-lp .tori-cancel {
+  animation: tori-cancel 7s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+}
+.tori-lp .tori-strike {
+  position: relative;
+}
+.tori-lp .tori-strike::after {
+  content: "";
+  position: absolute;
+  inset-inline: -3px;
+  top: 52%;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--ink-400);
+  transform: scaleX(1);
+  transform-origin: 100% 50%;
+  animation: tori-strike 7s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+}
+.tori-lp .tori-loss {
+  animation: tori-loss 7s cubic-bezier(0.34, 1.42, 0.64, 1) infinite;
+}
+.tori-lp .tori-q {
+  animation: tori-queue 7s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+}
+.tori-lp .tori-ring {
+  animation: tori-ring 7s ease-in-out infinite;
+  transform-origin: 50% 18%;
+}
+.tori-lp .tori-device {
+  animation: tori-float 8s ease-in-out infinite;
+  --r: 0deg;
+  transform-style: preserve-3d;
+}
+.tori-lp .tori-push-stack {
+  position: absolute;
+  z-index: 4;
+  inset-inline: 9px;
+  top: 32px;
+  display: grid;
+}
+.tori-lp .tori-push {
+  grid-area: 1/1;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 0 0 1px rgba(23, 22, 22, 0.05),
+    0 12px 26px rgba(23, 22, 22, 0.16);
+  animation: tori-push-in 12s cubic-bezier(0.34, 1.42, 0.64, 1) infinite;
+  opacity: 0;
+}
+.tori-lp .tori-push-tile {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  flex: 0 0 auto;
+}
+.tori-lp .tori-slot {
+  padding: 8px 0;
+  border-radius: 9px;
+  background: var(--ink-50);
+  color: var(--ink-700);
+  text-align: center;
+  font-size: 11px;
+  font-weight: 500;
+  font-feature-settings: "tnum" 1;
+  animation: tori-slot-pick 12s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+}
+.tori-lp .tori-slot--off {
+  background: var(--ink-100);
+  color: var(--ink-400);
+  text-decoration: line-through;
+  animation: none;
+}
+.tori-lp .tori-confirm {
+  min-height: 42px;
+  border-radius: 13px;
+  background: var(--ink-900);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 3px;
+  animation: tori-confirm-pulse 12s ease-out infinite;
+}
+.tori-lp .tori-shine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 34%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.5),
+    rgba(255, 255, 255, 0)
+  );
+  animation: tori-shine 7s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+  pointer-events: none;
+}
+.tori-lp .tori-badge {
+  position: absolute;
+  top: -2px;
+  inset-inline-end: -2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--red-500);
+  border: 1.5px solid var(--white);
+  animation: tori-badge 12s ease-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tori-lp .tori-push,
+  .tori-lp .tori-slot,
+  .tori-lp .tori-confirm,
+  .tori-lp .tori-shine,
+  .tori-lp .tori-badge,
+  .tori-lp .tori-device {
+    animation: none !important;
+  }
+  .tori-lp .tori-push:first-child {
+    opacity: 1;
+  }
+}
+@keyframes tori-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(12, 255, 190, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(12, 255, 190, 0);
+  }
+}
+@keyframes tori-sheen {
+  from {
+    transform: translateX(-140%) skewX(-18deg);
+  }
+  to {
+    transform: translateX(240%) skewX(-18deg);
+  }
+}
+.tori-lp .tori-live {
+  animation: tori-pulse 2.2s ease-out infinite;
+}
+.tori-lp .tori-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.tori-lp .tori-line > span {
+  display: block;
+  transform: translateY(112%);
+  animation: tori-reveal 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(0.15s + var(--i, 0) * 0.14s);
+}
+.tori-lp .tori-cta {
+  transition:
+    transform 0.2s cubic-bezier(0.22, 0.61, 0.36, 1),
+    box-shadow 0.2s;
+}
+.tori-lp .tori-cta::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 36%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.55),
+    rgba(255, 255, 255, 0)
+  );
+  transform: translateX(-140%) skewX(-18deg);
+  pointer-events: none;
+}
+.tori-lp .tori-cta:hover {
+  box-shadow: var(--shadow-brand-lg);
+}
+.tori-lp .tori-cta:hover::after {
+  animation: tori-sheen 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.tori-lp .tori-cta:active {
+  transform: scale(0.97) !important;
+}
+.tori-lp .tori-cta-arrow {
+  transition: transform 0.3s cubic-bezier(0.34, 1.42, 0.64, 1);
+}
+.tori-lp .tori-cta:hover .tori-cta-arrow {
+  transform: translateX(-4px);
+}
+.tori-lp .tori-ghost {
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    transform 0.2s;
+}
+.tori-lp .tori-ghost:hover {
+  border-color: var(--ink-900);
+  background: var(--white);
+  transform: translateY(-2px);
+}
+@media (max-width: 560px) {
+  .tori-lp .tori-stage {
+    display: none !important;
+  }
+}
+
+body {
+  margin: 0;
+}
+.tori-lp,
+.tori-lp h1,
+.tori-lp h2,
+.tori-lp h3,
+.tori-lp h4,
+.tori-lp p,
+.tori-lp a,
+.tori-lp li,
+.tori-lp button,
+.tori-lp input,
+.tori-lp textarea,
+.tori-lp select,
+.tori-lp label,
+.tori-lp summary,
+.tori-lp strong {
+  font-family: "Google Sans", "Open Sans", system-ui, sans-serif;
+}
+.tori-lp a,
+.tori-lp a:hover {
+  text-decoration: none;
+}
+.tori-lp h1,
+.tori-lp h2,
+.tori-lp h3,
+.tori-lp h4 {
+  color: inherit;
+}
+.tori-lp details summary {
+  list-style: none;
+  cursor: pointer;
+}
+.tori-lp details summary::-webkit-details-marker {
+  display: none;
+}
+.tori-lp details[open] .tori-plus {
+  transform: rotate(45deg);
+}
+.tori-lp [data-reveal] {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.tori-lp [data-reveal][data-in] {
+  opacity: 1;
+  transform: none;
+}
+.tori-lp [data-reveal="2"] {
+  transition-delay: 0.1s;
+}
+.tori-lp [data-reveal="3"] {
+  transition-delay: 0.2s;
+}
+.tori-lp [data-reveal="4"] {
+  transition-delay: 0.3s;
+}
+.tori-lp [data-reveal="5"] {
+  transition-delay: 0.4s;
+}
+.tori-lp [data-reveal="6"] {
+  transition-delay: 0.5s;
+}
+.tori-lp .tori-lift {
+  transition:
+    transform 0.25s cubic-bezier(0.22, 0.61, 0.36, 1),
+    box-shadow 0.25s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.tori-lp .tori-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+.tori-lp .tori-sticker {
+  transition: transform 0.25s cubic-bezier(0.34, 1.42, 0.64, 1);
+}
+.tori-lp .tori-sticker:hover {
+  transform: rotate(0deg) scale(1.04);
+}
+.tori-lp .tori-step {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--ink-200);
+  border-radius: 18px;
+  padding: 28px 24px 24px;
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  background: var(--white);
+  text-decoration: none;
+  transition:
+    transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1),
+    border-color 0.35s,
+    box-shadow 0.35s;
+}
+.tori-lp .tori-step::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 1.5px;
+  background: var(--gradient-brand);
+  transform: scaleX(0);
+  transform-origin: 100% 0;
+  transition: transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.tori-lp .tori-step::after {
+  content: "";
+  position: absolute;
+  inset-inline-end: -30%;
+  top: -60%;
+  width: 70%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(12, 255, 190, 0.22),
+    rgba(12, 255, 190, 0) 70%
+  );
+  opacity: 0;
+  transition: opacity 0.45s;
+  pointer-events: none;
+}
+.tori-lp .tori-step:hover {
+  transform: translateY(-6px);
+  border-color: var(--green-400);
+  box-shadow:
+    0 0 0 1px var(--green-400),
+    0 20px 46px rgba(12, 255, 190, 0.22);
+}
+.tori-lp .tori-step:hover::before {
+  transform: scaleX(1);
+}
+.tori-lp .tori-step:hover::after {
+  opacity: 1;
+}
+.tori-lp .tori-step-num {
+  position: absolute;
+  inset-inline-end: 20px;
+  top: 14px;
+  font-family: "Google Sans", "Open Sans", system-ui, sans-serif;
+  font-size: 58px;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--ink-200);
+  transition:
+    -webkit-text-stroke-color 0.35s,
+    filter 0.35s,
+    transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+  pointer-events: none;
+}
+.tori-lp .tori-step:hover .tori-step-num {
+  -webkit-text-stroke-color: var(--green-400);
+  filter: drop-shadow(0 0 9px rgba(12, 255, 190, 0.55));
+  transform: translateY(-3px);
+}
+.tori-lp .tori-step-ico {
+  stroke: var(--ink-900);
+  transition:
+    stroke 0.35s,
+    filter 0.35s,
+    transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.tori-lp .tori-step:hover .tori-step-ico {
+  stroke: var(--green-500);
+  filter: drop-shadow(0 0 10px rgba(12, 255, 190, 0.8));
+  transform: translateY(-3px) scale(1.06);
+}
+.tori-lp .tori-field {
+  display: grid;
+  gap: 7px;
+}
+.tori-lp .tori-field-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-900);
+}
+.tori-lp .tori-field-hint {
+  font-size: 12px;
+  color: var(--ink-400);
+}
+.tori-lp .tori-field-wrap {
+  position: relative;
+  display: block;
+}
+.tori-lp .tori-field-ico {
+  position: absolute;
+  inset-inline-start: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink-400);
+  transition:
+    color 0.2s,
+    filter 0.2s;
+  pointer-events: none;
+}
+.tori-lp .tori-field-wrap input {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 48px;
+  padding: 0 42px 0 14px;
+  border-radius: 14px;
+  border: 1px solid var(--ink-200);
+  background: var(--ink-50);
+  font:
+    400 16px/1 "Google Sans",
+    "Open Sans",
+    system-ui,
+    sans-serif;
+  color: var(--ink-900);
+  outline: none;
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    box-shadow 0.2s;
+}
+.tori-lp .tori-field-wrap input::placeholder {
+  color: var(--ink-400);
+}
+.tori-lp .tori-field-wrap input:hover {
+  border-color: var(--ink-300);
+}
+.tori-lp .tori-field-wrap input:focus {
+  background: var(--white);
+  border-color: var(--green-400);
+  box-shadow: 0 0 0 4px rgba(12, 255, 190, 0.18);
+}
+.tori-lp .tori-field-wrap:focus-within .tori-field-ico {
+  color: var(--green-600);
+  filter: drop-shadow(0 0 7px rgba(12, 255, 190, 0.6));
+}
+.tori-lp .tori-chip {
+  position: relative;
+  cursor: pointer;
+}
+.tori-lp .tori-chip input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.tori-lp .tori-chip span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 13px;
+  border-radius: 10px;
+  border: 1px solid var(--ink-200);
+  background: var(--white);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-700);
+  transition: all 0.2s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.tori-lp .tori-chip:hover span {
+  border-color: var(--green-400);
+  color: var(--ink-900);
+}
+.tori-lp .tori-chip input:checked + span {
+  border-color: var(--green-500);
+  background: var(--green-50);
+  color: var(--green-900);
+  box-shadow:
+    0 0 0 1px var(--green-500),
+    0 6px 18px rgba(12, 255, 190, 0.22);
+}
+.tori-lp .tori-chip input:focus-visible + span {
+  box-shadow: 0 0 0 4px rgba(12, 255, 190, 0.25);
+}
+.tori-lp .tori-more summary {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--green-700);
+  padding: 2px 0;
+}
+.tori-lp .tori-more .tori-more-ico {
+  display: inline-flex;
+  transition: transform 0.25s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.tori-lp .tori-more[open] .tori-more-ico {
+  transform: rotate(180deg);
+}
+.tori-lp .tori-more textarea {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 10px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--ink-200);
+  background: var(--ink-50);
+  font:
+    400 15px/1.55 "Google Sans",
+    "Open Sans",
+    system-ui,
+    sans-serif;
+  color: var(--ink-900);
+  outline: none;
+  resize: vertical;
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    box-shadow 0.2s;
+}
+.tori-lp .tori-more textarea:focus {
+  background: var(--white);
+  border-color: var(--green-400);
+  box-shadow: 0 0 0 4px rgba(12, 255, 190, 0.18);
+}
+.tori-lp .tori-pal {
+  all: unset;
+  cursor: pointer;
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  border: 1px solid var(--ink-200);
+  background: var(--white);
+  transition:
+    transform 0.2s cubic-bezier(0.34, 1.42, 0.64, 1),
+    box-shadow 0.2s,
+    border-color 0.2s;
+}
+.tori-lp .tori-pal span {
+  display: block;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+}
+.tori-lp .tori-pal:hover {
+  transform: translateY(-2px);
+  border-color: var(--ink-400);
+}
+.tori-lp .tori-pal[data-on="true"] {
+  border-color: var(--ink-900);
+  box-shadow:
+    0 0 0 2px var(--ink-900),
+    0 6px 16px rgba(23, 22, 22, 0.16);
+}
+.tori-lp .tori-upload {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px dashed var(--line-strong);
+  background: var(--white);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-800);
+  transition:
+    border-color 0.2s,
+    color 0.2s,
+    box-shadow 0.2s;
+}
+.tori-lp .tori-upload:hover {
+  border-color: var(--green-500);
+  color: var(--green-800);
+  box-shadow: 0 0 0 3px rgba(12, 255, 190, 0.14);
+}
+.tori-lp .tori-upload input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+.tori-lp .tori-live-phone {
+  transition: filter 0.3s;
+}
+.tori-lp .tori-seg2 {
+  display: flex;
+  background: var(--ink-100);
+  border-radius: 12px;
+  padding: 3px;
+  gap: 2px;
+}
+.tori-lp .tori-seg2 button {
+  all: unset;
+  cursor: pointer;
+  flex: 1;
+  text-align: center;
+  min-height: 36px;
+  line-height: 36px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-600);
+  transition:
+    background 0.15s,
+    color 0.15s,
+    box-shadow 0.15s;
+}
+.tori-lp .tori-seg2 button:hover {
+  color: var(--ink-900);
+}
+.tori-lp .tori-seg2 button[data-on="true"] {
+  background: var(--white);
+  color: var(--ink-900);
+  box-shadow: 0 1px 3px rgba(23, 22, 22, 0.14);
+}
+.tori-lp .tori-font {
+  all: unset;
+  cursor: pointer;
+  box-sizing: border-box;
+  flex: 1;
+  min-width: 0;
+  min-height: 46px;
+  padding: 0 8px;
+  border-radius: 11px;
+  border: 1px solid var(--ink-200);
+  background: var(--white);
+  color: var(--ink-800);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  white-space: nowrap;
+  transition:
+    transform 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.tori-lp .tori-font:hover {
+  transform: translateY(-2px);
+  border-color: var(--ink-400);
+}
+.tori-lp .tori-font[data-on="true"] {
+  border-color: var(--ink-900);
+  box-shadow:
+    0 0 0 2px var(--ink-900),
+    0 6px 16px rgba(23, 22, 22, 0.14);
+}
+.tori-lp .tori-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--lime-400), var(--green-400));
+  outline: none;
+  cursor: pointer;
+}
+.tori-lp .tori-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 1.5px solid var(--ink-900);
+  box-shadow: 0 2px 8px rgba(23, 22, 22, 0.22);
+  cursor: grab;
+  transition: transform 0.15s;
+}
+.tori-lp .tori-range::-webkit-slider-thumb:hover {
+  transform: scale(1.12);
+}
+.tori-lp .tori-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 1.5px solid var(--ink-900);
+  box-shadow: 0 2px 8px rgba(23, 22, 22, 0.22);
+  cursor: grab;
+}
+.tori-lp .tori-range:focus-visible {
+  box-shadow: 0 0 0 4px rgba(12, 255, 190, 0.25);
+}
+.tori-lp .tori-feats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 40px 30px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+.tori-lp .tori-feat {
+  display: grid;
+  gap: 18px;
+  position: relative;
+}
+.tori-lp .tori-feat-media {
+  position: relative;
+  aspect-ratio: 1;
+  width: 100%;
+  max-width: 320px;
+  justify-self: center;
+  border-radius: 22px;
+  overflow: hidden;
+  background: var(--white);
+  border: 1px solid rgba(23, 22, 22, 0.14);
+}
+
+.tori-lp .tori-feat-media video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.13);
+  filter: brightness(1.085) saturate(1.05);
+  transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.tori-lp .tori-feat:hover .tori-feat-media video {
+  transform: scale(1.18);
+}
+.tori-lp .tori-feat-body {
+  display: grid;
+  gap: 9px;
+  padding-inline-start: 2px;
+}
+.tori-lp .tori-feat-num {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--ink-400);
+}
+.tori-lp .tori-feat-title {
+  font-family: "Google Sans", "Open Sans", system-ui, sans-serif;
+  font-size: 22px;
+  line-height: 1.18;
+  color: var(--ink-900);
+  margin: 0;
+  display: grid;
+  gap: 3px;
+}
+.tori-lp .tori-feat-title span {
+  font-family: "Google Sans", "Open Sans", system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--green-700);
+}
+.tori-lp .tori-feat-text {
+  font-size: 14.5px;
+  line-height: 1.62;
+  color: var(--ink-600);
+  margin: 0;
+  max-width: 34ch;
+}
+@media (max-width: 900px) {
+  .tori-lp .tori-feats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 36px 24px;
+  }
+}
+@media (max-width: 600px) {
+  .tori-lp .tori-feats {
+    grid-template-columns: 1fr;
+    gap: 34px;
+    max-width: 340px;
+  }
+  .tori-lp .tori-feat {
+    justify-items: center;
+    text-align: center;
+  }
+  .tori-lp .tori-feat-media {
+    width: 100%;
+    max-width: 300px;
+  }
+  .tori-lp .tori-feat-text {
+    max-width: 32ch;
+  }
+}
+.tori-lp .tori-vs {
+  display: grid;
+  grid-template-columns: 1.06fr 1fr;
+  gap: 20px;
+  align-items: stretch;
+  max-width: 940px;
+  margin: 0 auto;
+}
+.tori-lp .tori-vs-col {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 26px 24px;
+  border-radius: 26px;
+  border: 1px solid var(--ink-200);
+  background: var(--white);
+  min-width: 0;
+}
+.tori-lp .tori-vs-col[data-me="true"] {
+  position: relative;
+  background: var(--ink-900);
+  border-color: transparent;
+  padding: 30px 26px;
+  box-shadow: 0 30px 70px rgba(23, 22, 22, 0.28);
+}
+.tori-lp .tori-vs-col[data-me="true"]::before {
+  content: "";
+  position: absolute;
+  inset: -1.5px;
+  border-radius: 27.5px;
+  background: var(--gradient-brand);
+  z-index: -1;
+}
+.tori-lp .tori-vs-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line-subtle);
+}
+.tori-lp .tori-vs-col[data-me="true"] .tori-vs-head {
+  border-bottom-color: rgba(255, 255, 255, 0.14);
+}
+.tori-lp .tori-vs-name {
+  font-family: "Google Sans", "Open Sans", system-ui, sans-serif;
+  font-size: 20px;
+  color: var(--ink-900);
+  line-height: 1.1;
+}
+.tori-lp .tori-vs-sub {
+  font-size: 12.5px;
+  color: var(--ink-500);
+}
+.tori-lp .tori-vs-badge {
+  display: inline-flex;
+  padding: 3px 11px;
+  border-radius: 999px;
+  background: var(--gradient-brand);
+  color: var(--ink-900);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.tori-lp .tori-vs-list {
+  display: grid;
+  gap: 13px;
+  grid-auto-rows: minmax(56px, auto);
+  align-content: start;
+}
+.tori-lp .tori-vs-item {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+  min-height: 56px;
+}
+.tori-lp .tori-vs-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.tori-lp .tori-vs-feat {
+  font-size: 14.5px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--ink-900);
+  text-wrap: pretty;
+}
+.tori-lp .tori-vs-note {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-500);
+}
+.tori-lp .tori-vs-col[data-me="true"] .tori-vs-feat {
+  color: var(--white);
+}
+.tori-lp .tori-vs-col[data-me="true"] .tori-vs-note {
+  color: rgba(255, 255, 255, 0.6);
+}
+.tori-lp .tori-vs-col:not([data-me="true"]) .tori-vs-item {
+  opacity: 0.9;
+}
+.tori-lp .tori-vs-ico {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin-top: 1px;
+}
+.tori-lp .tori-vs-ico[data-k="y"] {
+  background: var(--gradient-brand);
+  color: var(--ink-900);
+}
+.tori-lp .tori-vs-ico[data-k="n"] {
+  background: var(--ink-100);
+  color: var(--ink-400);
+}
+.tori-lp .tori-vs-ico[data-k="p"],
+.tori-lp .tori-vs-ico[data-k="d"] {
+  background: var(--ink-100);
+  color: var(--ink-500);
+}
+.tori-lp .tori-vs-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 12px 0 22px;
+  border-radius: 14px;
+  background: var(--gradient-brand);
+  color: var(--ink-900);
+  font-size: 16px;
+  font-weight: 600;
+  transition:
+    transform 0.18s cubic-bezier(0.22, 0.61, 0.36, 1),
+    box-shadow 0.22s;
+}
+.tori-lp .tori-vs-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(12, 255, 190, 0.3);
+}
+.tori-lp .tori-vs-cta-ico {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--ink-900);
+  color: var(--lime-400);
+}
+@media (max-width: 900px) {
+  .tori-lp .tori-vs {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .tori-lp .tori-vs-col[data-me="true"] {
+    order: -1;
+  }
+}
+@media (max-width: 980px) {
+  .tori-lp .tori-lead-grid {
+    grid-template-columns: 1fr !important;
+    gap: 34px !important;
+    padding: 60px 20px !important;
+  }
+  .tori-lp .tori-price-grid > div {
+    flex: 1 1 100% !important;
+  }
+}
+@media (max-width: 760px) {
+  .tori-lp section {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+  .tori-lp .tori-hero {
+    padding-top: 96px !important;
+  }
+  .tori-lp .tori-hero-phone {
+    transform: scale(1) rotate(-3deg) !important;
+  }
+  .tori-lp .tori-brand-phone {
+    width: 290px !important;
+  }
+}
+@media (max-width: 560px) {
+  .tori-lp .tori-stage {
+    display: grid !important;
+  }
+  .tori-lp .tori-hero-phone {
+    transform: scale(0.9) rotate(-3deg) !important;
+  }
+  .tori-lp .tori-brand-phone {
+    width: min(100%, 270px) !important;
+  }
+  .tori-lp .tori-loader-inner video {
+    width: min(64vw, 230px) !important;
+  }
+}
+@media (max-width: 430px) {
+  .tori-lp .tori-hero-phone {
+    transform: scale(0.8) rotate(-3deg) !important;
+  }
+  .tori-lp .tori-brand-phone {
+    width: min(100%, 250px) !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tori-lp * {
+    animation: none !important;
+    transition: none !important;
+  }
+  .tori-lp [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.tori-lp .tori-branch.is-off {
+  display: none !important;
+}
+.tori-lp .ths1:hover {
+  color: var(--red-500);
+}
+.tori-lp .ths2:hover {
+  background: var(--ink-700);
+}
+.tori-lp .ths3:hover {
+  color: var(--green-800);
+}
+.tori-lp .ths4:hover {
+  box-shadow: var(--shadow-md);
+}
+.tori-lp .ths5:hover {
+  box-shadow: var(--shadow-md);
+}
+.tori-lp .ths6:hover {
+  box-shadow: var(--shadow-md);
+}
+.tori-lp .ths7:hover {
+  box-shadow: var(--shadow-md);
+}
+.tori-lp .ths8:hover {
+  box-shadow: var(--shadow-md);
+}
+.tori-lp .ths9:hover {
+  color: var(--green-800);
+}
+.tori-lp .ths10:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-brand-lg);
+}
+.tori-lp .ths11:active {
+  transform: scale(0.98);
+}
+.tori-lp .ths12:hover {
+  color: var(--ink-900);
+}
+.tori-lp .ths13:hover {
+  color: var(--ink-900);
+}
+.tori-lp .ths14:hover {
+  color: var(--ink-900);
+}
+.tori-lp .ths15:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+.tori-lp .ths16:hover {
+  color: #0e3c96;
+}
+.tori-lp .ths17:hover {
+  background: rgba(255, 255, 255, 0.2);
+}

@@ -1,0 +1,19 @@
+function ApptScreen({ onBook }) {
+  const { appointments, cancel: cancelAppointment } = useAppStore();
+  const [tab, setTab] = React.useState('next');
+  const [cancel, setCancel] = React.useState(null);
+  const today = dateKey(new Date());
+  const upcoming = appointments.filter((a) => ['confirmed', 'pending'].includes(a.status) && a.date >= today);
+  const history = appointments.filter((a) => !upcoming.includes(a));
+  const rows = tab === 'next' ? upcoming : history;
+  return <div style={{ background: 'var(--surface-page)', minHeight: '100%', position: 'relative' }}>
+    <TopBar title="התורים שלי" sticky={false} actions={<IconButton icon="plus" label="תור חדש" variant="brand" onClick={onBook} />} />
+    <div style={{ padding: '0 20px' }}><Tabs items={[{ value: 'next', label: 'קרובים', count: upcoming.length }, { value: 'past', label: 'היסטוריה' }]} value={tab} onChange={setTab} /></div>
+    <div style={{ padding: '14px 20px 110px', display: 'grid', gridTemplateColumns: 'minmax(0,1fr)', gap: 10 }}>
+      {rows.map((a) => <AppointmentRow key={a.id} time={a.time} name={formatDate(a.date)} service={`${a.service} · ${a.mins} דק׳`} status={a.status} price={`${a.price} ₪`} onClick={tab === 'next' ? () => setCancel(a) : undefined} />)}
+      {!rows.length && <EmptyState title={tab === 'next' ? 'אין תורים קרובים' : 'אין עדיין היסטוריית תורים'} description="כל התורים שלך יופיעו כאן." action={<Button onClick={onBook}>קביעת תור</Button>} />}
+      {tab === 'next' && rows.length > 0 && <Card elevation="flat" style={{ display: 'flex', gap: 10, alignItems: 'center', background: 'var(--status-info-bg)', border: 'none' }}><Icon name="bell-ring" size={20} style={{ color: 'var(--status-info-fg)' }} /><span style={{ font: 'var(--type-caption)', color: 'var(--status-info-fg)', lineHeight: 1.5 }}>התורים נשמרים בדפדפן הזה. שליחת תזכורות זמינה לאחר חיבור SMS.</span></Card>}
+    </div>
+    {cancel && <Dialog title="לבטל את התור?" description={`התור ב־${cancel.time} יתפנה למישהי אחרת.`} onClose={() => setCancel(null)} actions={<><Button variant="danger" block onClick={() => { cancelAppointment(cancel.id); setCancel(null); }}>כן, בטל</Button><Button variant="ghost" block onClick={() => setCancel(null)}>לא, השאר</Button></>} />}
+  </div>;
+}

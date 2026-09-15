@@ -1,0 +1,62 @@
+html {
+  scroll-behavior: smooth;
+}
+.message-page {
+  min-height: 100svh;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 20px;
+  padding: 32px;
+  text-align: center;
+}
+.demo-page {
+  min-height: 100svh;
+  padding: 28px 16px;
+  display: grid;
+  justify-content: center;
+  align-content: start;
+  background: var(--surface-page);
+}
+.demo-notice {
+  text-align: center;
+  font: var(--type-caption);
+  color: var(--text-muted);
+  max-width: 390px;
+}
+.demo-notice a {
+  text-decoration: underline;
+}
+.tori-phone-body::-webkit-scrollbar {
+  display: none;
+}
+.tori-app-frame {
+  width: min(390px, calc(100vw - 32px)) !important;
+}
+@media (max-width: 480px) {
+  .demo-page {
+    padding: 0 0 18px;
+  }
+  .tori-app-frame {
+    width: 100vw !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+  }
+  .tori-app-screen {
+    height: 100svh !important;
+    border-radius: 0 !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

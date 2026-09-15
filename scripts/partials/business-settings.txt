@@ -1,0 +1,16 @@
+function BizSettingsScreen({ tenant, onSwitchRole }) {
+  const store = useAppStore();
+  const [editing, setEditing] = React.useState(false);
+  const [hours, setHours] = React.useState(store.settings.hours);
+  const colors = [{ value:'#0CFFBE',label:'ירוק tori (ברירת מחדל)' },{value:'#7C3AED',label:'סגול'},{value:'#FF2E93',label:'ורוד'},{value:'#F59E0B',label:'כתום'},{value:'#0EA5E9',label:'תכלת'}];
+  return <div style={{background:'var(--surface-page)',minHeight:'100%'}}>
+    <TopBar title="הגדרות העסק" tone="brand" sticky={false} />
+    <div style={{padding:'4px 20px 110px',display:'grid',gridTemplateColumns:'minmax(0,1fr)',gap:14}}>
+      <Card elevation="flat" style={{display:'grid',gap:14}}><span style={{font:'var(--type-label)',color:'var(--text-muted)'}}>שעות פעילות</span>{['א׳–ה׳','ו׳','שבת'].map((d,i) => <div key={d} style={{display:'flex',justifyContent:'space-between',font:'var(--type-body)'}}><span>{d}</span><span dir="ltr">{store.settings.hours[i]}</span></div>)}<Button variant="outline" size="sm" icon="pencil" onClick={() => setEditing(true)}>עריכת שעות</Button></Card>
+      <Card elevation="flat" style={{display:'grid',gap:16}}><span style={{font:'var(--type-label)',color:'var(--text-muted)'}}>אוטומציות</span>{[['dayReminder','תזכורת יום לפני'],['hourReminder','תזכורת שעתיים לפני'],['waiting','רשימת המתנה'],['manual','אישור ידני לתורים חדשים']].map(([key,label]) => <Switch key={key} label={label} checked={store.settings[key]} onChange={(e) => store.updateSettings({[key]:e.target.checked})} />)}</Card>
+      <Card elevation="flat" style={{display:'grid',gap:12}}><span style={{font:'var(--type-label)',color:'var(--text-muted)'}}>מיתוג האפליקציה</span><div style={{display:'flex',gap:10,alignItems:'center'}}><span style={{width:48,height:48,borderRadius:14,background:'var(--gradient-brand)',display:'grid',placeItems:'center'}}><Icon name="sparkles" size={22} /></span><span style={{display:'grid',gap:2,flex:1,minWidth:0}}><span style={{font:'var(--type-body-strong)'}}>{tenant.name}</span><span style={{font:'var(--type-caption)',color:'var(--text-muted)'}}>אייקון וצבעים · תצוגה מקדימה</span></span><Badge tone="brand" dot>הדגמה</Badge></div><Select label="ערכת צבע" options={colors.some((c) => c.value === tenant.color) ? colors : [...colors,{value:tenant.color,label:'צבע אישי'}]} value={tenant.color} onChange={(e) => store.updateBusiness({color:e.target.value})} /><Input label="שם העסק" value={tenant.name} onChange={(e) => store.updateBusiness({name:e.target.value})} maxLength={100} /></Card>
+      <Button variant="ghost" block icon="user-round" onClick={onSwitchRole}>חזרה לתצוגת לקוח</Button>
+    </div>
+    {editing && <Sheet title="שעות פעילות" onClose={() => setEditing(false)} actions={<Button block disabled={hours.some((h) => !h.trim())} onClick={() => {store.updateSettings({hours});setEditing(false);}}>שמירת שעות</Button>}><div style={{display:'grid',gap:12}}>{['א׳–ה׳','ו׳','שבת'].map((label,i) => <Input key={label} label={label} value={hours[i]} onChange={(e) => setHours((values) => values.map((v,j) => i === j ? e.target.value : v))} />)}</div></Sheet>}
+  </div>;
+}

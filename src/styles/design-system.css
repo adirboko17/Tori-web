@@ -1,0 +1,1333 @@
+/* tori webfonts. Hebrew-first: every face ships a Hebrew subset alongside Latin.
+   Rubik = product/UI voice. Varela Round = display / brand voice (single weight by design). */
+
+/* Rubik — variable 300..900 */
+@font-face {
+  font-family: "Rubik";
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+  src: url("/assets/fonts/rubik-var-hebrew.woff2") format("woff2");
+  unicode-range:
+    U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+}
+@font-face {
+  font-family: "Rubik";
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+  src: url("/assets/fonts/rubik-var-latin.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Rubik";
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+  src: url("/assets/fonts/rubik-var-latin-ext.woff2") format("woff2");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB,
+    U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* Varela Round — 400 only */
+@font-face {
+  font-family: "Varela Round";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/assets/fonts/varela-round-hebrew.woff2") format("woff2");
+  unicode-range:
+    U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+}
+@font-face {
+  font-family: "Varela Round";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/assets/fonts/varela-round-latin.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
+}
+
+/* Tenant display faces — each business picks one for its own mark inside its app.
+   Hebrew subsets only; these are never used for tori's own UI or product chrome. */
+@font-face {
+  font-family: "Suez One";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/assets/fonts/suez-one-hebrew.woff2") format("woff2");
+  unicode-range:
+    U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+}
+@font-face {
+  font-family: "Secular One";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/assets/fonts/secular-one-hebrew.woff2") format("woff2");
+  unicode-range:
+    U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+}
+@font-face {
+  font-family: "Amatic SC";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/assets/fonts/amatic-sc-hebrew.woff2") format("woff2");
+  unicode-range:
+    U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+}
+
+/* tori colour system.
+   Anchors sampled directly from the supplied brand artwork (/assets/brand/tori-app-icon.png):
+   lime #BFFF51 (top-left) -> mint #0CFFBE (bottom-right), ink #211F1F.
+   The two neons are BRAND SURFACE colours, not text colours. For green ink on white,
+   use --green-600/700 (the "stroke green" used for icons and links). */
+:root {
+  /* ---- brand anchors (do not alter) ---- */
+  --tori-lime: #bfff51;
+  --tori-grass: #6bff85;
+  --tori-mint: #0cffbe;
+  --tori-ink: #211f1f;
+
+  /* ---- green ramp (hue of the mint anchor) ---- */
+  --green-50: #e9fff8;
+  --green-100: #c6ffee;
+  --green-200: #8cffdc;
+  --green-300: #4dffc9;
+  --green-400: #0cffbe;
+  --green-500: #00dfa3;
+  --green-600: #00b183;
+  --green-700: #008765;
+  --green-800: #04654e;
+  --green-900: #084e3e;
+
+  /* ---- lime ramp (hue of the lime anchor) ---- */
+  --lime-50: #f7ffe8;
+  --lime-100: #edffc7;
+  --lime-200: #ddff9b;
+  --lime-300: #cdff6f;
+  --lime-400: #bfff51;
+  --lime-500: #a2e92e;
+  --lime-600: #7fc010;
+  --lime-700: #61930c;
+  --lime-800: #4b7110;
+  --lime-900: #3b5811;
+
+  /* ---- warm ink neutrals (derived from the logo black) ---- */
+  --ink-950: #0f0e0e;
+  --ink-900: #171616;
+  --ink-800: #211f1f;
+  --ink-700: #2e2c2c;
+  --ink-600: #4a4746;
+  --ink-500: #6b6867;
+  --ink-400: #94918f;
+  --ink-300: #c3c0be;
+  --ink-200: #e3e1df;
+  --ink-100: #f1f0ee;
+  --ink-50: #f8f8f6;
+  --white: #ffffff;
+
+  /* ---- status hues ---- */
+  --amber-100: #fff1d6;
+  --amber-500: #ffa51f;
+  --amber-700: #a66200;
+  --red-100: #ffe5e3;
+  --red-500: #f5433c;
+  --red-700: #b31e19;
+  --teal-100: #dff6fb;
+  --teal-500: #1fa8c7;
+  --teal-700: #0b6a80;
+
+  /* ---- gradients ---- */
+  --gradient-brand: linear-gradient(
+    135deg,
+    #bfff51 0%,
+    #6bff85 46%,
+    #0cffbe 100%
+  ); /* @kind color */
+  --gradient-brand-soft: linear-gradient(
+    135deg,
+    #f7ffe8 0%,
+    #e9fff8 100%
+  ); /* @kind color */
+  --gradient-brand-vertical: linear-gradient(
+    180deg,
+    #bfff51 0%,
+    #0cffbe 100%
+  ); /* @kind color */
+  --gradient-ink: linear-gradient(
+    160deg,
+    #2e2c2c 0%,
+    #0f0e0e 100%
+  ); /* @kind color */
+  --gradient-protect-bottom: linear-gradient(
+    180deg,
+    rgba(15, 14, 14, 0) 0%,
+    rgba(15, 14, 14, 0.72) 100%
+  ); /* @kind color */
+
+  /* ---- semantic aliases: text ---- */
+  --text-strong: var(--ink-900);
+  --text-body: var(--ink-800);
+  --text-muted: var(--ink-500);
+  --text-faint: var(--ink-400);
+  --text-on-brand: var(--ink-900);
+  --text-on-ink: var(--white);
+  --text-link: var(--green-700);
+  --text-link-hover: var(--green-800);
+  --text-danger: var(--red-700);
+  --text-success: var(--green-700);
+
+  /* ---- semantic aliases: surface ---- */
+  --surface-page: var(--ink-50);
+  --surface-card: var(--white);
+  --surface-sunken: var(--ink-100);
+  --surface-ink: var(--ink-900);
+  --surface-brand: var(--gradient-brand); /* @kind color */
+  --surface-brand-tint: var(--green-50);
+  --surface-lime-tint: var(--lime-50);
+  --surface-overlay: rgba(15, 14, 14, 0.55);
+  --surface-glass: rgba(255, 255, 255, 0.72);
+
+  /* ---- semantic aliases: line ---- */
+  --line-subtle: var(--ink-200);
+  --line-strong: var(--ink-300);
+  --line-brand: var(--green-400);
+  --line-focus: var(--green-600);
+
+  /* ---- semantic aliases: action ---- */
+  --action-primary-bg: var(--gradient-brand);
+  --action-primary-fg: var(--ink-900);
+  --action-secondary-bg: var(--ink-900);
+  --action-secondary-fg: var(--white);
+  --action-ghost-fg: var(--ink-800);
+  --action-disabled-bg: var(--ink-200);
+  --action-disabled-fg: var(--ink-400);
+
+  /* ---- semantic aliases: status ---- */
+  --status-confirmed-fg: var(--green-800);
+  --status-confirmed-bg: var(--green-100);
+  --status-pending-fg: var(--amber-700);
+  --status-pending-bg: var(--amber-100);
+  --status-cancelled-fg: var(--red-700);
+  --status-cancelled-bg: var(--red-100);
+  --status-done-fg: var(--ink-600);
+  --status-done-bg: var(--ink-100);
+  --status-info-fg: var(--teal-700);
+  --status-info-bg: var(--teal-100);
+
+  /* ---- icon colours ---- */
+  --icon-default: var(--ink-700);
+  --icon-muted: var(--ink-400);
+  --icon-brand: var(--green-600);
+  --icon-on-ink: var(--green-300);
+}
+
+/* tori typography. Hebrew-first, so leading is generous and tracking is left alone
+   on Hebrew text (Hebrew has no case and no tracking tradition — negative tracking
+   smears it). Latin display type gets a touch of negative tracking only. */
+:root {
+  --font-display: "Varela Round", "Rubik", system-ui, sans-serif;
+  --font-ui: "Rubik", system-ui, sans-serif;
+  --font-num: "Rubik", system-ui, sans-serif;
+
+  /* tenant display faces — the business's own mark, picked per tenant. Never product chrome. */
+  --font-tenant-round: "Varela Round", "Rubik", sans-serif;
+  --font-tenant-heavy: "Secular One", "Rubik", sans-serif;
+  --font-tenant-bold: "Suez One", "Rubik", serif;
+  --font-tenant-script: "Amatic SC", "Rubik", cursive;
+
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* size ramp (px, mobile-first: the app never goes below 13px) */
+  --size-display-xl: 44px;
+  --size-display-lg: 36px;
+  --size-display-md: 30px;
+  --size-heading-lg: 24px;
+  --size-heading-md: 20px;
+  --size-heading-sm: 18px;
+  --size-body-lg: 17px;
+  --size-body: 15px;
+  --size-body-sm: 14px;
+  --size-label: 13px;
+  --size-caption: 12px;
+
+  --leading-tight: 1.12;
+  --leading-snug: 1.25;
+  --leading-normal: 1.45;
+  --leading-relaxed: 1.6;
+
+  --tracking-display: -0.01em;
+  --tracking-normal: 0em;
+  --tracking-caps: 0.06em;
+
+  /* semantic type roles */
+  --type-hero: var(--weight-regular) var(--size-display-xl)/var(--leading-tight)
+    var(--font-display); /* @kind font */
+  --type-display: var(--weight-regular)
+    var(--size-display-lg)/var(--leading-tight) var(--font-display); /* @kind font */
+  --type-title: var(--weight-semibold)
+    var(--size-heading-lg)/var(--leading-snug) var(--font-ui); /* @kind font */
+  --type-heading: var(--weight-semibold)
+    var(--size-heading-md)/var(--leading-snug) var(--font-ui); /* @kind font */
+  --type-subheading: var(--weight-medium)
+    var(--size-heading-sm)/var(--leading-snug) var(--font-ui); /* @kind font */
+  --type-body: var(--weight-regular) var(--size-body)/var(--leading-relaxed)
+    var(--font-ui); /* @kind font */
+  --type-body-strong: var(--weight-medium)
+    var(--size-body)/var(--leading-normal) var(--font-ui); /* @kind font */
+  --type-label: var(--weight-medium) var(--size-label)/var(--leading-normal)
+    var(--font-ui); /* @kind font */
+  --type-caption: var(--weight-regular)
+    var(--size-caption)/var(--leading-normal) var(--font-ui); /* @kind font */
+  --type-button: var(--weight-medium) var(--size-body)/1 var(--font-ui); /* @kind font */
+
+  /* time / counters use tabular figures so lists don't jitter */
+  --numeric-tabular: "tnum" 1, "lnum" 1; /* @kind other */
+}
+
+/* tori spacing. 4px base with a 2px and a 6px step for tight component internals. */
+:root {
+  --space-0: 0px;
+  --space-2: 2px;
+  --space-4: 4px;
+  --space-6: 6px;
+  --space-8: 8px;
+  --space-10: 10px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-40: 40px;
+  --space-48: 48px;
+  --space-64: 64px;
+  --space-80: 80px;
+
+  /* semantic spacing */
+  --gutter-screen: 20px; /* app screen side padding */
+  --gutter-screen-wide: 32px; /* tablet / web */
+  --gap-stack: 12px; /* between stacked list items */
+  --gap-section: 28px; /* between screen sections */
+  --pad-card: 16px;
+  --pad-card-lg: 20px;
+  --pad-control-x: 18px;
+  --pad-control-y: 12px;
+  --hit-min: 44px; /* minimum touch target — never smaller */
+  --bar-height: 56px; /* top bar */
+  --tabbar-height: 64px; /* bottom tab bar (excl. safe area) */
+  --maxw-content: 1120px;
+  --maxw-prose: 62ch;
+}
+
+/* tori radii. The logo mark is a soft squircle, so the system runs generous:
+   controls are 12px, cards 18px, chips 8px, sheets 28px on the leading edges. Only
+   switches, badges and avatars are fully round — buttons are NOT pills. */
+:root {
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 26px;
+  --radius-2xl: 32px;
+  --radius-pill: 999px;
+  --radius-circle: 50%;
+
+  --radius-control: 12px;
+  --radius-button: 12px;
+  --radius-card: 18px;
+  --radius-sheet: 28px;
+  --radius-chip: 8px;
+  --radius-avatar: var(--radius-circle);
+  --radius-squircle: 30%; /* logo-tile proportion: radius = 30% of side */
+}
+
+/* tori elevation. Shadows are warm-black and soft — never grey-blue, never hard.
+   Brand glows are SMALL and low-alpha: a hint of neon around green ink, not a bloom. */
+:root {
+  --shadow-xs: 0 1px 2px rgba(23, 22, 22, 0.06);
+  --shadow-sm:
+    0 1px 3px rgba(23, 22, 22, 0.07), 0 1px 1px rgba(23, 22, 22, 0.04);
+  --shadow-md:
+    0 4px 12px rgba(23, 22, 22, 0.08), 0 1px 2px rgba(23, 22, 22, 0.05);
+  --shadow-lg:
+    0 10px 28px rgba(23, 22, 22, 0.1), 0 2px 6px rgba(23, 22, 22, 0.05);
+  --shadow-xl: 0 22px 54px rgba(23, 22, 22, 0.14);
+  --shadow-inset-hairline: inset 0 0 0 1px rgba(23, 22, 22, 0.06);
+  --shadow-inset-top: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+
+  /* brand shadows: coloured lift under gradient surfaces */
+  --shadow-brand: 0 8px 22px rgba(0, 177, 131, 0.26);
+  --shadow-brand-lg: 0 16px 40px rgba(0, 177, 131, 0.3);
+  --shadow-lime: 0 8px 22px rgba(127, 192, 16, 0.24);
+
+  /* icon / accent glows */
+  --glow-icon: 0 0 8px rgba(12, 255, 190, 0.35);
+  --glow-icon-strong: 0 0 14px rgba(12, 255, 190, 0.5);
+  --glow-lime: 0 0 10px rgba(191, 255, 81, 0.45);
+  --glow-ring: 0 0 0 6px rgba(12, 255, 190, 0.18);
+
+  --focus-ring: 0 0 0 3px rgba(0, 177, 131, 0.35);
+  --blur-glass: saturate(1.4) blur(14px); /* @kind other */
+  --border-hairline: 1px solid var(--line-subtle); /* @kind other */
+}
+
+/* tori motion. Short, confident, slightly springy on press. Nothing bounces on entry
+   except the confirmation check — celebration is rationed. */
+:root {
+  --dur-instant: 80ms; /* @kind other */
+  --dur-fast: 140ms; /* @kind other */
+  --dur-base: 200ms; /* @kind other */
+  --dur-slow: 300ms; /* @kind other */
+  --dur-page: 380ms; /* @kind other */
+
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1); /* @kind other */
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1); /* @kind other */
+  --ease-spring: cubic-bezier(0.34, 1.42, 0.64, 1); /* @kind other */
+
+  --transition-control:
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out); /* @kind other */
+  --transition-surface:
+    box-shadow var(--dur-base) var(--ease-out),
+    transform var(--dur-base) var(--ease-out); /* @kind other */
+  --press-scale: 0.97; /* @kind other */
+  --press-scale-tile: 0.985; /* @kind other */
+}
+
+/* tori base layer. Minimal element defaults so specimen cards, kits and consumer
+   pages start from the same ground. Hebrew-first: dir="rtl" belongs on <html>. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  background: var(--surface-page);
+  color: var(--text-body);
+  font: var(--type-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+figure,
+blockquote {
+  margin: 0;
+}
+h1 {
+  font: var(--type-display);
+  letter-spacing: var(--tracking-display);
+  color: var(--text-strong);
+}
+h2 {
+  font: var(--type-title);
+  color: var(--text-strong);
+}
+h3 {
+  font: var(--type-heading);
+  color: var(--text-strong);
+}
+h4 {
+  font: var(--type-subheading);
+  color: var(--text-strong);
+}
+p {
+  text-wrap: pretty;
+}
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+a {
+  color: var(--text-link);
+  text-decoration: none;
+  text-underline-offset: 3px;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+a:hover {
+  color: var(--text-link-hover);
+  text-decoration: underline;
+}
+a:active {
+  color: var(--green-900);
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+button {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+:focus-visible {
+  outline: 2px solid var(--line-focus);
+  outline-offset: 2px;
+}
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+time,
+.tori-num {
+  font-feature-settings: var(--numeric-tabular);
+}
+hr {
+  border: 0;
+  border-top: 1px solid var(--line-subtle);
+  margin: 0;
+}
+::selection {
+  background: var(--green-200);
+  color: var(--ink-900);
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* tori component layer. Class hooks for the React primitives in components/**.
+   Only states that inline styles cannot express live here (hover / active / focus /
+   disabled / checked / placeholder). Everything resolves to tokens. */
+
+/* ---------- Button ---------- */
+.tori-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+  font: var(--type-button);
+  border-radius: var(--radius-button);
+  padding-inline: var(--pad-control-x);
+  min-height: var(--hit-min);
+  border: 1px solid transparent;
+  transition: var(--transition-control);
+  white-space: nowrap;
+  position: relative;
+  isolation: isolate;
+}
+.tori-btn--sm {
+  min-height: 36px;
+  padding-inline: 14px;
+  font-size: var(--size-label);
+}
+.tori-btn--lg {
+  min-height: 52px;
+  padding-inline: 26px;
+  font-size: var(--size-body-lg);
+}
+.tori-btn--block {
+  width: 100%;
+}
+.tori-btn--primary {
+  background: var(--gradient-brand);
+  color: var(--action-primary-fg);
+  box-shadow: var(--shadow-brand);
+}
+.tori-btn--primary:hover {
+  box-shadow: var(--shadow-brand-lg);
+  filter: saturate(1.06) brightness(1.03);
+}
+.tori-btn--primary:active {
+  transform: scale(var(--press-scale));
+  box-shadow: var(--shadow-sm);
+  filter: brightness(0.97);
+}
+.tori-btn--secondary {
+  background: var(--action-secondary-bg);
+  color: var(--action-secondary-fg);
+  box-shadow: var(--shadow-sm);
+}
+.tori-btn--secondary:hover {
+  background: var(--ink-700);
+}
+.tori-btn--secondary:active {
+  transform: scale(var(--press-scale));
+  background: var(--ink-800);
+}
+.tori-btn--outline {
+  background: var(--white);
+  color: var(--ink-800);
+  border-color: var(--line-strong);
+}
+.tori-btn--outline:hover {
+  border-color: var(--green-600);
+  color: var(--green-800);
+  background: var(--green-50);
+}
+.tori-btn--outline:active {
+  transform: scale(var(--press-scale));
+  background: var(--green-100);
+}
+.tori-btn--ghost {
+  background: transparent;
+  color: var(--action-ghost-fg);
+}
+.tori-btn--ghost:hover {
+  background: var(--ink-100);
+}
+.tori-btn--ghost:active {
+  transform: scale(var(--press-scale));
+  background: var(--ink-200);
+}
+.tori-btn--danger {
+  background: var(--red-500);
+  color: var(--white);
+}
+.tori-btn--danger:hover {
+  background: var(--red-700);
+}
+.tori-btn--danger:active {
+  transform: scale(var(--press-scale));
+}
+.tori-btn:disabled,
+.tori-btn[aria-disabled="true"] {
+  background: var(--action-disabled-bg);
+  color: var(--action-disabled-fg);
+  box-shadow: none;
+  filter: none;
+  transform: none;
+  border-color: transparent;
+  cursor: not-allowed;
+}
+
+/* ---------- IconButton ---------- */
+.tori-iconbtn {
+  display: inline-grid;
+  place-items: center;
+  width: var(--hit-min);
+  height: var(--hit-min);
+  border-radius: var(--radius-control);
+  border: 1px solid transparent;
+  color: var(--icon-default);
+  transition: var(--transition-control);
+}
+.tori-iconbtn--sm {
+  width: 36px;
+  height: 36px;
+}
+.tori-iconbtn--lg {
+  width: 52px;
+  height: 52px;
+}
+.tori-iconbtn--ghost:hover {
+  background: var(--ink-100);
+  color: var(--ink-900);
+}
+.tori-iconbtn--ghost:active {
+  background: var(--ink-200);
+  transform: scale(var(--press-scale));
+}
+.tori-iconbtn--outline {
+  border-color: var(--line-subtle);
+  background: var(--white);
+}
+.tori-iconbtn--outline:hover {
+  border-color: var(--green-600);
+  color: var(--green-700);
+}
+.tori-iconbtn--outline:active {
+  transform: scale(var(--press-scale));
+  background: var(--green-50);
+}
+.tori-iconbtn--solid {
+  background: var(--ink-900);
+  color: var(--white);
+}
+.tori-iconbtn--solid:hover {
+  background: var(--ink-700);
+}
+.tori-iconbtn--brand {
+  background: var(--gradient-brand);
+  color: var(--ink-900);
+  box-shadow: var(--shadow-brand);
+}
+.tori-iconbtn--brand:hover {
+  box-shadow: var(--shadow-brand-lg);
+  filter: brightness(1.03);
+}
+.tori-iconbtn--brand:active {
+  transform: scale(var(--press-scale));
+}
+/* on ink surfaces (TopBar tone="ink", dark cards): ghost/outline icon controls invert */
+.tori-on-ink .tori-iconbtn--ghost {
+  color: var(--icon-on-ink);
+}
+.tori-on-ink .tori-iconbtn--ghost:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--white);
+}
+.tori-on-ink .tori-iconbtn--ghost:active {
+  background: rgba(255, 255, 255, 0.18);
+}
+.tori-on-ink .tori-iconbtn--outline {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.28);
+  color: var(--icon-on-ink);
+}
+.tori-on-ink .tori-iconbtn--outline:hover {
+  border-color: var(--green-300);
+  color: var(--white);
+}
+.tori-on-ink .tori-iconbtn--solid {
+  background: var(--white);
+  color: var(--ink-900);
+}
+.tori-iconbtn:disabled {
+  color: var(--action-disabled-fg);
+  background: var(--action-disabled-bg);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* ---------- Card ---------- */
+.tori-card {
+  background: var(--surface-card);
+  border-radius: var(--radius-card);
+  transition: var(--transition-surface);
+}
+.tori-card--flat {
+  box-shadow: var(--shadow-inset-hairline);
+}
+.tori-card--raised {
+  box-shadow: var(--shadow-md);
+}
+.tori-card--floating {
+  box-shadow: var(--shadow-lg);
+}
+.tori-card--interactive {
+  cursor: pointer;
+}
+.tori-card--interactive:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+.tori-card--interactive:active {
+  transform: scale(var(--press-scale-tile));
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---------- Field primitives ---------- */
+.tori-input,
+.tori-select,
+.tori-textarea {
+  width: 100%;
+  background: var(--white);
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--radius-control);
+  min-height: var(--hit-min);
+  padding: var(--pad-control-y) 14px;
+  font: var(--type-body);
+  color: var(--text-body);
+  transition: var(--transition-control);
+}
+.tori-textarea {
+  min-height: 96px;
+  resize: vertical;
+  line-height: var(--leading-relaxed);
+}
+.tori-input::placeholder,
+.tori-textarea::placeholder {
+  color: var(--text-faint);
+}
+.tori-input:hover,
+.tori-select:hover,
+.tori-textarea:hover {
+  border-color: var(--line-strong);
+}
+.tori-input:focus,
+.tori-select:focus,
+.tori-textarea:focus {
+  outline: none;
+  border-color: var(--green-600);
+  box-shadow: var(--focus-ring);
+}
+.tori-input:disabled,
+.tori-select:disabled,
+.tori-textarea:disabled {
+  background: var(--ink-100);
+  color: var(--text-faint);
+  cursor: not-allowed;
+}
+.tori-field--invalid .tori-input,
+.tori-field--invalid .tori-select,
+.tori-field--invalid .tori-textarea {
+  border-color: var(--red-500);
+}
+.tori-field--invalid .tori-input:focus {
+  box-shadow: 0 0 0 3px rgba(245, 67, 60, 0.28);
+}
+.tori-select {
+  appearance: none;
+  padding-inline-end: 40px;
+  cursor: pointer;
+}
+.tori-input--with-icon {
+  padding-inline-start: 44px;
+}
+
+/* ---------- Choice controls ---------- */
+.tori-choice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  cursor: pointer;
+  min-height: var(--hit-min);
+  padding-block: var(--space-8);
+}
+.tori-choice input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+.tori-box {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--line-strong);
+  border-radius: var(--radius-xs);
+  background: var(--white);
+  display: grid;
+  place-items: center;
+  transition: var(--transition-control);
+  margin-top: 1px;
+}
+.tori-box--radio {
+  border-radius: var(--radius-circle);
+}
+.tori-choice:hover .tori-box {
+  border-color: var(--green-600);
+}
+.tori-choice input:checked + .tori-box {
+  background: var(--gradient-brand);
+  border-color: transparent;
+  box-shadow: var(--glow-icon);
+}
+.tori-choice input:focus-visible + .tori-box {
+  box-shadow: var(--focus-ring);
+}
+.tori-choice input:disabled + .tori-box {
+  background: var(--ink-100);
+  border-color: var(--line-subtle);
+}
+.tori-choice input:disabled ~ .tori-choice-label {
+  color: var(--text-faint);
+}
+.tori-box-mark {
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+.tori-choice input:checked + .tori-box .tori-box-mark {
+  opacity: 1;
+}
+
+/* ---------- Switch ---------- */
+.tori-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-12);
+  cursor: pointer;
+  min-height: var(--hit-min);
+}
+.tori-switch input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+.tori-switch-track {
+  width: 50px;
+  height: 30px;
+  border-radius: var(--radius-pill);
+  background: var(--ink-300);
+  position: relative;
+  transition: var(--transition-control);
+  flex: 0 0 auto;
+}
+.tori-switch-thumb {
+  position: absolute;
+  top: 3px;
+  inset-inline-start: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-circle);
+  background: var(--white);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--dur-base) var(--ease-spring);
+}
+.tori-switch input:checked + .tori-switch-track {
+  background: var(--gradient-brand);
+  box-shadow: var(--glow-icon);
+}
+.tori-switch input:checked + .tori-switch-track .tori-switch-thumb {
+  transform: translateX(-20px);
+}
+[dir="ltr"] .tori-switch input:checked + .tori-switch-track .tori-switch-thumb {
+  transform: translateX(20px);
+}
+.tori-switch input:focus-visible + .tori-switch-track {
+  box-shadow: var(--focus-ring);
+}
+.tori-switch input:disabled + .tori-switch-track {
+  background: var(--ink-200);
+}
+
+/* ---------- Segmented control ---------- */
+.tori-seg {
+  display: inline-flex;
+  background: var(--ink-100);
+  border-radius: var(--radius-control);
+  padding: 3px;
+  gap: 2px;
+}
+.tori-seg-item {
+  flex: 1;
+  min-height: 38px;
+  padding-inline: 16px;
+  border-radius: 10px;
+  font: var(--type-label);
+  color: var(--text-muted);
+  transition: var(--transition-control);
+  white-space: nowrap;
+}
+.tori-seg-item:hover {
+  color: var(--ink-900);
+}
+.tori-seg-item[aria-selected="true"] {
+  background: var(--white);
+  color: var(--ink-900);
+  box-shadow: var(--shadow-sm);
+}
+.tori-seg--brand .tori-seg-item[aria-selected="true"] {
+  background: var(--gradient-brand);
+  box-shadow: var(--shadow-brand);
+}
+
+/* ---------- Tabs ---------- */
+.tori-tabs {
+  display: flex;
+  gap: var(--space-24);
+  border-bottom: 1px solid var(--line-subtle);
+}
+.tori-tab {
+  padding-block: 12px;
+  font: var(--type-body-strong);
+  color: var(--text-muted);
+  position: relative;
+  transition: var(--transition-control);
+}
+.tori-tab:hover {
+  color: var(--ink-900);
+}
+.tori-tab[aria-selected="true"] {
+  color: var(--ink-900);
+}
+.tori-tab[aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: -1px;
+  height: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--gradient-brand);
+}
+
+/* ---------- Bottom tab bar ---------- */
+.tori-tabbar {
+  display: flex;
+  background: var(--surface-glass);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+  border-top: 1px solid var(--line-subtle);
+  height: var(--tabbar-height);
+}
+.tori-tabbar-item {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  color: var(--icon-muted);
+  font: var(--type-caption);
+  transition: var(--transition-control);
+  padding-block: 8px;
+}
+.tori-tabbar-item:hover {
+  color: var(--ink-700);
+}
+.tori-tabbar-item[aria-current="page"] {
+  color: var(--green-700);
+}
+.tori-tabbar-item[aria-current="page"] svg {
+  filter: drop-shadow(0 0 6px rgba(12, 255, 190, 0.55));
+}
+
+/* floating pill variant — the shipped tori nav: white pill over content, raised active circle */
+.tori-tabbar--floating {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-top: 0;
+  height: auto;
+  padding: 0 14px 14px;
+  display: block;
+}
+.tori-tabbar-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--white);
+  border-radius: var(--radius-pill);
+  padding: 8px 10px;
+  box-shadow:
+    0 10px 30px rgba(23, 22, 22, 0.16),
+    0 2px 6px rgba(23, 22, 22, 0.06);
+}
+.tori-tabbar--floating .tori-tabbar-item {
+  flex: 1;
+  min-height: 44px;
+  border-radius: var(--radius-pill);
+  gap: 0;
+  padding: 0;
+  color: var(--ink-400);
+}
+.tori-tabbar--floating .tori-tabbar-item:hover {
+  color: var(--ink-700);
+  background: var(--ink-50);
+}
+.tori-tabbar--floating .tori-tabbar-item[aria-current="page"] {
+  color: var(--ink-900);
+  background: transparent;
+}
+.tori-tabbar--floating .tori-tabbar-item[aria-current="page"] svg {
+  filter: none;
+}
+.tori-tabbar-raised {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--gradient-brand);
+  display: grid;
+  place-items: center;
+  color: var(--ink-900);
+  box-shadow: var(--shadow-brand-lg);
+  transform: translateY(-8px);
+  transition: var(--transition-surface);
+}
+.tori-tabbar-item:hover .tori-tabbar-raised {
+  transform: translateY(-11px);
+}
+.tori-tabbar-item:active .tori-tabbar-raised {
+  transform: translateY(-8px) scale(var(--press-scale));
+}
+
+/* ---------- ActionTile ---------- */
+.tori-action {
+  all: unset;
+  cursor: pointer;
+  box-sizing: border-box;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  background: var(--surface-card);
+  border-radius: var(--radius-card);
+  padding: 14px 10px 12px;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-surface);
+  text-align: center;
+}
+.tori-action:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+.tori-action:active {
+  transform: scale(var(--press-scale));
+}
+.tori-action-ico {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  background: var(--gradient-brand);
+  color: var(--ink-900);
+  box-shadow: var(--shadow-brand);
+}
+.tori-action--ink .tori-action-ico {
+  background: var(--ink-900);
+  color: var(--icon-on-ink);
+}
+.tori-action-label {
+  font: var(--type-label);
+  color: var(--text-strong);
+}
+.tori-action-count {
+  position: absolute;
+  top: -6px;
+  inset-inline-end: -6px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: var(--radius-pill);
+  background: var(--red-500);
+  color: var(--white);
+  font: var(--type-caption);
+  font-size: 11px;
+  font-weight: 600;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--white);
+}
+
+/* ---------- Slot / chip pickers ---------- */
+.tori-slot {
+  min-height: var(--hit-min);
+  border-radius: var(--radius-control);
+  border: 1px solid var(--line-subtle);
+  background: var(--white);
+  font: var(--type-body-strong);
+  color: var(--ink-800);
+  font-feature-settings: var(--numeric-tabular);
+  transition: var(--transition-control);
+  display: grid;
+  place-items: center;
+}
+.tori-slot:hover:not(:disabled) {
+  border-color: var(--green-600);
+  color: var(--green-800);
+  background: var(--green-50);
+}
+.tori-slot:active:not(:disabled) {
+  transform: scale(var(--press-scale));
+}
+.tori-slot[aria-pressed="true"] {
+  background: var(--gradient-brand);
+  border-color: transparent;
+  color: var(--ink-900);
+  box-shadow: var(--shadow-brand);
+}
+.tori-slot:disabled {
+  background: var(--ink-100);
+  color: var(--text-faint);
+  border-color: transparent;
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+.tori-daychip {
+  min-width: 52px;
+  min-height: 66px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line-subtle);
+  background: var(--white);
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  transition: var(--transition-control);
+  flex: 0 0 auto;
+}
+.tori-daychip:hover {
+  border-color: var(--green-600);
+  background: var(--green-50);
+}
+.tori-daychip[aria-pressed="true"] {
+  background: var(--gradient-brand);
+  border-color: transparent;
+  box-shadow: var(--shadow-brand);
+}
+.tori-daychip:disabled {
+  background: var(--ink-100);
+  color: var(--text-faint);
+  border-color: transparent;
+}
+
+/* ---------- Tag ---------- */
+.tori-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: var(--radius-chip);
+  padding: 5px 12px;
+  font: var(--type-label);
+  border: 1px solid var(--line-subtle);
+  background: var(--white);
+  color: var(--ink-700);
+  transition: var(--transition-control);
+}
+.tori-tag--selectable {
+  cursor: pointer;
+}
+.tori-tag--selectable:hover {
+  border-color: var(--green-600);
+  color: var(--green-800);
+  background: var(--green-50);
+}
+.tori-tag[aria-pressed="true"] {
+  background: var(--green-100);
+  border-color: var(--green-400);
+  color: var(--green-900);
+}
+.tori-tag-x {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-circle);
+  color: var(--ink-500);
+}
+.tori-tag-x:hover {
+  background: var(--ink-200);
+  color: var(--ink-900);
+}
+
+/* ---------- Overlays ---------- */
+.tori-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--surface-overlay);
+  display: grid;
+  animation: tori-fade var(--dur-base) var(--ease-out);
+}
+.tori-dialog {
+  background: var(--surface-card);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  padding: var(--space-24);
+  width: min(420px, calc(100% - 40px));
+  margin: auto;
+  animation: tori-pop var(--dur-base) var(--ease-out);
+}
+.tori-sheet {
+  background: var(--surface-card);
+  border-start-start-radius: var(--radius-sheet);
+  border-start-end-radius: var(--radius-sheet);
+  box-shadow: var(--shadow-xl);
+  padding: var(--space-20) var(--gutter-screen) var(--space-24);
+  margin-top: auto;
+  width: 100%;
+  animation: tori-slide-up var(--dur-slow) var(--ease-out);
+}
+.tori-sheet-grip {
+  width: 44px;
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--line-strong);
+  margin: 0 auto var(--space-16);
+}
+.tori-toast {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-12);
+  background: var(--ink-900);
+  color: var(--white);
+  border-radius: var(--radius-control);
+  padding: 12px 18px;
+  box-shadow: var(--shadow-lg);
+  font: var(--type-body-strong);
+  animation: tori-slide-up var(--dur-base) var(--ease-out);
+}
+.tori-tooltip {
+  background: var(--ink-900);
+  color: var(--white);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  font: var(--type-caption);
+  box-shadow: var(--shadow-md);
+  white-space: nowrap;
+}
+@keyframes tori-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes tori-pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes tori-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- Rows ---------- */
+.tori-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  width: 100%;
+  background: var(--surface-card);
+  border-radius: var(--radius-card);
+  padding: var(--pad-card);
+  text-align: start;
+  transition: var(--transition-surface);
+}
+.tori-row--interactive {
+  cursor: pointer;
+}
+.tori-row--interactive:hover {
+  box-shadow: var(--shadow-md);
+}
+.tori-row--interactive:active {
+  transform: scale(var(--press-scale-tile));
+}
+.tori-scroll-x {
+  display: flex;
+  gap: var(--space-8);
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-block: 2px;
+}
+.tori-scroll-x::-webkit-scrollbar {
+  display: none;
+}

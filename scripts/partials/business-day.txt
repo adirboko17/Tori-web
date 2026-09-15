@@ -1,0 +1,30 @@
+function BizDayScreen({ onBroadcast }) {
+  const store = useAppStore();
+  const [range, setRange] = React.useState('היום');
+  const [adding, setAdding] = React.useState(false);
+  const [client, setClient] = React.useState('');
+  const [date, setDate] = React.useState(dateKey(new Date()));
+  const [time, setTime] = React.useState('09:00');
+  const [serviceId, setServiceId] = React.useState(store.business.services[0].id);
+  const [error, setError] = React.useState('');
+  const today = dateKey(new Date());
+  const end = new Date(); end.setDate(end.getDate() + (range === 'השבוע' ? 7 : range === 'החודש' ? 31 : 0));
+  const rows = store.appointments.filter((a) => a.date >= today && a.date <= dateKey(end));
+  const income = rows.filter((a) => a.status !== 'cancelled').reduce((sum,a) => sum + a.price, 0);
+  function add() {
+    const svc = store.business.services.find((s) => s.id === serviceId);
+    if (!client.trim() || !date || date < today || !time) { setError('מלאו שם לקוח, תאריך ושעה תקינים.'); return; }
+    try { store.book({ id: crypto.randomUUID(), date, time, name: client.trim(), service: svc.name, mins: svc.mins, price: svc.price, status: 'confirmed', note: '' }); setAdding(false); setClient(''); setError(''); }
+    catch(e) { setError(e.message); }
+  }
+  return <div style={{ background: 'var(--surface-page)', minHeight: '100%' }}>
+    <TopBar title="לוח התורים" subtitle={formatDate(today)} tone="ink" sticky={false} actions={<IconButton icon="calendar-plus" label="תור חדש" onClick={() => setAdding(true)} />} />
+    <div style={{ padding: '16px 20px 110px', display: 'grid', gridTemplateColumns: 'minmax(0,1fr)', gap: 16 }}>
+      <SegmentedControl options={['היום','השבוע','החודש']} value={range} onChange={setRange} block />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>{[[String(rows.length),'תורים','calendar-days'],[`${income.toLocaleString('he-IL')} ₪`,'הכנסה צפויה','banknote'],[String(rows.filter((a) => a.status === 'cancelled').length),'ביטולים','calendar-x']].map(([v,l,ic]) => <Card key={l} elevation="flat" style={{ display: 'grid', gap: 6, padding: 14 }}><Icon name={ic} size={18} style={{ color: 'var(--icon-brand)' }} glow /><span style={{ font: 'var(--type-heading)', color: 'var(--text-strong)' }}>{v}</span><span style={{ font: 'var(--type-caption)', color: 'var(--text-muted)' }}>{l}</span></Card>)}</div>
+      <div><SectionLabel>לוח {range}</SectionLabel><div style={{ display: 'grid', gap: 10 }}>{rows.map((a) => <AppointmentRow key={a.id} time={a.time} name={a.name} service={`${a.service} · ${formatDate(a.date)}`} status={a.status} price={`${a.price} ₪`} />)}{!rows.length && <EmptyState title="היומן פנוי" description="אפשר להוסיף תור חדש או לעבור לתצוגת השבוע." />}<button onClick={() => setAdding(true)} style={{ display: 'flex', gap: 12, alignItems: 'center', border: '1px dashed var(--line-strong)', borderRadius: 'var(--radius-card)', padding: 16, color: 'var(--text-muted)' }}><Icon name="plus" size={18} />הוספת תור</button></div></div>
+      <Card elevation="raised" style={{ display: 'flex', gap: 12, alignItems: 'center' }}><Icon name="send" size={20} style={{ color: 'var(--icon-brand)' }} glow /><span style={{ flex: 1, font: 'var(--type-body-strong)' }}>הודעה לכל הלקוחות</span><Button variant="secondary" size="sm" onClick={onBroadcast}>שליחה</Button></Card>
+    </div>
+    {adding && <Sheet title="תור חדש" onClose={() => setAdding(false)} actions={<Button block onClick={add}>שמירת תור</Button>}><div style={{ display: 'grid', gap: 12 }}><Input label="שם הלקוח" value={client} onChange={(e) => setClient(e.target.value)} /><Select label="שירות" value={serviceId} onChange={(e) => setServiceId(e.target.value)} options={store.business.services.map((s) => ({ value: s.id, label: s.name }))} /><Input label="תאריך" type="date" min={today} value={date} onChange={(e) => setDate(e.target.value)} /><Input label="שעה" type="time" value={time} onChange={(e) => setTime(e.target.value)} />{error && <p role="alert" style={{color:'var(--text-danger)'}}>{error}</p>}</div></Sheet>}
+  </div>;
+}

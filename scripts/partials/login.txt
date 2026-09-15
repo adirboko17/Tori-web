@@ -1,0 +1,32 @@
+function LoginScreen({ onDone }) {
+  const store = useAppStore();
+  const [step, setStep] = React.useState('phone');
+  const [phone, setPhone] = React.useState('');
+  const [code, setCode] = React.useState(['', '', '', '']);
+  const [error, setError] = React.useState('');
+  const digits = React.useRef([]);
+  function sendCode() {
+    const parsed = phoneSchema.safeParse(phone);
+    if (!parsed.success) { setError('צריך להזין מספר נייד ישראלי תקין.'); return; }
+    setError(''); setStep('code');
+  }
+  function signIn() {
+    if (code.join('') !== '1234') { setError('קוד ההדגמה הוא 1234.'); return; }
+    store.updateProfile({ phone }); onDone();
+  }
+  return <div style={{ minHeight: '100%', display: 'grid', gridTemplateRows: 'auto 1fr', background: 'var(--surface-card)' }}>
+    <div style={{ position: 'relative', height: 260 }}>
+      <img src={`${IMG}work-mosaic.jpg`} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+      <span style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg,rgba(20,18,18,.45) 0%,rgba(20,18,18,.1) 45%,rgba(20,18,18,.55) 100%)' }} />
+      <span style={{ position: 'absolute', insetInline: 0, top: 72, display: 'grid', placeItems: 'center' }}><span style={{ display: 'grid', justifyItems: 'center', gap: 6, background: 'rgba(23,22,22,.6)', backdropFilter: 'blur(10px)', borderRadius: 22, padding: '12px 22px 14px' }}><span style={{ fontFamily: 'var(--font-display)', fontSize: 34, lineHeight: 1.12, color: 'var(--white)' }}>{store.business.name}</span><span style={{ font: 'var(--type-body)', color: 'var(--white)' }}>{store.business.tagline}</span></span></span>
+    </div>
+    <form onSubmit={(e) => { e.preventDefault(); step === 'phone' ? sendCode() : signIn(); }} style={{ padding: '24px 20px', display: 'grid', gap: 18, alignContent: 'start' }}>
+      <div style={{ display: 'grid', gap: 6 }}><span style={{ font: 'var(--type-title)', color: 'var(--text-strong)' }}>{step === 'phone' ? 'נעים להכיר' : 'הזן/י את הקוד'}</span><span style={{ font: 'var(--type-body)', color: 'var(--text-muted)' }}>{step === 'phone' ? 'כניסה להדגמה. קוד הכניסה הוא 1234; לא נשלח SMS.' : `קוד ההדגמה עבור ${phone}: 1234`}</span></div>
+      {step === 'phone' ? <><Input label="מספר טלפון" icon="phone" inputMode="tel" autoComplete="tel" dir="ltr" placeholder="050-000-0000" value={phone} onChange={(e) => setPhone(e.target.value)} /><Checkbox label="שלחו לי תזכורת יום לפני התור" defaultChecked /><Button type="submit" block iconEnd="arrow-left">שליחת קוד</Button></> : <>
+        <div style={{ display: 'flex', gap: 10, direction: 'ltr' }}>{code.map((v, i) => <input key={i} ref={(el) => { digits.current[i] = el; }} aria-label={`ספרה ${i + 1}`} value={v} onChange={(e) => { const value = e.target.value.replace(/\D/g, '').slice(-1); setCode((c) => c.map((x, j) => i === j ? value : x)); if (value) digits.current[i + 1]?.focus(); }} onKeyDown={(e) => { if (e.key === 'Backspace' && !v) digits.current[i - 1]?.focus(); }} inputMode="numeric" maxLength={1} style={{ minWidth: 0, width: '100%', flex: 1, height: 64, textAlign: 'center', font: 'var(--type-title)', fontSize: 26, color: 'var(--text-strong)', background: 'var(--surface-sunken)', border: `1.5px solid ${v ? 'var(--line-focus)' : 'transparent'}`, borderRadius: 'var(--radius-control)' }} />)}</div>
+        <Button type="submit" block>כניסה</Button><Button variant="ghost" onClick={() => { setStep('phone'); setError(''); }}>שינוי מספר</Button>
+      </>}
+      {error && <p role="alert" style={{ font: 'var(--type-caption)', color: 'var(--text-danger)' }}>{error}</p>}
+    </form>
+  </div>;
+}
