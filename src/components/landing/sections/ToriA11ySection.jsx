@@ -5,7 +5,7 @@ export default function ToriA11ySection() {
       style={{
         position: "fixed",
         zIndex: "130",
-        bottom: "24px",
+        bottom: "32px",
         right: "24px",
         display: "grid",
         justifyItems: "right",
