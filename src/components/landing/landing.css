@@ -206,7 +206,7 @@
 }
 @media (max-width: 560px) {
   .tori-lp .tori-a11y {
-    bottom: 20px !important;
+    bottom: 14px !important;
     right: 14px !important;
   }
   .tori-lp .tori-a11y-fab {

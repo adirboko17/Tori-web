@@ -192,7 +192,7 @@
   /* ---------- 7. floating controls ----------
      Keep the two FABs out of each other's way and off the content. */
   .tori-lp .tori-a11y {
-    bottom: calc(20px + var(--m-safe-b)) !important;
+    bottom: calc(14px + var(--m-safe-b)) !important;
     right: 14px !important;
   }
   .tori-lp .tori-chat {
