@@ -1,4 +1,9 @@
-export const SMS_PACKAGE_IDS = ["pack_2000", "pack_5000", "pack_10000"] as const;
+export const SMS_PACKAGE_IDS = [
+  "pack_10",
+  "pack_2000",
+  "pack_5000",
+  "pack_10000",
+] as const;
 
 export type SmsPackageId = (typeof SMS_PACKAGE_IDS)[number];
 
@@ -11,6 +16,12 @@ export type SmsPackage = {
 };
 
 const SMS_PACKAGES: readonly SmsPackage[] = [
+  {
+    id: "pack_10",
+    smsCredits: 10,
+    amountIls: 1,
+    label: "10 הודעות SMS",
+  },
   {
     id: "pack_2000",
     smsCredits: 2000,

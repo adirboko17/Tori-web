@@ -39,6 +39,7 @@ test("keeps package prices on the server catalog only", () => {
   assert.deepEqual(
     packs.map((pack) => [pack.id, pack.smsCredits, pack.amountIls]),
     [
+      ["pack_10", 10, 1],
       ["pack_2000", 2000, 60],
       ["pack_5000", 5000, 130],
       ["pack_10000", 10000, 200],
