@@ -34,6 +34,18 @@ export function payplusConfigured() {
   );
 }
 
+export function payplusSubscriptionConfigured() {
+  return Boolean(
+    trimEnv(process.env.PAYPLUS_API_KEY) &&
+      trimEnv(process.env.PAYPLUS_SECRET_KEY) &&
+      trimEnv(process.env.PAYPLUS_SUBSCRIPTION_PAGE_UID),
+  );
+}
+
+export function payplusSubscriptionPageUid() {
+  return trimEnv(process.env.PAYPLUS_SUBSCRIPTION_PAGE_UID);
+}
+
 export function payplusBaseUrl() {
   return trimEnv(process.env.PAYPLUS_ENV).toLowerCase() === "staging"
     ? "https://restapidev.payplus.co.il/api/v1.0"
@@ -43,11 +55,24 @@ export function payplusBaseUrl() {
 export function publicAppUrl(request?: Request) {
   const configured = trimEnv(process.env.APP_URL).replace(/\/$/, "");
   if (configured) return configured;
-  if (!request) return "http://127.0.0.1:3000";
+  return requestOrigin(request) || "http://127.0.0.1:3000";
+}
+
+export function requestOrigin(request?: Request) {
+  if (!request) return "";
   const host =
     request.headers.get("x-forwarded-host") || request.headers.get("host");
+  if (!host) return "";
   const proto = request.headers.get("x-forwarded-proto") || "http";
-  return host ? `${proto}://${host}` : "http://127.0.0.1:3000";
+  return `${proto}://${host}`;
+}
+
+export function checkoutReturnUrl(request?: Request) {
+  const origin = requestOrigin(request);
+  if (origin && /^(localhost|127\.0\.0\.1)(:\d+)?$/i.test(new URL(origin).host)) {
+    return origin;
+  }
+  return publicAppUrl(request);
 }
 
 export function payplusCallbackUrl(request?: Request) {
@@ -60,4 +85,5 @@ export const CONFIG_ERRORS = {
   backend: "השרת עדיין לא הוגדר לזיהוי מנהלים.",
   session: "חסר מפתח הפעלה בשרת. פנו לתמיכה.",
   payplus: "סליקה עדיין לא הוגדרה.",
+  subscription: "סליקת המנוי החודשי עדיין לא הוגדרה.",
 } as const;

@@ -1,7 +1,15 @@
+import { priceSummary } from "@/lib/booking";
+import {
+  SUBSCRIPTION_ITEM_NAME,
+  subscriptionMoreInfo,
+} from "@/lib/subscription";
 import {
   payplusBaseUrl,
   payplusCallbackUrl,
   payplusConfigured,
+  payplusSubscriptionConfigured,
+  payplusSubscriptionPageUid,
+  checkoutReturnUrl,
   publicAppUrl,
 } from "./env";
 import type { SmsPackage } from "./packages";
@@ -21,6 +29,8 @@ import {
 export type PayplusCustomer = {
   customer_name: string;
   phone: string;
+  email?: string;
+  vat_number?: string;
 };
 
 export type PayplusLinkInput = {
@@ -85,6 +95,100 @@ export async function generatePayplusLink(input: PayplusLinkInput) {
     return {
       ok: false as const,
       message: "יצירת דף התשלום נכשלה. נסו שוב.",
+    };
+  }
+  return {
+    ok: true as const,
+    link,
+    pageRequestUid,
+  };
+}
+
+export type PayplusSubscriptionInput = {
+  businessId: string;
+  customer: PayplusCustomer;
+  request?: Request;
+};
+
+export async function generatePayplusSubscriptionLink(
+  input: PayplusSubscriptionInput,
+) {
+  if (!payplusSubscriptionConfigured()) {
+    return { ok: false as const, message: "סליקת המנוי החודשי עדיין לא הוגדרה." };
+  }
+  const appUrl = checkoutReturnUrl(input.request);
+  const amount = priceSummary().total;
+  const customer: Record<string, string> = {
+    customer_name: input.customer.customer_name,
+    phone: input.customer.phone,
+  };
+  if (input.customer.email) customer.email = input.customer.email;
+  if (input.customer.vat_number) {
+    customer.vat_number = input.customer.vat_number;
+  }
+  const body = {
+    payment_page_uid: payplusSubscriptionPageUid(),
+    charge_method: 3,
+    amount,
+    currency_code: "ILS",
+    language_code: "he",
+    paying_vat: true,
+    sendEmailApproval: true,
+    sendEmailFailure: true,
+    send_failure_callback: true,
+    more_info: subscriptionMoreInfo(input.businessId),
+    more_info_1: input.businessId,
+    more_info_2: "subscription",
+    more_info_3: "monthly",
+    refURL_success: `${appUrl}/subscribe/success`,
+    refURL_failure: `${appUrl}/subscribe/failure`,
+    refURL_callback: payplusCallbackUrl(input.request),
+    customer,
+    items: [
+      {
+        name: SUBSCRIPTION_ITEM_NAME,
+        quantity: 1,
+        price: amount,
+        vat_type: 0,
+      },
+    ],
+    recurring_settings: {
+      instant_first_payment: true,
+      recurring_type: 2,
+      recurring_range: 1,
+      number_of_charges: 0,
+      start_date_on_payment_date: true,
+      start_date: 1,
+      jump_payments: 0,
+      successful_invoice: true,
+      customer_failure_email: true,
+      send_customer_success_email: true,
+    },
+  };
+
+  const response = await fetch(
+    `${payplusBaseUrl()}/PaymentPages/generateLink`,
+    {
+      method: "POST",
+      headers: payplusAuthHeaders(),
+      body: JSON.stringify(body),
+    },
+  );
+  const json = (await response.json().catch(() => ({}))) as Record<
+    string,
+    unknown
+  >;
+  const data = (json.data ?? json) as Record<string, unknown>;
+  const link = String(data.payment_page_link ?? data.link ?? data.url ?? "");
+  const pageRequestUid = String(data.page_request_uid ?? data.uid ?? "");
+  if (!response.ok || !link) {
+    console.error("payplus subscription link failed", {
+      status: response.status,
+      results: json.results ?? json.message ?? json.error,
+    });
+    return {
+      ok: false as const,
+      message: "יצירת דף הוראת הקבע נכשלה. נסו שוב.",
     };
   }
   return {

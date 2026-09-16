@@ -1255,7 +1255,7 @@ export default function Onboarding() {
                       }}
                     >
                       {
-                        "זו סביבת הדגמה — פרטי כרטיס אינם נאספים ולא מתבצע חיוב. אפשר לשמור את העסק ולהיכנס לממשק הניהול."
+                        "299 ₪ לחודש + מע״מ, כהוראת קבע. התשלום מתבצע בדף מאובטח נפרד, בלי לשמור פרטי כרטיס אצלנו. אפשר להתנתק מתי שרוצים."
                       }
                     </p>
                   </div>
@@ -1269,139 +1269,6 @@ export default function Onboarding() {
                     }}
                   >
                     <div style={{ display: "grid", gap: "9px", minWidth: "0" }}>
-                      <div
-                        style={{
-                          display: "grid",
-                          gridTemplateColumns:
-                            "repeat(auto-fit,minmax(220px,1fr))",
-                          gap: "10px",
-                        }}
-                      >
-                        <label style={{ display: "grid", gap: "5px" }}>
-                          <span
-                            style={{
-                              fontSize: "13px",
-                              fontWeight: "600",
-                              color: "#3D3B3A",
-                            }}
-                          >
-                            {"שם בעל/ת הכרטיס"}
-                          </span>
-                          <input
-                            className="ob-input "
-                            data-act="on.cardName"
-                            data-ev="change"
-                            placeholder="NOA BARAK"
-                            autoComplete="cc-name"
-                            dir="ltr"
-                            style={{
-                              textAlign: "right",
-                              letterSpacing: ".04em",
-                            }}
-                            disabled
-                            aria-label="שם בעל הכרטיס — להמחשה בלבד"
-                          />
-                        </label>
-                        <label style={{ display: "grid", gap: "5px" }}>
-                          <span
-                            style={{
-                              fontSize: "13px",
-                              fontWeight: "600",
-                              color: "#3D3B3A",
-                            }}
-                          >
-                            {"מספר כרטיס"}
-                          </span>
-                          <input
-                            className="ob-input "
-                            inputMode="numeric"
-                            data-act="on.cardNumber"
-                            data-ev="change"
-                            placeholder="0000 0000 0000 0000"
-                            autoComplete="cc-number"
-                            dir="ltr"
-                            style={{
-                              textAlign: "right",
-                              letterSpacing: ".06em",
-                            }}
-                            disabled
-                            aria-label="שדה תשלום להמחשה בלבד"
-                          />
-                        </label>
-                      </div>
-                      <div
-                        style={{
-                          display: "grid",
-                          gridTemplateColumns: "1fr 1fr 1fr",
-                          gap: "10px",
-                        }}
-                      >
-                        <label style={{ display: "grid", gap: "5px" }}>
-                          <span
-                            style={{
-                              fontSize: "13px",
-                              fontWeight: "600",
-                              color: "#3D3B3A",
-                            }}
-                          >
-                            {"תוקף"}
-                          </span>
-                          <input
-                            className="ob-input "
-                            inputMode="numeric"
-                            data-act="on.cardExp"
-                            data-ev="change"
-                            placeholder="MM/YY"
-                            autoComplete="cc-exp"
-                            dir="ltr"
-                            style={{ textAlign: "center" }}
-                            disabled
-                            aria-label="שדה תשלום להמחשה בלבד"
-                          />
-                        </label>
-                        <label style={{ display: "grid", gap: "5px" }}>
-                          <span
-                            style={{
-                              fontSize: "13px",
-                              fontWeight: "600",
-                              color: "#3D3B3A",
-                            }}
-                          >
-                            {"CVV"}
-                          </span>
-                          <input
-                            className="ob-input "
-                            inputMode="numeric"
-                            data-act="on.cardCvv"
-                            data-ev="change"
-                            placeholder="123"
-                            autoComplete="cc-csc"
-                            dir="ltr"
-                            style={{ textAlign: "center" }}
-                            disabled
-                            aria-label="שדה תשלום להמחשה בלבד"
-                          />
-                        </label>
-                        <label style={{ display: "grid", gap: "5px" }}>
-                          <span
-                            style={{
-                              fontSize: "13px",
-                              fontWeight: "600",
-                              color: "#3D3B3A",
-                            }}
-                          >
-                            {"ת.ז."}
-                          </span>
-                          <input
-                            className="ob-input"
-                            inputMode="numeric"
-                            data-act="on.idNumber"
-                            data-ev="change"
-                            dir="ltr"
-                            style={{ textAlign: "center" }}
-                          />
-                        </label>
-                      </div>
                       <span
                         style={{
                           display: "inline-flex",
@@ -1430,7 +1297,9 @@ export default function Onboarding() {
                           ></rect>
                           <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
                         </svg>
-                        {"בבדיקה אפשר להמשיך בלי אשראי. תשלום יחובר אחר כך."}
+                        {
+                          "פרטי האשראי מוזנים רק אצל PayPlus. אצלנו נשמר רק שהוראת הקבע נקלטה."
+                        }
                       </span>
                     </div>
                     <div
@@ -1575,7 +1444,7 @@ export default function Onboarding() {
                           data-act="saveDemo"
                           data-ev="click"
                         >
-                          <span data-ref="payBtnLabel">{"שמירה ופתיחת ההדגמה"}</span>
+                          <span data-ref="payBtnLabel">{"לתשלום בהוראת קבע"}</span>
                           <span
                             style={{
                               display: "inline-grid",
@@ -1610,7 +1479,7 @@ export default function Onboarding() {
                           }}
                         >
                           {
-                            "אפשר לשמור בלי אשראי. המנוי כולל 1,000 הודעות SMS בחודש."
+                            "החיוב הראשון היום, ואז כל חודש. המנוי כולל 1,000 הודעות SMS."
                           }
                         </span>
                       </div>

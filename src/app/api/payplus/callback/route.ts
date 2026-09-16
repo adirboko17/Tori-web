@@ -13,6 +13,11 @@ import {
   parsePayplusCallback,
   verifyPayplusHash,
 } from "@/lib/sms/payplus";
+import {
+  parseSubscriptionMoreInfo,
+  subscriptionChargeIls,
+} from "@/lib/subscription";
+import { fulfillPaidSubscription } from "@/lib/subscription-orders";
 
 export const runtime = "nodejs";
 
@@ -58,8 +63,23 @@ async function handleCallback(request: Request) {
     isPayplusUserAgent(userAgent) &&
     verifyPayplusHash(rawBody, hash, (process.env.PAYPLUS_SECRET_KEY ?? "").trim());
 
+  const subscriptionId = parseSubscriptionMoreInfo(parsed.moreInfo);
+  if (subscriptionId) {
+    if (signed && isSuccessfulPayplusStatus(parsed.statusCode)) {
+      const result = await fulfillPaidSubscription({
+        businessId: subscriptionId,
+        amount: parsed.amount,
+      });
+      if (!result.ok) return jsonError(result.message, 502);
+      return jsonOk({ ok: true, kind: "subscription", idempotent: result.idempotent });
+    }
+    if (signed && !isSuccessfulPayplusStatus(parsed.statusCode)) {
+      return jsonOk({ ok: true, kind: "subscription", ignored: true });
+    }
+  }
+
   const orderId = parsed.moreInfo.trim();
-  if (signed && orderId && isSuccessfulPayplusStatus(parsed.statusCode)) {
+  if (signed && orderId && !subscriptionId && isSuccessfulPayplusStatus(parsed.statusCode)) {
     const order = await loadOrder(orderId);
     if (!order) return jsonError("order not found", 404);
     if (
@@ -77,7 +97,12 @@ async function handleCallback(request: Request) {
     return jsonOk({ ok: true, idempotent: result.idempotent ?? false });
   }
 
-  if (signed && orderId && !isSuccessfulPayplusStatus(parsed.statusCode)) {
+  if (
+    signed &&
+    orderId &&
+    !subscriptionId &&
+    !isSuccessfulPayplusStatus(parsed.statusCode)
+  ) {
     await markOrderFailed(
       orderId,
       `PayPlus status ${parsed.statusCode || "unknown"}`,
@@ -95,6 +120,19 @@ async function handleCallback(request: Request) {
   });
 
   if (payment?.moreInfo) {
+    const paidSubscriptionId = parseSubscriptionMoreInfo(payment.moreInfo);
+    if (
+      paidSubscriptionId &&
+      isConfirmedPayplusPayment(payment, subscriptionChargeIls())
+    ) {
+      const result = await fulfillPaidSubscription({
+        businessId: paidSubscriptionId,
+        amount: payment.amount,
+      });
+      if (!result.ok) return jsonError(result.message, 502);
+      return jsonOk({ ok: true, kind: "subscription", via: "ipn" });
+    }
+
     const order = await loadOrder(payment.moreInfo);
     if (order && isConfirmedPayplusPayment(payment, Number(order.amount_ils))) {
       const result = await fulfillPaidOrder({

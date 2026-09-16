@@ -106,6 +106,7 @@ export function initializeOnboarding(root) {
           lang: st.lang,
           logoMode: st.logoMode,
           customColor: st.customColor,
+          savedId: st.savedId || "",
         }),
       );
       return true;
@@ -129,6 +130,7 @@ export function initializeOnboarding(root) {
       st.customColor = /^#[0-9a-f]{6}$/i.test(saved.customColor || "")
         ? saved.customColor
         : "";
+      st.savedId = typeof saved.savedId === "string" ? saved.savedId : "";
       const savedStep = Math.min(6, Math.max(1, saved.step || 1));
       st.step =
         "pkg" in saved && savedStep >= 5
@@ -301,7 +303,7 @@ export function initializeOnboarding(root) {
       btn.disabled = busy;
       btn.setAttribute("aria-busy", String(busy));
     });
-    setPayLabel(busy ? "שולחים את הפרטים..." : "שמירה ופתיחת ההדגמה");
+    setPayLabel(busy ? "מעבירים לתשלום מאובטח..." : "לתשלום בהוראת קבע");
   }
   function savedErrorId(error) {
     const cause = error && typeof error === "object" ? error.cause : null;
@@ -311,8 +313,9 @@ export function initializeOnboarding(root) {
     if (st.submitting) return;
     setBusy(true);
     showError("");
-    setPayStatus("שומרים את העסק ושולחים הודעה לצוות...", false);
+    setPayStatus("שומרים את העסק ומעבירים להוראת קבע...", false);
     try {
+      const summary = priceSummary();
       const result = await Promise.race([
         submitBusinessOnboarding(
           {
@@ -327,6 +330,9 @@ export function initializeOnboarding(root) {
             brandColor: st.customColor || PALETTE[st.pal][1],
             logoFile: st.logoMode === "img" ? st.logoFile : null,
             services: st.services,
+            plan: "monthly",
+            price: String(summary.total),
+            commitment: "pending-payment",
           },
           st.savedId || undefined,
         ),
@@ -338,6 +344,7 @@ export function initializeOnboarding(root) {
         ),
       ]);
       st.savedId = result.id;
+      persist();
       try {
         localStorage.setItem(
           "tori-business",
@@ -365,9 +372,23 @@ export function initializeOnboarding(root) {
         setPayStatus(msg, true);
         return;
       }
-      st.done = true;
-      paintSteps();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      const checkout = await fetch("/api/subscribe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          businessId: result.id,
+          customerName: st.f.fullName,
+          phone: st.f.phone,
+          email: st.f.email,
+          vatNumber: st.f.idNumber,
+        }),
+      });
+      const data = await checkout.json().catch(() => ({}));
+      if (!checkout.ok || !data.url) {
+        throw new Error(data.error || "יצירת דף התשלום נכשלה. נסו שוב.");
+      }
+      window.location.assign(data.url);
+      return;
     } catch (error) {
       const existingId = savedErrorId(error);
       if (existingId) st.savedId = existingId;
@@ -589,7 +610,7 @@ export function initializeOnboarding(root) {
       t.textContent =
         summary.total.toLocaleString("he-IL", { minimumFractionDigits: 2 }) +
         " ₪";
-    if (!st.submitting) setPayLabel("שמירה ופתיחת ההדגמה");
+    if (!st.submitting) setPayLabel("לתשלום בהוראת קבע");
   }
 
   /* ---------- contract ---------- */

@@ -79,6 +79,7 @@ export async function submitBusinessOnboarding(
       .select("id")
       .single();
     if (insertError) {
+      console.error("business insert failed", insertError.message);
       throw new Error("לא הצלחנו לשמור את הפרטים. נסו שוב.");
     }
 
