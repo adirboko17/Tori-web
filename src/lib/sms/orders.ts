@@ -1,6 +1,10 @@
 import { transferPrepaidCredits } from "./balance";
 import { fulfillmentAfterMissedLock } from "./fulfillment";
 import type { SmsPackage } from "./packages";
+import {
+  isConfirmedPayplusPayment,
+  lookupPayplusPayment,
+} from "./payplus";
 import type { SmsSession } from "./session";
 import { getServiceSupabase } from "./supabase-admin";
 
@@ -150,4 +154,38 @@ export async function fulfillPaidOrder(input: {
     .eq("id", order.id);
 
   return { ok: true as const, idempotent: false };
+}
+
+export async function loadPendingOrders(businessId?: string) {
+  const supabase = getServiceSupabase();
+  let query = supabase
+    .from("sms_topup_orders")
+    .select("*")
+    .eq("status", "pending")
+    .order("created_at", { ascending: false })
+    .limit(20);
+  if (businessId) query = query.eq("business_id", businessId);
+  const { data, error } = await query;
+  if (error) throw new Error("טעינת ההזמנות נכשלה.");
+  return (data ?? []) as SmsTopupOrder[];
+}
+
+export async function reconcilePendingOrders(businessId?: string) {
+  const pending = await loadPendingOrders(businessId);
+  let fulfilled = 0;
+  for (const order of pending) {
+    const payment = await lookupPayplusPayment({
+      paymentRequestUid: order.payplus_page_request_uid || undefined,
+      moreInfo: order.id,
+    });
+    if (!payment || !isConfirmedPayplusPayment(payment, Number(order.amount_ils))) {
+      continue;
+    }
+    const result = await fulfillPaidOrder({
+      orderId: order.id,
+      transactionUid: payment.uid || order.payplus_page_request_uid || order.id,
+    });
+    if (result.ok && !result.idempotent) fulfilled += 1;
+  }
+  return { checked: pending.length, fulfilled };
 }

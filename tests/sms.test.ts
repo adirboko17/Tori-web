@@ -114,6 +114,7 @@ test("verifies PayPlus callback hash against the raw body", () => {
   assert.equal(isSuccessfulPayplusStatus(parsed.statusCode), true);
   assert.equal(isSuccessfulPayplusStatus("001"), false);
   assert.equal(isPayplusUserAgent("PayPlus"), true);
+  assert.equal(isPayplusUserAgent("PayPlus/1.0"), true);
   assert.equal(isPayplusUserAgent(null), true);
   assert.equal(isPayplusUserAgent("Mozilla"), false);
 });

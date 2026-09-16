@@ -42,5 +42,5 @@ export function isSuccessfulPayplusStatus(statusCode: string) {
 
 export function isPayplusUserAgent(userAgent: string | null) {
   if (!userAgent) return true;
-  return userAgent.trim() === "PayPlus";
+  return /payplus/i.test(userAgent);
 }

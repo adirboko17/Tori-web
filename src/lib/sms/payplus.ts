@@ -13,6 +13,10 @@ export {
   parsePayplusCallback,
   verifyPayplusHash,
 } from "./payplus-crypto";
+import {
+  amountsMatch,
+  isSuccessfulPayplusStatus,
+} from "./payplus-crypto";
 
 export type PayplusCustomer = {
   customer_name: string;
@@ -88,4 +92,85 @@ export async function generatePayplusLink(input: PayplusLinkInput) {
     link,
     pageRequestUid,
   };
+}
+
+function payplusAuthHeaders() {
+  return {
+    "Content-Type": "application/json",
+    "api-key": process.env.PAYPLUS_API_KEY ?? "",
+    "secret-key": process.env.PAYPLUS_SECRET_KEY ?? "",
+  };
+}
+
+function pickDeep(
+  value: unknown,
+  keys: string[],
+): unknown {
+  if (!value || typeof value !== "object") return undefined;
+  const record = value as Record<string, unknown>;
+  for (const key of keys) {
+    if (record[key] != null && record[key] !== "") return record[key];
+  }
+  for (const nested of Object.values(record)) {
+    if (nested && typeof nested === "object") {
+      const found = pickDeep(nested, keys);
+      if (found != null && found !== "") return found;
+    }
+  }
+  return undefined;
+}
+
+export type PayplusIpnPayment = {
+  uid: string;
+  statusCode: string;
+  amount: number;
+  moreInfo: string;
+};
+
+export async function lookupPayplusPayment(input: {
+  paymentRequestUid?: string;
+  transactionUid?: string;
+  moreInfo?: string;
+}): Promise<PayplusIpnPayment | null> {
+  if (
+    !input.paymentRequestUid &&
+    !input.transactionUid &&
+    !input.moreInfo
+  ) {
+    return null;
+  }
+  const response = await fetch(`${payplusBaseUrl()}/PaymentPages/ipn-full`, {
+    method: "POST",
+    headers: payplusAuthHeaders(),
+    body: JSON.stringify({
+      payment_request_uid: input.paymentRequestUid || undefined,
+      transaction_uid: input.transactionUid || undefined,
+      more_info: input.moreInfo || undefined,
+    }),
+  });
+  const json = (await response.json().catch(() => ({}))) as Record<
+    string,
+    unknown
+  >;
+  const statusCode = String(
+    pickDeep(json, ["status_code", "statusCode"]) ?? "",
+  );
+  const amount = Number(pickDeep(json, ["amount"]));
+  const uid = String(
+    pickDeep(json, ["transaction_uid", "uid", "transactionUid"]) ?? "",
+  );
+  const moreInfo = String(pickDeep(json, ["more_info", "moreInfo"]) ?? "");
+  if (!uid && !statusCode) return null;
+  return { uid, statusCode, amount, moreInfo };
+}
+
+export function isConfirmedPayplusPayment(
+  payment: PayplusIpnPayment,
+  expectedAmount: number,
+) {
+  return (
+    isSuccessfulPayplusStatus(payment.statusCode) &&
+    Number.isFinite(payment.amount) &&
+    amountsMatch(payment.amount, expectedAmount)
+  );
 }
