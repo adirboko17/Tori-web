@@ -3,7 +3,6 @@ import {
   fulfillPaidOrder,
   loadOrder,
   markOrderFailed,
-  reconcilePendingOrders,
 } from "@/lib/sms/orders";
 import {
   amountsMatch,
@@ -107,11 +106,6 @@ async function handleCallback(request: Request) {
     }
   }
 
-  const recovered = await reconcilePendingOrders();
-  if (recovered.fulfilled > 0) {
-    return jsonOk({ ok: true, via: "reconcile", ...recovered });
-  }
-
   console.error("payplus callback not fulfilled", {
     method: request.method,
     signed,
@@ -119,7 +113,7 @@ async function handleCallback(request: Request) {
     statusCode: parsed.statusCode,
     agent: userAgent,
   });
-  return jsonError("unauthorized", 401);
+  return jsonOk({ ok: false, ignored: true });
 }
 
 export async function POST(request: Request) {

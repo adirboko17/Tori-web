@@ -147,19 +147,26 @@ export async function lookupPayplusPayment(input: {
       transaction_uid: input.transactionUid || undefined,
       more_info: input.moreInfo || undefined,
     }),
+    signal: AbortSignal.timeout(8000),
   });
   const json = (await response.json().catch(() => ({}))) as Record<
     string,
     unknown
   >;
+  const data = (json.data ?? json) as Record<string, unknown>;
   const statusCode = String(
-    pickDeep(json, ["status_code", "statusCode"]) ?? "",
+    data.status_code ?? pickDeep(json, ["status_code", "statusCode"]) ?? "",
   );
-  const amount = Number(pickDeep(json, ["amount"]));
+  const amount = Number(data.amount ?? pickDeep(data, ["amount"]));
   const uid = String(
-    pickDeep(json, ["transaction_uid", "uid", "transactionUid"]) ?? "",
+    data.transaction_uid ??
+      data.uid ??
+      pickDeep(json, ["transaction_uid", "uid"]) ??
+      "",
   );
-  const moreInfo = String(pickDeep(json, ["more_info", "moreInfo"]) ?? "");
+  const moreInfo = String(
+    data.more_info ?? pickDeep(json, ["more_info", "moreInfo"]) ?? "",
+  );
   if (!uid && !statusCode) return null;
   return { uid, statusCode, amount, moreInfo };
 }

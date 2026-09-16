@@ -174,18 +174,25 @@ export async function reconcilePendingOrders(businessId?: string) {
   const pending = await loadPendingOrders(businessId);
   let fulfilled = 0;
   for (const order of pending) {
-    const payment = await lookupPayplusPayment({
-      paymentRequestUid: order.payplus_page_request_uid || undefined,
-      moreInfo: order.id,
-    });
-    if (!payment || !isConfirmedPayplusPayment(payment, Number(order.amount_ils))) {
-      continue;
+    try {
+      const payment = await lookupPayplusPayment({
+        paymentRequestUid: order.payplus_page_request_uid || undefined,
+        moreInfo: order.id,
+      });
+      if (
+        !payment ||
+        !isConfirmedPayplusPayment(payment, Number(order.amount_ils))
+      ) {
+        continue;
+      }
+      const result = await fulfillPaidOrder({
+        orderId: order.id,
+        transactionUid: payment.uid || order.payplus_page_request_uid || order.id,
+      });
+      if (result.ok && !result.idempotent) fulfilled += 1;
+    } catch (error) {
+      console.error("reconcile order failed", order.id, error);
     }
-    const result = await fulfillPaidOrder({
-      orderId: order.id,
-      transactionUid: payment.uid || order.payplus_page_request_uid || order.id,
-    });
-    if (result.ok && !result.idempotent) fulfilled += 1;
   }
   return { checked: pending.length, fulfilled };
 }

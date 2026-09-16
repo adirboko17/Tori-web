@@ -1,11 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { reconcilePendingOrders } from "@/lib/sms/orders";
+import { readSmsSession } from "@/lib/sms/session";
 import "../sms.css";
 
 export const metadata: Metadata = { title: "התשלום התקבל" };
+export const dynamic = "force-dynamic";
 
-export default function SmsSuccessPage() {
+export default async function SmsSuccessPage() {
+  try {
+    const session = await readSmsSession();
+    await reconcilePendingOrders(session?.businessId);
+  } catch (error) {
+    console.error("success reconcile failed", error);
+  }
+
   return (
     <main className="sms-result">
       <Image
@@ -16,8 +26,8 @@ export default function SmsSuccessPage() {
       />
       <h1>התשלום התקבל</h1>
       <p>
-        ההודעות יתווספו ליתרת «נקנו» תוך רגעים. הן נשארות מעל החבילה החודשית
-        ולא מתאפסות ב-1 לחודש.
+        ההודעות נוספות ליתרה כהודעות שנקנו, מעל החבילה החודשית, ולא מתאפסות
+        ב-1 לחודש.
       </p>
       <Link className="tori-btn tori-btn--secondary" href="/sms">
         חזרה לחנות ההודעות
