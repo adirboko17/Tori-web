@@ -1,0 +1,204 @@
+/* ============================================================
+   tori landing — page loader
+   Exit choreography (wipe / inner-out) still lives in landing.css.
+   ============================================================ */
+
+.tori-lp .tori-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: calc(28px + env(safe-area-inset-top, 0px)) 24px
+    calc(28px + env(safe-area-inset-bottom, 0px));
+  background: #f7f7f7;
+  cursor: pointer;
+  transition:
+    opacity 0.65s cubic-bezier(0.22, 0.61, 0.36, 1),
+    visibility 0.65s;
+}
+
+/* gradient curtain that wipes up on exit (keyframes in landing.css) */
+.tori-lp .tori-wipe {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  transform: translateY(102%);
+  background: linear-gradient(135deg, #bfff51 0%, #6bff85 42%, #0cffbe 100%);
+  pointer-events: none;
+}
+.tori-lp .tori-wipe > span {
+  position: absolute;
+  inset-block: 0;
+  width: 42%;
+  opacity: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.65),
+    rgba(255, 255, 255, 0)
+  );
+}
+
+.tori-lp .tori-loader-inner {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 0;
+  width: min(100%, 300px);
+}
+
+/* ---------- mark ---------- */
+.tori-lp .tori-loader-art {
+  display: grid;
+  place-items: center;
+  width: min(52vw, 260px);
+  height: min(39vw, 195px);
+}
+.tori-lp .tori-loader-art > * {
+  grid-area: 1 / 1;
+}
+.tori-lp .tori-loader-fallback {
+  width: 88px;
+  height: 88px;
+  transition: opacity 0.35s ease;
+  animation: tori-float 2.6s ease-in-out infinite;
+}
+/* The clip ships an unevenly lit off-white ground (244..251) that no flat
+   backdrop can match, so its edges are feathered away instead. */
+.tori-lp .tori-loader-art video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  -webkit-mask-image: radial-gradient(
+    ellipse 70% 70% at 50% 50%,
+    #000 58%,
+    transparent 92%
+  );
+  mask-image: radial-gradient(
+    ellipse 70% 70% at 50% 50%,
+    #000 58%,
+    transparent 92%
+  );
+}
+
+@keyframes tori-loader-rise {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- progress ---------- */
+.tori-lp .tori-loader-track {
+  position: relative;
+  width: 100%;
+  height: 3px;
+  margin-top: 30px;
+  border-radius: 999px;
+  background: rgba(23, 22, 22, 0.1);
+  overflow: hidden;
+  opacity: 0;
+  animation: tori-loader-rise 0.6s ease 0.3s forwards;
+}
+.tori-lp .tori-loader-fill {
+  display: block;
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: var(--gradient-brand);
+  transition: width 0.42s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+/* travelling highlight so the bar reads as active, not stalled */
+.tori-lp .tori-loader-fill::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  width: 44%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.85),
+    rgba(255, 255, 255, 0)
+  );
+  animation: tori-loader-sweep 1.5s linear infinite;
+}
+@keyframes tori-loader-sweep {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(340%);
+  }
+}
+
+.tori-lp .tori-loader-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 11px;
+  opacity: 0;
+  animation: tori-loader-rise 0.6s ease 0.42s forwards;
+}
+.tori-lp .tori-loader-cap {
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--ink-500);
+}
+.tori-lp .tori-loader-pct {
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-900);
+}
+
+/* ---------- skip affordance ---------- */
+.tori-lp .tori-loader-skip {
+  position: absolute;
+  bottom: calc(26px + env(safe-area-inset-bottom, 0px));
+  inset-inline: 0;
+  text-align: center;
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: var(--ink-400);
+  opacity: 0;
+  animation: tori-loader-rise 0.7s ease 1.9s forwards;
+  pointer-events: none;
+}
+
+/* ---------- exiting ---------- */
+.tori-lp .tori-loader.is-out .tori-loader-skip {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+@media (max-width: 480px) {
+  .tori-lp .tori-loader-inner {
+    width: min(100%, 250px);
+  }
+  .tori-lp .tori-loader-art {
+    width: min(62vw, 240px);
+    height: min(46vw, 180px);
+  }
+  .tori-lp .tori-loader-track {
+    margin-top: 26px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tori-lp .tori-loader-fill::after,
+  .tori-lp .tori-loader-fallback {
+    animation: none !important;
+  }
+  .tori-lp .tori-loader-track,
+  .tori-lp .tori-loader-meta,
+  .tori-lp .tori-loader-skip {
+    opacity: 1;
+    transform: none;
+    animation: none !important;
+  }
+}

@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  allowedDevOrigins: ["*.trycloudflare.com"],
   turbopack: { root: process.cwd() },
   env: {
     NEXT_PUBLIC_SUPABASE_URL: process.env.VITE_SUPABASE_URL,
