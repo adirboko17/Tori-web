@@ -1,5 +1,7 @@
 import { createDomScope } from "@/lib/dom-scope";
 import { phoneSchema, priceSummary, serviceSchema } from "@/lib/booking";
+import { submitBusinessOnboarding } from "@/lib/business-onboarding";
+import { missingPaymentFields } from "@/lib/onboarding-payment";
 export function initializeOnboarding(root) {
   const scope = createDomScope();
   const setTimeout = scope.timeout;
@@ -21,11 +23,7 @@ export function initializeOnboarding(root) {
     );
 
   const FREE_SMS = 1000;
-  const PKGS = [
-    { n: 0, price: 0 },
-    { n: 5000, price: 399 },
-    { n: 10000, price: 699 },
-  ];
+  const LAST_STEP = 5;
   const PALETTE = [
     ["#BFFF51", "#0CFFBE"],
     ["#FF8ACF", "#FF2E93"],
@@ -47,7 +45,7 @@ export function initializeOnboarding(root) {
       "address",
       "idNumber",
     ],
-    6: [],
+    5: [],
   };
   const LABELS = {
     fullName: "שם מלא",
@@ -71,13 +69,15 @@ export function initializeOnboarding(root) {
     lang: "he",
     logoMode: "text",
     logoUrl: null,
+    logoFile: null,
+    savedId: "",
+    submitting: false,
     pal: 0,
     media: [],
     services: [
       { name: "", duration: "", price: "" },
       { name: "", duration: "", price: "" },
     ],
-    pkg: 0,
     agreed: false,
     contractRead: false,
     error: "",
@@ -103,7 +103,6 @@ export function initializeOnboarding(root) {
           f: safe,
           services: st.services,
           pal: st.pal,
-          pkg: st.pkg,
           lang: st.lang,
           logoMode: st.logoMode,
           customColor: st.customColor,
@@ -125,13 +124,16 @@ export function initializeOnboarding(root) {
           : st.services;
       st.pal =
         Number.isInteger(saved.pal) && PALETTE[saved.pal] ? saved.pal : 0;
-      st.pkg = Number.isInteger(saved.pkg) && PKGS[saved.pkg] ? saved.pkg : 0;
       st.lang = saved.lang || "he";
       st.logoMode = saved.logoMode || "text";
       st.customColor = /^#[0-9a-f]{6}$/i.test(saved.customColor || "")
         ? saved.customColor
         : "";
-      st.step = Math.min(6, Math.max(1, saved.step || 1));
+      const savedStep = Math.min(6, Math.max(1, saved.step || 1));
+      st.step =
+        "pkg" in saved && savedStep >= 5
+          ? savedStep - 1
+          : Math.min(LAST_STEP, savedStep);
     }
   } catch (e) {}
 
@@ -168,7 +170,7 @@ export function initializeOnboarding(root) {
           st.f[k] = v;
           el.classList.remove("is-bad");
           persist();
-          if (st.step === 6) paintSummary();
+          if (st.step === LAST_STEP) paintSummary();
         });
       });
     });
@@ -203,8 +205,9 @@ export function initializeOnboarding(root) {
     if (back) back.classList.toggle("is-off", st.step === 1 || st.done);
     const nb = ref("nextBtn");
     if (nb && nb.firstChild)
-      nb.firstChild.nodeValue = st.step === 5 ? "מאשר/ת וממשיכים" : "לשלב הבא";
-    if (st.step === 6) paintSummary();
+      nb.firstChild.nodeValue =
+        st.step === 4 ? "אני מאשר/ת את תנאי ההסכם" : "לשלב הבא";
+    if (st.step === LAST_STEP) paintSummary();
   }
   function showError(msg) {
     st.error = msg;
@@ -265,16 +268,76 @@ export function initializeOnboarding(root) {
         return false;
       }
     }
-    if (st.step === 5 && !st.agreed) {
+    if (st.step === 4 && !st.agreed) {
       showError("צריך לאשר את ההסכם כדי להמשיך.");
       return false;
+    }
+    if (st.step === LAST_STEP) {
+      const missingPay = missingPaymentFields(st.f);
+      if (missingPay.length) {
+        showError(
+          "צריך למלא: " + missingPay.map((k) => LABELS[k]).join(", "),
+        );
+        return false;
+      }
     }
     showError("");
     return true;
   }
-  on("next", () => {
-    if (!validate()) return;
-    if (st.step === 6) {
+  function setPayLabel(text) {
+    const label = ref("payBtnLabel");
+    if (label) label.textContent = text;
+  }
+  function setPayStatus(text, isError) {
+    const status = ref("payStatus");
+    if (!status) return;
+    status.textContent = text;
+    status.style.color = isError ? "#FF8A8A" : "rgba(255,255,255,.55)";
+  }
+  function setBusy(busy) {
+    st.submitting = busy;
+    [ref("nextBtn"), ref("nextBtnPay")].forEach((btn) => {
+      if (!btn) return;
+      btn.disabled = busy;
+      btn.setAttribute("aria-busy", String(busy));
+    });
+    setPayLabel(busy ? "שולחים את הפרטים..." : "שמירה ופתיחת ההדגמה");
+  }
+  function savedErrorId(error) {
+    const cause = error && typeof error === "object" ? error.cause : null;
+    return cause && typeof cause.id === "string" ? cause.id : "";
+  }
+  async function finishOnboarding() {
+    if (st.submitting) return;
+    setBusy(true);
+    showError("");
+    setPayStatus("שומרים את העסק ושולחים הודעה לצוות...", false);
+    try {
+      const result = await Promise.race([
+        submitBusinessOnboarding(
+          {
+            managerName: st.f.fullName,
+            phone: st.f.phone,
+            businessNameHe: st.f.appName,
+            businessNameEn: st.f.appNameEn,
+            appNameEn: st.f.appNameEn,
+            address: st.f.address,
+            email: st.f.email,
+            managerPassword: st.f.adminPassword,
+            brandColor: st.customColor || PALETTE[st.pal][1],
+            logoFile: st.logoMode === "img" ? st.logoFile : null,
+            services: st.services,
+          },
+          st.savedId || undefined,
+        ),
+        new Promise((_, reject) =>
+          setTimeout(
+            () => reject(new Error("השליחה לוקחת יותר מדי זמן. נסו שוב.")),
+            28000,
+          ),
+        ),
+      ]);
+      st.savedId = result.id;
       try {
         localStorage.setItem(
           "tori-business",
@@ -284,7 +347,7 @@ export function initializeOnboarding(root) {
             nameEn: st.f.appNameEn,
             color: st.customColor || PALETTE[st.pal][1],
             language: st.lang,
-            smsPackage: st.pkg,
+            smsPackage: FREE_SMS,
             services: st.services
               .filter((s) => s.name.trim())
               .map((s, i) => ({
@@ -297,19 +360,41 @@ export function initializeOnboarding(root) {
           }),
         );
       } catch {
-        showError("שמירת העסק נכשלה. פנו מקום בדפדפן ונסו שוב.");
+        const msg = "הפרטים נשלחו, אבל שמירת ההדגמה בדפדפן נכשלה.";
+        showError(msg);
+        setPayStatus(msg, true);
         return;
       }
       st.done = true;
       paintSteps();
       window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+      const existingId = savedErrorId(error);
+      if (existingId) st.savedId = existingId;
+      const msg =
+        error instanceof Error
+          ? error.message
+          : "השליחה נכשלה. נסו שוב בעוד רגע.";
+      showError(msg);
+      setPayStatus(msg, true);
+    } finally {
+      setBusy(false);
+    }
+  }
+  on("next", () => {
+    if (st.step === LAST_STEP) {
+      finishOnboarding();
       return;
     }
+    if (!validate()) return;
     st.step += 1;
     persist();
     paintSteps();
     const sc = $(".ob-scroll", root);
     if (sc) sc.scrollTop = 0;
+  });
+  on("saveDemo", () => {
+    finishOnboarding();
   });
   on("back", () => {
     if (st.step === 1) return;
@@ -374,6 +459,7 @@ export function initializeOnboarding(root) {
     }
     if (st.logoUrl) URL.revokeObjectURL(st.logoUrl);
     st.logoUrl = URL.createObjectURL(f);
+    st.logoFile = f;
     st.logoMode = "img";
     paintLogo();
   });
@@ -485,22 +571,16 @@ export function initializeOnboarding(root) {
     persist();
   });
 
-  /* ---------- SMS packages + summary ---------- */
-  const fmt = (n) => Math.round(n).toLocaleString("he-IL") + " ₪";
+  /* ---------- payment summary ---------- */
   function paintSummary() {
-    const p = PKGS[st.pkg] || PKGS[0];
-    const base = 299 + p.price;
     const c = ref("smsCount"),
       pr = ref("smsPrice"),
       v = ref("vat"),
       t = ref("total"),
       pay = ref("nextBtnPay");
-    if (c)
-      c.textContent = p.n
-        ? "‎+" + p.n.toLocaleString("he-IL") + " הודעות"
-        : "כלול במנוי";
-    if (pr) pr.textContent = p.price ? fmt(p.price) : "‎0 ₪";
-    const summary = priceSummary(st.pkg);
+    if (c) c.textContent = FREE_SMS.toLocaleString("he-IL") + " הודעות";
+    if (pr) pr.textContent = "‎0 ₪";
+    const summary = priceSummary();
     if (v)
       v.textContent =
         summary.vat.toLocaleString("he-IL", { minimumFractionDigits: 2 }) +
@@ -509,20 +589,8 @@ export function initializeOnboarding(root) {
       t.textContent =
         summary.total.toLocaleString("he-IL", { minimumFractionDigits: 2 }) +
         " ₪";
-    if (pay && pay.firstChild) pay.firstChild.nodeValue = "שמירה ופתיחת ההדגמה";
+    if (!st.submitting) setPayLabel("שמירה ופתיחת ההדגמה");
   }
-  PKGS.forEach((_, i) =>
-    on("pkg:" + i, () => {
-      st.pkg = i;
-      PKGS.forEach((__, j) =>
-        acts("pkg:" + j).forEach((b) =>
-          b.setAttribute("aria-pressed", String(i === j)),
-        ),
-      );
-      persist();
-      paintSummary();
-    }),
-  );
 
   /* ---------- contract ---------- */
   const contract = ref("contractRef");
@@ -565,11 +633,6 @@ export function initializeOnboarding(root) {
   PALETTE.forEach((_, j) =>
     acts("pal:" + j).forEach((b) =>
       b.setAttribute("aria-pressed", String(st.pal === j)),
-    ),
-  );
-  PKGS.forEach((_, j) =>
-    acts("pkg:" + j).forEach((b) =>
-      b.setAttribute("aria-pressed", String(st.pkg === j)),
     ),
   );
   ["he", "ru", "en", "ar"].forEach((c) =>

@@ -1,9 +1,17 @@
 "use client";
 import { useEffect, useRef } from "react";
+import ServiceAgreement from "@/components/service-agreement";
 import { initializeOnboarding } from "./interactions";
 export default function Onboarding() {
   const rootRef = useRef(null);
-  useEffect(() => initializeOnboarding(rootRef.current), []);
+  useEffect(() => {
+    try {
+      return initializeOnboarding(rootRef.current);
+    } catch (error) {
+      console.error("onboarding init failed", error);
+      return undefined;
+    }
+  }, []);
   return (
     <div
       className="ob"
@@ -262,22 +270,6 @@ export default function Onboarding() {
                 >
                   <span className="ob-stepper-line"></span>
                   <span className="ob-stepper-num">{"4"}</span>
-                  <span className="ob-stepper-title">{"חבילת SMS"}</span>
-                </li>
-                <li
-                  className="ob-stepper-item"
-                  data-state="todo"
-                  style={{
-                    flex: "1 1 0",
-                    minWidth: "0",
-                    display: "grid",
-                    justifyItems: "center",
-                    gap: "8px",
-                    position: "relative",
-                  }}
-                >
-                  <span className="ob-stepper-line"></span>
-                  <span className="ob-stepper-num">{"5"}</span>
                   <span className="ob-stepper-title">{"הסכם"}</span>
                 </li>
                 <li
@@ -293,7 +285,7 @@ export default function Onboarding() {
                   }}
                 >
                   <span className="ob-stepper-line"></span>
-                  <span className="ob-stepper-num">{"6"}</span>
+                  <span className="ob-stepper-num">{"5"}</span>
                   <span className="ob-stepper-title">{"תשלום"}</span>
                 </li>
               </ol>
@@ -1146,203 +1138,6 @@ export default function Onboarding() {
               <div className="ob-panel-step is-off" data-step-panel="4">
                 <div
                   className="ob-step"
-                  style={{ display: "grid", gap: "16px" }}
-                >
-                  <div style={{ display: "grid", gap: "4px" }}>
-                    <h1
-                      style={{
-                        fontSize: "clamp(23px,2.5vw,31px)",
-                        lineHeight: "1.08",
-                        margin: "0",
-                        fontWeight: "700",
-                        letterSpacing: "-.01em",
-                      }}
-                    >
-                      {"חבילת SMS"}
-                    </h1>
-                    <p
-                      style={{
-                        margin: "0",
-                        fontSize: "14.5px",
-                        lineHeight: "1.5",
-                        color: "#5C5A58",
-                        maxWidth: "54ch",
-                      }}
-                    >
-                      {"כל מנוי מקבל "}
-                      <strong style={{ color: "#171616" }}>
-                        {"1,000 הודעות חינם בחודש"}
-                      </strong>
-                      {
-                        ", והמכסה מתאפסת בתחילת כל חודש. כאן בוחרים כמה הודעות להוסיף מעל זה."
-                      }
-                    </p>
-                  </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "flex-start",
-                      gap: "9px",
-                      padding: "11px 13px",
-                      borderRadius: "13px",
-                      background: "#F4F9F6",
-                      border: "1px solid #DDEBE4",
-                    }}
-                  >
-                    <span
-                      style={{
-                        flex: "0 0 auto",
-                        color: "#0F7A5C",
-                        marginTop: "1px",
-                      }}
-                    >
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <circle cx="12" cy="12" r="9"></circle>
-                        <path d="M12 8h.01M11 12h1v4h1"></path>
-                      </svg>
-                    </span>
-                    <span
-                      style={{
-                        fontSize: "12.5px",
-                        lineHeight: "1.5",
-                        color: "#3D3B3A",
-                      }}
-                    >
-                      {"חבילות ה-SMS הן "}
-                      <strong>{"רכישה חד-פעמית"}</strong>
-                      {
-                        " ואינן מתווספות למנוי החודשי. המנוי נשאר 299 ₪ + מע״מ בחודש."
-                      }
-                    </span>
-                  </div>
-                  <div
-                    className="ob-two"
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(3,1fr)",
-                      gap: "12px",
-                    }}
-                  >
-                    <button
-                      type="button"
-                      className="ob-pkg"
-                      data-pop="false"
-                      data-free="true"
-                      aria-pressed="true"
-                      data-act="pkg:0"
-                      data-ev="click"
-                    >
-                      <span className="ob-pkg-tag">{"כלול במנוי"}</span>
-                      <span
-                        style={{
-                          fontSize: "25px",
-                          fontWeight: "700",
-                          lineHeight: "1",
-                          letterSpacing: "-.01em",
-                        }}
-                      >
-                        {"1,000"}
-                      </span>
-                      <span style={{ fontSize: "12.5px", color: "#7A7876" }}>
-                        {"הודעות"}
-                      </span>
-                      <span className="ob-pkg-price">{"‎חינם"}</span>
-                      <span
-                        style={{
-                          fontSize: "11.5px",
-                          lineHeight: "1.35",
-                          color: "#7A7876",
-                          textWrap: "balance",
-                        }}
-                      >
-                        {"‎מתאפס ל־1,000 בכל חודש"}
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      className="ob-pkg"
-                      data-pop="true"
-                      data-free="false"
-                      aria-pressed="false"
-                      data-act="pkg:1"
-                      data-ev="click"
-                    >
-                      <span className="ob-pkg-tag">{"הפופולרי ביותר"}</span>
-                      <span
-                        style={{
-                          fontSize: "25px",
-                          fontWeight: "700",
-                          lineHeight: "1",
-                          letterSpacing: "-.01em",
-                        }}
-                      >
-                        {"6,000"}
-                      </span>
-                      <span style={{ fontSize: "12.5px", color: "#7A7876" }}>
-                        {"הודעות"}
-                      </span>
-                      <span className="ob-pkg-price">{"‎‎399 ₪"}</span>
-                      <span
-                        style={{
-                          fontSize: "11.5px",
-                          lineHeight: "1.35",
-                          color: "#7A7876",
-                          textWrap: "balance",
-                        }}
-                      >
-                        {"‎‎1,000 חינם + 5,000 · 0.08 ₪ להודעה"}
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      className="ob-pkg"
-                      data-pop="false"
-                      data-free="false"
-                      aria-pressed="false"
-                      data-act="pkg:2"
-                      data-ev="click"
-                    >
-                      <span className="ob-pkg-tag">{"לעסק עמוס"}</span>
-                      <span
-                        style={{
-                          fontSize: "25px",
-                          fontWeight: "700",
-                          lineHeight: "1",
-                          letterSpacing: "-.01em",
-                        }}
-                      >
-                        {"11,000"}
-                      </span>
-                      <span style={{ fontSize: "12.5px", color: "#7A7876" }}>
-                        {"הודעות"}
-                      </span>
-                      <span className="ob-pkg-price">{"‎‎699 ₪"}</span>
-                      <span
-                        style={{
-                          fontSize: "11.5px",
-                          lineHeight: "1.35",
-                          color: "#7A7876",
-                          textWrap: "balance",
-                        }}
-                      >
-                        {"‎‎1,000 חינם + 10,000 · 0.07 ₪ להודעה"}
-                      </span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="ob-panel-step is-off" data-step-panel="5">
-                <div
-                  className="ob-step"
                   style={{ display: "grid", gap: "20px" }}
                 >
                   <div style={{ display: "grid", gap: "4px" }}>
@@ -1355,19 +1150,8 @@ export default function Onboarding() {
                         letterSpacing: "-.01em",
                       }}
                     >
-                      {"הסכם השירות"}
+                      {"הסכם שירות"}
                     </h1>
-                    <p
-                      style={{
-                        margin: "0",
-                        fontSize: "14.5px",
-                        lineHeight: "1.5",
-                        color: "#5C5A58",
-                        maxWidth: "52ch",
-                      }}
-                    >
-                      {"קצר וברור. אין התחייבות לתקופה — מתנתקים מתי שרוצים."}
-                    </p>
                   </div>
                   <div
                     className="ob-scroll"
@@ -1375,7 +1159,7 @@ export default function Onboarding() {
                     data-act="onContractScroll"
                     data-ev="scroll"
                     style={{
-                      maxHeight: "300px",
+                      maxHeight: "min(52vh, 480px)",
                       border: "1px solid #E3E3E0",
                       borderRadius: "16px",
                       padding: "20px 22px",
@@ -1383,64 +1167,9 @@ export default function Onboarding() {
                       fontSize: "14px",
                       lineHeight: "1.75",
                       color: "#3D3B3A",
-                      display: "grid",
-                      gap: "12px",
                     }}
                   >
-                    <strong style={{ color: "#171616", fontSize: "15px" }}>
-                      {"הסכם שימוש בשירות tori"}
-                    </strong>
-                    <p style={{ margin: "0" }}>
-                      <strong>{"1. השירות."}</strong>
-                      {
-                        " tori מספקת לעסק אפליקציה ממותגת לניהול תורים ב־App Store וב־Google Play, כולל יומן, תזכורות, תשלומים וניהול לקוחות. ההקמה מתבצעת על ידי tori תוך 72 שעות מקבלת הפרטים והלוגו."
-                      }
-                    </p>
-                    <p style={{ margin: "0" }}>
-                      <strong>{"2. תמורה."}</strong>
-                      {
-                        " דמי שימוש חודשיים קבועים בסך 299 ₪ בתוספת מע״מ כדין, ללא דמי הקמה. חבילות SMS נרכשות בנפרד ואינן פגות."
-                      }
-                    </p>
-                    <p style={{ margin: "0" }}>
-                      <strong>{"3. תקופה וביטול."}</strong>
-                      {
-                        " ההסכם מתחדש מדי חודש. ניתן לבטל בכל עת בהודעה בכתב; הביטול ייכנס לתוקף בסוף תקופת החיוב הנוכחית, ללא קנסות."
-                      }
-                    </p>
-                    <p style={{ margin: "0" }}>
-                      <strong>{"4. תוכן ומיתוג."}</strong>
-                      {
-                        " העסק מצהיר כי הלוגו, התמונות והתכנים שהוא מעלה בבעלותו או ברשותו, ומעניק ל־tori רישיון להשתמש בהם לצורך הפעלת האפליקציה בלבד."
-                      }
-                    </p>
-                    <p style={{ margin: "0" }}>
-                      <strong>{"5. פרטיות ומידע."}</strong>
-                      {
-                        " פרטי הלקוחות של העסק נשמרים בשרתים מאובטחים בישראל, בהתאם לחוק הגנת הפרטיות. tori לא תעשה במידע שימוש מלבד לצורך מתן השירות."
-                      }
-                    </p>
-                    <p style={{ margin: "0" }}>
-                      <strong>{"6. זמינות ותמיכה."}</strong>
-                      {
-                        " tori תפעל לזמינות של 99.5% ותספק תמיכה אנושית בימים א׳–ה׳ בין 9:00–17:00."
-                      }
-                    </p>
-                    <p style={{ margin: "0" }}>
-                      <strong>{"7. חנויות האפליקציות."}</strong>
-                      {
-                        " פרסום האפליקציה כפוף לאישור Apple ו־Google. tori תטפל בתהליך האישור מול החנויות."
-                      }
-                    </p>
-                    <p style={{ margin: "0" }}>
-                      <strong>{"8. שינויים."}</strong>
-                      {
-                        " שם האפליקציה, העיצוב, הצבעים והשירותים ניתנים לשינוי בכל עת מתוך ממשק הניהול, ללא עלות נוספת."
-                      }
-                    </p>
-                    <p style={{ margin: "0", color: "#7A7876" }}>
-                      {"עדכון אחרון: ספטמבר 2026"}
-                    </p>
+                    <ServiceAgreement />
                   </div>
                   <label
                     style={{
@@ -1469,7 +1198,7 @@ export default function Onboarding() {
                       }}
                     >
                       {
-                        "קראתי את נוסח הסכם השירות להדגמה. האישור כאן אינו יוצר מנוי או התחייבות."
+                        "קראתי את הסכם השירות, אני מבין/ה את תנאיו ומסכים/ה להם במלואם."
                       }
                       <span
                         data-ref="contractHint"
@@ -1499,7 +1228,7 @@ export default function Onboarding() {
                   </div>
                 </div>
               </div>
-              <div className="ob-panel-step is-off" data-step-panel="6">
+              <div className="ob-panel-step is-off" data-step-panel="5">
                 <div
                   className="ob-step"
                   style={{ display: "grid", gap: "16px" }}
@@ -1701,7 +1430,7 @@ export default function Onboarding() {
                           ></rect>
                           <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
                         </svg>
-                        {"תשלום יופעל לאחר חיבור לספק סליקה"}
+                        {"בבדיקה אפשר להמשיך בלי אשראי. תשלום יחובר אחר כך."}
                       </span>
                     </div>
                     <div
@@ -1762,8 +1491,8 @@ export default function Onboarding() {
                         >
                           <span style={{ color: "rgba(255,255,255,.72)" }}>
                             {"SMS · "}
-                            <span data-ref="smsCount">{"כלול במנוי"}</span>
-                            {" · חד-פעמי"}
+                            <span data-ref="smsCount">{"1,000 הודעות"}</span>
+                            {" · כלול במנוי"}
                           </span>
                           <span
                             data-ref="smsPrice"
@@ -1843,10 +1572,10 @@ export default function Onboarding() {
                           className="ob-primary ob-primary-inv"
                           style={{ width: "100%", justifyContent: "center" }}
                           data-ref="nextBtnPay"
-                          data-act="next"
+                          data-act="saveDemo"
                           data-ev="click"
                         >
-                          {"לשלב הבא"}
+                          <span data-ref="payBtnLabel">{"שמירה ופתיחת ההדגמה"}</span>
                           <span
                             style={{
                               display: "inline-grid",
@@ -1873,6 +1602,7 @@ export default function Onboarding() {
                           </span>
                         </button>
                         <span
+                          data-ref="payStatus"
                           style={{
                             fontSize: "11.5px",
                             color: "rgba(255,255,255,.55)",
@@ -1880,7 +1610,7 @@ export default function Onboarding() {
                           }}
                         >
                           {
-                            "חבילת ה-SMS היא רכישה חד-פעמית. מהחודש הבא ‎299 ₪ + מע״מ בחודש, בלי התחייבות."
+                            "אפשר לשמור בלי אשראי. המנוי כולל 1,000 הודעות SMS בחודש."
                           }
                         </span>
                       </div>
@@ -1962,7 +1692,7 @@ export default function Onboarding() {
                     }}
                   >
                     {
-                      "הפרטים והשירותים נשמרו בדפדפן הזה. אפשר להיכנס לממשק הניהול ולנסות את האפליקציה. לא בוצע חיוב ולא נשלחה בקשה לחנויות."
+                      "הפרטים נשלחו בהצלחה. נחזור אליך תוך 72 שעות. בינתיים אפשר להיכנס לממשק הניהול ולנסות את ההדגמה."
                     }
                   </p>
                   <div

@@ -595,13 +595,13 @@
     height: 18px;
   }
 }
-.ob[data-step="6"] .ob-scroll {
+.ob[data-step="5"] .ob-scroll {
   overflow: visible !important;
 }
-.ob[data-step="6"] .ob-nav-cta {
+.ob[data-step="5"] .ob-nav-cta {
   display: none !important;
 }
-.ob[data-step="6"] .ob-step {
+.ob[data-step="5"] .ob-step {
   height: 100%;
   grid-template-rows: auto minmax(0, 1fr);
 }

@@ -2004,6 +2004,11 @@ body {
   transform: translateY(-2px);
   box-shadow: var(--shadow-brand-lg);
 }
+.tori-lp .ths10:disabled {
+  opacity: 0.7;
+  cursor: wait;
+  transform: none;
+}
 .tori-lp .ths11:active {
   transform: scale(0.98);
 }

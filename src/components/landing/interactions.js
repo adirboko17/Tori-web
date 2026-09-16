@@ -1,4 +1,5 @@
 import { createDomScope } from "@/lib/dom-scope";
+import { submitBusinessOnboarding } from "@/lib/business-onboarding";
 export function initializeLanding(root) {
   const scope = createDomScope();
   const setTimeout = scope.timeout;
@@ -650,15 +651,18 @@ export function initializeLanding(root) {
     leadMsg.style.display = msg ? "block" : "none";
     leadMsg.style.color = ok ? "var(--green-700)" : "var(--red-600, #C2231C)";
   }
-  on("submitLead", () => {
+  let leadSavedId = "";
+  let leadBusy = false;
+  on("submitLead", async () => {
     const form = $("#lead-form", root);
-    if (!form) return;
+    if (!form || leadBusy) return;
     const name = form.querySelector('input[autocomplete="name"]');
     const tel = form.querySelector('input[type="tel"]');
     const biz = form.querySelector(
       'input[type="text"]:not([autocomplete="name"])',
     );
     const note = form.querySelector("textarea");
+    const submitBtn = form.querySelector('[data-act="submitLead"]');
     const missing = [];
     [
       [name, "שם מלא"],
@@ -668,7 +672,8 @@ export function initializeLanding(root) {
     });
     if (missing.length) {
       say("צריך למלא: " + missing.join(" ו"), false);
-      if (missing[0] && name) name.focus();
+      if (name && !name.value.trim()) name.focus();
+      else if (tel) tel.focus();
       return;
     }
     if (!/^0\d[\d\- ]{7,}$/.test(tel.value.trim())) {
@@ -679,17 +684,46 @@ export function initializeLanding(root) {
     const type = form.querySelector('input[name="biz-type"]:checked');
     const typeLabel =
       type && type.parentElement ? type.parentElement.textContent.trim() : "";
-    const parts = ["שלום, אני " + name.value.trim() + "."];
-    if (biz && biz.value.trim()) parts.push("העסק: " + biz.value.trim() + ".");
-    if (typeLabel) parts.push("תחום: " + typeLabel + ".");
-    parts.push("טלפון לחזרה: " + tel.value.trim() + ".");
-    if (note && note.value.trim()) parts.push(note.value.trim());
-    parts.push("אשמח לשמוע פרטים על תורי.");
-    say("פותחים לכם וואטסאפ — נחזור אליכם תוך שעה.", true);
-    window.open(
-      "https://wa.me/972535575303?text=" + encodeURIComponent(parts.join(" ")),
-      "_blank",
-    );
+    leadBusy = true;
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.setAttribute("aria-busy", "true");
+    }
+    say("שולחים את הפרטים...", true);
+    try {
+      const result = await submitBusinessOnboarding(
+        {
+          managerName: name.value.trim(),
+          phone: tel.value.trim(),
+          businessNameHe: (biz && biz.value.trim()) || name.value.trim(),
+          plan: typeLabel || null,
+        },
+        leadSavedId || undefined,
+      );
+      leadSavedId = result.id;
+      if (name) name.value = "";
+      if (tel) tel.value = "";
+      if (biz) biz.value = "";
+      if (note) note.value = "";
+      leadSavedId = "";
+      say("הפרטים נשלחו בהצלחה. נחזור אליך תוך 72 שעות.", true);
+    } catch (error) {
+      const cause =
+        error && typeof error === "object" ? error.cause : null;
+      if (cause && typeof cause.id === "string") leadSavedId = cause.id;
+      say(
+        error instanceof Error
+          ? error.message
+          : "השליחה נכשלה. נסו שוב בעוד רגע.",
+        false,
+      );
+    } finally {
+      leadBusy = false;
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.removeAttribute("aria-busy");
+      }
+    }
   });
   return () => scope.dispose();
 }
