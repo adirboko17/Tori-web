@@ -1,5 +1,10 @@
 import { createDomScope } from "@/lib/dom-scope";
 import { submitBusinessOnboarding } from "@/lib/business-onboarding";
+
+/** True once the loader has actually finished, not merely started. Survives a
+    remount within the same page load (React re-runs effects in development). */
+let loaderPlayed = false;
+
 export function initializeLanding(root) {
   const scope = createDomScope();
   const setTimeout = scope.timeout;
@@ -25,9 +30,37 @@ export function initializeLanding(root) {
   /* ---------- loader ---------- */
   const loader = $(".tori-loader", root);
   let loaderDone = false;
+
+  /* Progress eases toward 92% on its own, then snaps to 100% the moment the
+     loader is actually dismissed, so the bar and the counter never disagree. */
+  const bar = ref("loaderBarRef");
+  const pct = ref("loaderPctRef");
+  let progress = 0;
+  function paintProgress(value) {
+    progress = Math.max(progress, Math.min(100, value));
+    if (bar) bar.style.width = progress + "%";
+    if (pct) pct.textContent = Math.round(progress) + "%";
+  }
+  (function rampProgress() {
+    if (!bar && !pct) return;
+    const start = performance.now();
+    const tick = (now) => {
+      if (loaderDone) return;
+      const t = Math.min(1, (now - start) / 2600);
+      paintProgress(92 * (1 - Math.pow(1 - t, 3)));
+      if (t < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  })();
+
   function dismissLoader() {
     if (loaderDone) return;
+    paintProgress(100);
     loaderDone = true;
+    loaderPlayed = true;
+    try {
+      sessionStorage.setItem("tori-lp-loader", "1");
+    } catch (e) {}
     if (loader) loader.classList.add("is-out");
     setTimeout(() => {
       document.body.style.overflow = "";
@@ -37,10 +70,9 @@ export function initializeLanding(root) {
   (function startLoader() {
     if (!loader) return;
     const v = ref("loaderVideoRef") || loader.querySelector("video");
-    let seen = false;
+    let seen = loaderPlayed;
     try {
-      seen = sessionStorage.getItem("tori-lp-loader") === "1";
-      sessionStorage.setItem("tori-lp-loader", "1");
+      seen = seen || sessionStorage.getItem("tori-lp-loader") === "1";
     } catch (e) {}
     if (reduce || seen) {
       loader.style.display = "none";
@@ -311,6 +343,54 @@ export function initializeLanding(root) {
   }
   listen(window, "scroll", onNavScroll, { passive: true });
   onNavScroll();
+
+  /* ---------- mobile menu ---------- */
+  const menu = ref("menuRef");
+  const burger = $('[data-act="toggleMenu"]', root);
+  const menuLinks = $$("[data-menu-link]", root);
+  function setMenu(open) {
+    root.classList.toggle("menu-open", open);
+    if (burger) {
+      burger.setAttribute("aria-expanded", String(open));
+      burger.setAttribute("aria-label", open ? "סגירת תפריט" : "פתיחת תפריט");
+    }
+    if (menu) menu.hidden = false;
+    document.body.style.overflow = open ? "hidden" : "";
+  }
+  on("toggleMenu", () => setMenu(!root.classList.contains("menu-open")));
+  on("closeMenu", () => setMenu(false));
+  listen(window, "keydown", (e) => {
+    if (e.key === "Escape" && root.classList.contains("menu-open"))
+      setMenu(false);
+  });
+  listen(window, "resize", () => {
+    if (window.innerWidth > 760 && root.classList.contains("menu-open"))
+      setMenu(false);
+  });
+  scope.cleanup(() => root.classList.remove("menu-open"));
+
+  /* marks the section in view on both the bar links and the menu */
+  if (menuLinks.length) {
+    const spy = scope.observe(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          menuLinks.forEach((a) =>
+            a.classList.toggle("is-current", a.dataset.menuLink === id),
+          );
+          $$("[data-nav]", root).forEach((a) =>
+            a.classList.toggle("is-current", a.dataset.nav === id),
+          );
+        });
+      },
+      { rootMargin: "-45% 0px -50% 0px" },
+    );
+    menuLinks.forEach((a) => {
+      const section = $("#" + a.dataset.menuLink, root);
+      if (section) spy.observe(section);
+    });
+  }
 
   /* ---------- live brand demo ---------- */
   const PALETTES = [

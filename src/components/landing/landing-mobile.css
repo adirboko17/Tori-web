@@ -1,0 +1,254 @@
+/* ============================================================
+   tori landing — mobile layer (<= 760px)
+
+   The landing sections are authored with inline styles tuned for
+   desktop, so the mobile pass lives here as one reviewable layer.
+   `!important` is required to win over those inline declarations.
+   ============================================================ */
+
+@media (max-width: 760px) {
+  .tori-lp {
+    /* ---- mobile type scale (one ramp, used everywhere) ---- */
+    /* the caps meet the desktop clamps at 760px so nothing jumps at the seam */
+    --m-h1: clamp(31px, 8.4vw, 36px);
+    --m-h2: clamp(26px, 7vw, 31px);
+    --m-h3: 20px;
+    --m-h4: 17px;
+    --m-lead: 16.5px;
+    --m-body: 15.5px;
+    --m-small: 13.5px;
+    --m-micro: 11.5px;
+
+    /* ---- mobile rhythm ---- */
+    --m-gutter: 20px;
+    --m-section-y: clamp(52px, 12vw, 72px);
+    --m-block: 28px;
+    --m-card-pad: 20px;
+    --m-radius: 20px;
+
+    --m-safe-b: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* ---------- 1. section rhythm + gutter ---------- */
+  .tori-lp section {
+    padding-left: var(--m-gutter) !important;
+    padding-right: var(--m-gutter) !important;
+    padding-top: var(--m-section-y) !important;
+    padding-bottom: var(--m-section-y) !important;
+  }
+  .tori-lp .tori-hero {
+    padding-top: 104px !important;
+    padding-bottom: 56px !important;
+  }
+
+  /* ---------- 2. typography ---------- */
+  .tori-lp h1 {
+    font-size: var(--m-h1) !important;
+    line-height: 1.1 !important;
+    letter-spacing: -0.025em !important;
+  }
+  .tori-lp h2 {
+    font-size: var(--m-h2) !important;
+    line-height: 1.14 !important;
+    letter-spacing: -0.022em !important;
+    text-wrap: balance;
+  }
+  .tori-lp h3 {
+    font-size: var(--m-h3) !important;
+    line-height: 1.25 !important;
+    letter-spacing: -0.015em !important;
+  }
+  .tori-lp .tori-feat-title,
+  .tori-lp .tori-vs-name {
+    font-size: var(--m-h3) !important;
+  }
+  .tori-lp .tori-feat-title > span {
+    font-size: var(--m-small) !important;
+  }
+
+  /* body copy: collapse the 12/13/13.5/14/15/15.5/16/17px jumble
+     onto three steps so the page reads as one system. */
+  .tori-lp p {
+    font-size: var(--m-body) !important;
+    line-height: 1.62 !important;
+  }
+  .tori-lp section > div > div[data-reveal] > p,
+  .tori-lp .tori-hero p:first-of-type {
+    font-size: var(--m-lead) !important;
+    line-height: 1.58 !important;
+  }
+  .tori-lp .tori-feat-text,
+  .tori-lp .tori-vs-sub,
+  .tori-lp .tori-vs-text,
+  .tori-lp .tori-step p,
+  .tori-lp .tori-q p {
+    font-size: var(--m-small) !important;
+    line-height: 1.6 !important;
+  }
+  .tori-lp .tori-badge,
+  .tori-lp .tori-chip,
+  .tori-lp .tori-feat-num,
+  .tori-lp .tori-step-num,
+  .tori-lp .tori-vs-badge {
+    font-size: var(--m-micro) !important;
+    letter-spacing: 0.06em !important;
+  }
+
+  /* ---------- 3. the alignment spine ----------
+     Hebrew body copy centred is hard to scan. Everything hangs off
+     the same right-hand edge; only badges/eyebrows stay inline. */
+  .tori-lp section :is(h2, h3, p) {
+    text-align: start !important;
+  }
+  /* any wrapper that owns a section heading stops centring its children */
+  .tori-lp section div:has(> h2) {
+    justify-items: start !important;
+    text-align: start !important;
+    max-width: 100% !important;
+    margin-inline: 0 !important;
+    margin-bottom: var(--m-block) !important;
+    gap: 10px !important;
+  }
+  .tori-lp .tori-feat-body,
+  .tori-lp .tori-feat-title,
+  .tori-lp .tori-feat-text,
+  .tori-lp .tori-step,
+  .tori-lp .tori-vs-head {
+    text-align: start !important;
+    align-items: start !important;
+    justify-items: start !important;
+  }
+  .tori-lp .tori-feat-title {
+    align-items: flex-start !important;
+  }
+  .tori-lp p {
+    max-width: 100% !important;
+  }
+
+  /* ---------- 4. hero ---------- */
+  .tori-lp .tori-hero > div {
+    gap: 26px !important;
+  }
+  .tori-lp .tori-hero p:first-of-type {
+    margin: 16px 0 22px !important;
+  }
+  /* CTAs: full-width, equal, stacked — no ragged right edge */
+  .tori-lp .tori-hero .tori-cta,
+  .tori-lp .tori-hero .tori-ghost {
+    width: 100% !important;
+    justify-content: space-between !important;
+    min-height: 56px !important;
+    padding: 0 16px 0 20px !important;
+    border-radius: 14px !important;
+    font-size: 16px !important;
+  }
+  .tori-lp .tori-hero > div > div:last-child {
+    width: 100%;
+  }
+  .tori-lp .tori-hero .tori-cta + .tori-ghost,
+  .tori-lp .tori-hero div:has(> .tori-cta) {
+    gap: 10px !important;
+  }
+  /* the stage carries 76/70px of padding for the desktop float; on a phone
+     that reads as a dead band between the CTAs and the device */
+  .tori-lp .tori-stage > div {
+    padding: 20px 0 0 !important;
+  }
+
+  /* ---------- 5. tap targets ---------- */
+  .tori-lp a,
+  .tori-lp button {
+    -webkit-tap-highlight-color: rgba(191, 255, 81, 0.28);
+  }
+  .tori-lp .tori-upload,
+  .tori-lp .tori-seg2 > *,
+  .tori-lp .tori-font,
+  .tori-lp .tori-more {
+    min-height: 44px !important;
+  }
+  .tori-lp .tori-q {
+    min-height: 56px !important;
+  }
+
+  /* ---------- 6. containers ---------- */
+  .tori-lp .tori-feat,
+  .tori-lp .tori-vs-col,
+  .tori-lp .tori-q,
+  .tori-lp .tori-step,
+  .tori-lp .tori-lead-form-col {
+    border-radius: var(--m-radius) !important;
+  }
+  .tori-lp .tori-feats {
+    gap: 18px !important;
+  }
+  .tori-lp .tori-vs-list {
+    gap: 2px !important;
+  }
+  .tori-lp .tori-vs-item {
+    padding-top: 13px !important;
+    padding-bottom: 13px !important;
+  }
+
+  /* ---------- 7. floating controls ----------
+     Keep the two FABs out of each other's way and off the content. */
+  .tori-lp .tori-a11y {
+    bottom: calc(14px + var(--m-safe-b)) !important;
+    right: 14px !important;
+  }
+  .tori-lp .tori-chat {
+    bottom: calc(14px + var(--m-safe-b)) !important;
+    left: 14px !important;
+  }
+  .tori-lp .tori-a11y-fab,
+  .tori-lp .tori-chat-fab {
+    width: 52px !important;
+    height: 52px !important;
+  }
+  .tori-lp .tori-chat-panel {
+    width: calc(100vw - 28px) !important;
+    max-width: 380px !important;
+  }
+
+  /* ---------- 8. section-specific ---------- */
+  /* pain cards carry a 340px floor plus a 170px bubble stage, which leaves a
+     dead band once the copy rewraps narrow */
+  .tori-lp #pain .tori-lift {
+    min-height: 0 !important;
+    padding: 20px 20px 0 !important;
+  }
+  .tori-lp #pain .tori-lift > div:last-child {
+    min-height: 150px !important;
+  }
+
+  /* every section CTA becomes a full-width block */
+  .tori-lp section .tori-cta,
+  .tori-lp section .tori-ghost,
+  .tori-lp .tori-vs-cta {
+    width: 100% !important;
+    justify-content: space-between !important;
+    min-height: 54px !important;
+    border-radius: 14px !important;
+  }
+  .tori-lp .tori-price-grid {
+    gap: 22px !important;
+  }
+  .tori-lp .tori-feat-media {
+    aspect-ratio: 4 / 3;
+  }
+
+  /* anchor jumps must clear the fixed bar */
+  .tori-lp section[id] {
+    scroll-margin-top: 78px;
+  }
+}
+
+/* ---------- 9. narrow phones ---------- */
+@media (max-width: 400px) {
+  .tori-lp {
+    --m-gutter: 17px;
+    --m-card-pad: 17px;
+  }
+  .tori-lp .tori-hero {
+    padding-top: 96px !important;
+  }
+}

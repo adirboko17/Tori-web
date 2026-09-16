@@ -1,0 +1,360 @@
+/* ============================================================
+   tori landing — mobile menu: burger button + full-screen sheet
+   ============================================================ */
+
+/* ---------- burger ---------- */
+.tori-lp .tori-burger {
+  display: none;
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 1px solid rgba(23, 22, 22, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.72);
+  -webkit-backdrop-filter: blur(14px) saturate(1.5);
+  backdrop-filter: blur(14px) saturate(1.5);
+  cursor: pointer;
+  place-items: center;
+  transition:
+    background 0.28s,
+    border-color 0.28s,
+    transform 0.16s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.tori-lp .tori-burger:active {
+  transform: scale(0.92);
+  transition-duration: 0.08s;
+}
+.tori-lp .tori-burger-box {
+  position: relative;
+  display: block;
+  width: 20px;
+  height: 14px;
+}
+.tori-lp .tori-burger-box span {
+  position: absolute;
+  inset-inline: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--ink-900);
+  transition:
+    transform 0.44s cubic-bezier(0.62, 0.02, 0.24, 1),
+    width 0.44s cubic-bezier(0.62, 0.02, 0.24, 1),
+    background 0.3s;
+}
+.tori-lp .tori-burger-box span:first-child {
+  top: 0;
+}
+.tori-lp .tori-burger-box span:last-child {
+  bottom: 0;
+  width: 13px;
+  margin-inline-start: auto;
+}
+
+/* open: the two bars cross into an X on a dark chip */
+.tori-lp.menu-open .tori-burger {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.18);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.tori-lp.menu-open .tori-burger-box span {
+  background: var(--tori-lime);
+  width: 20px;
+}
+.tori-lp.menu-open .tori-burger-box span:first-child {
+  transform: translateY(6px) rotate(45deg);
+}
+.tori-lp.menu-open .tori-burger-box span:last-child {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* ---------- sheet ---------- */
+.tori-lp .tori-menu {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 18px;
+  padding: calc(92px + env(safe-area-inset-top, 0px)) var(--m-gutter, 20px)
+    calc(22px + env(safe-area-inset-bottom, 0px));
+  background: var(--ink-950);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  opacity: 0;
+  visibility: hidden;
+  clip-path: circle(0% at calc(100% - 43px) 46px);
+  transition:
+    opacity 0.3s ease,
+    visibility 0.5s,
+    clip-path 0.62s cubic-bezier(0.62, 0.02, 0.24, 1);
+}
+/* `hidden` is the no-JS/no-CSS fallback; the sheet itself is CSS-driven */
+.tori-lp .tori-menu[hidden] {
+  display: grid;
+}
+.tori-lp.menu-open .tori-menu {
+  z-index: 1;
+  pointer-events: auto;
+  opacity: 1;
+  visibility: visible;
+  clip-path: circle(142% at calc(100% - 43px) 46px);
+}
+.tori-lp .tori-menu-glow {
+  position: absolute;
+  inset-inline-end: -28%;
+  top: -14%;
+  width: 92%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(191, 255, 81, 0.2),
+    rgba(12, 255, 190, 0.09) 44%,
+    transparent 68%
+  );
+  filter: blur(14px);
+  pointer-events: none;
+}
+
+/* ---------- links ---------- */
+.tori-lp .tori-menu-list {
+  position: relative;
+  display: grid;
+  align-content: center;
+  gap: 2px;
+}
+.tori-lp .tori-menu-list a {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  min-height: 58px;
+  padding: 11px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--white);
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    background 0.24s,
+    padding 0.32s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.tori-lp.menu-open .tori-menu-list a,
+.tori-lp.menu-open .tori-menu-foot {
+  animation: tori-menu-in 0.56s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  animation-delay: calc(0.13s + var(--i, 0) * 0.045s);
+}
+@keyframes tori-menu-in {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.tori-lp .tori-menu-num {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.34);
+  font-variant-numeric: tabular-nums;
+  transition: color 0.24s;
+}
+.tori-lp .tori-menu-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.tori-lp .tori-menu-label {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.16;
+  letter-spacing: -0.02em;
+}
+.tori-lp .tori-menu-hint {
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.46);
+}
+.tori-lp .tori-menu-chev {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.6);
+  transition:
+    transform 0.32s cubic-bezier(0.34, 1.42, 0.64, 1),
+    background 0.26s,
+    border-color 0.26s,
+    color 0.26s;
+}
+.tori-lp .tori-menu-list a:active {
+  background: rgba(255, 255, 255, 0.05);
+  padding-inline: 12px 0;
+}
+.tori-lp .tori-menu-list a:active .tori-menu-num {
+  color: var(--tori-lime);
+}
+.tori-lp .tori-menu-list a:active .tori-menu-chev {
+  transform: translateX(-4px);
+  background: var(--gradient-brand);
+  border-color: transparent;
+  color: var(--ink-900);
+}
+/* section currently in view */
+.tori-lp .tori-menu-list a.is-current .tori-menu-num {
+  color: var(--tori-lime);
+}
+.tori-lp .tori-menu-list a.is-current .tori-menu-label {
+  background-image: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- footer ---------- */
+.tori-lp .tori-menu-foot {
+  position: relative;
+  display: grid;
+  gap: 12px;
+  opacity: 0;
+  transform: translateY(20px);
+}
+.tori-lp .tori-menu-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 56px;
+  padding: 0 16px 0 20px;
+  border-radius: 15px;
+  background: var(--gradient-brand);
+  color: var(--ink-900);
+  font-size: 16px;
+  font-weight: 700;
+  transition: transform 0.16s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.tori-lp .tori-menu-cta:active {
+  transform: scale(0.97);
+}
+.tori-lp .tori-menu-cta-ico {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--ink-900);
+  color: var(--tori-lime);
+}
+.tori-lp .tori-menu-wa {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 48px;
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 14.5px;
+  font-weight: 500;
+  transition:
+    background 0.22s,
+    transform 0.16s;
+}
+.tori-lp .tori-menu-wa:active {
+  background: rgba(255, 255, 255, 0.07);
+  transform: scale(0.97);
+}
+
+/* ---------- bar layout at mobile widths ---------- */
+@media (max-width: 760px) {
+  .tori-lp .tori-burger {
+    display: grid;
+  }
+  .tori-lp .tori-nav-bar {
+    gap: 10px !important;
+    padding: 12px var(--m-gutter) !important;
+  }
+  .tori-lp .tori-nav.is-scrolled .tori-nav-bar {
+    width: calc(100% - 20px) !important;
+    margin-top: 8px !important;
+    padding: 8px 8px 8px 14px !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(1.7);
+    backdrop-filter: blur(20px) saturate(1.7);
+  }
+  .tori-lp .tori-nav-logo {
+    margin-inline-end: auto;
+  }
+  /* the bar CTA collapses to an icon; the worded CTA lives in the sheet */
+  .tori-lp .tori-nav-cta {
+    min-height: 46px !important;
+    width: 46px;
+    padding: 0 !important;
+    justify-content: center;
+    border-radius: 14px !important;
+  }
+  .tori-lp .tori-nav-cta > span:first-child {
+    display: none;
+  }
+  .tori-lp .tori-nav-cta-arrow {
+    width: 30px !important;
+    height: 30px !important;
+    background: var(--ink-900) !important;
+    color: var(--tori-lime) !important;
+  }
+  .tori-lp .tori-nav.is-scrolled .tori-nav-cta {
+    background: var(--gradient-brand) !important;
+  }
+  /* the sheet owns the screen while open — but the bar stays on top of it,
+     otherwise the burger you just tapped disappears behind the sheet */
+  .tori-lp.menu-open .tori-nav-bar {
+    position: relative;
+    z-index: 2;
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .tori-lp.menu-open .tori-nav-cta,
+  .tori-lp.menu-open .tori-nav-mark {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s;
+  }
+  /* the wordmark is dark artwork — flip it to read on the dark sheet */
+  .tori-lp.menu-open .tori-nav-word {
+    filter: invert(1);
+    transition: filter 0.3s;
+  }
+  .tori-lp.menu-open .tori-nav.is-hidden .tori-nav-bar {
+    transform: none;
+  }
+  /* the FABs sit above the nav layer, so park them while the sheet is open */
+  .tori-lp.menu-open .tori-a11y,
+  .tori-lp.menu-open .tori-chat {
+    opacity: 0;
+    transform: translateY(18px) scale(0.9);
+    pointer-events: none;
+    transition:
+      opacity 0.24s,
+      transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tori-lp .tori-menu {
+    clip-path: none !important;
+    transition:
+      opacity 0.2s,
+      visibility 0.2s !important;
+  }
+  .tori-lp .tori-menu-list a,
+  .tori-lp .tori-menu-foot {
+    opacity: 1;
+    transform: none;
+  }
+}
