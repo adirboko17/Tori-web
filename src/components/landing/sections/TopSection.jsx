@@ -36,18 +36,12 @@ export default function TopSection() {
               <span style={{ "--i": "0" }}>
                 {"היי, אני "}
                 <span className="tori-hero-mark">
-                  <video
-                    muted={true}
-                    loop={true}
-                    playsInline={true}
-                    autoPlay={true}
-                    preload="auto"
-                  >
-                    <source
-                      src="/assets/video/tori-mark-hero.webm"
-                      type="video/webm"
-                    />
-                  </video>
+                  <img
+                    src="/assets/brand/tori-mark-inline.png"
+                    alt=""
+                    aria-hidden="true"
+                    decoding="async"
+                  />
                 </span>
                 {" "}
                 <span className="tori-word">{"תורי."}</span>

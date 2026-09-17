@@ -91,7 +91,11 @@ export default function PricingSection() {
                     fontSize: "clamp(64px,8vw,104px)",
                     lineHeight: ".86",
                     color: "var(--white)",
-                    width: "197px",
+                    /* three tabular digits: holds the box steady while the
+                       count-up runs, and scales with the font clamp */
+                    width: "3ch",
+                    textAlign: "center",
+                    fontVariantNumeric: "tabular-nums",
                   }}
                 >
                   {"‎"}

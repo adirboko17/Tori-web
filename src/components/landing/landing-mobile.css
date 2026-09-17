@@ -125,29 +125,40 @@
     max-width: 100% !important;
   }
 
-  /* ---------- 4. hero ---------- */
+  /* ---------- 4. hero ----------
+     The hero is the one section that earns centring: three short lines,
+     one promise, one action. Everything below it keeps the start spine. */
   .tori-lp .tori-hero > div {
     gap: 26px !important;
+    justify-content: center !important;
+  }
+  .tori-lp .tori-hero h1,
+  .tori-lp .tori-hero p:first-of-type {
+    text-align: center !important;
   }
   .tori-lp .tori-hero p:first-of-type {
-    margin: 16px 0 22px !important;
+    margin: 16px auto 24px !important;
+    max-width: 31ch !important;
   }
-  /* CTAs: full-width, equal, stacked — no ragged right edge */
-  .tori-lp .tori-hero .tori-cta,
+  /* one action on a phone — the secondary link only splits the tap */
   .tori-lp .tori-hero .tori-ghost {
-    width: 100% !important;
-    justify-content: space-between !important;
-    min-height: 56px !important;
-    padding: 0 16px 0 20px !important;
-    border-radius: 14px !important;
-    font-size: 16px !important;
+    display: none !important;
   }
   .tori-lp .tori-hero > div > div:last-child {
     width: 100%;
   }
-  .tori-lp .tori-hero .tori-cta + .tori-ghost,
   .tori-lp .tori-hero div:has(> .tori-cta) {
-    gap: 10px !important;
+    justify-content: center !important;
+  }
+  /* sized to its own text, not to the viewport */
+  .tori-lp .tori-hero .tori-cta {
+    width: auto !important;
+    justify-content: center !important;
+    gap: 14px !important;
+    min-height: 56px !important;
+    padding: 0 14px 0 24px !important;
+    border-radius: 14px !important;
+    font-size: 16px !important;
   }
   /* the stage carries 76/70px of padding for the desktop float; on a phone
      that reads as a dead band between the CTAs and the device */
@@ -229,8 +240,38 @@
     min-height: 54px !important;
     border-radius: 14px !important;
   }
+  /* pricing: the offer column is one centred statement — number, promise,
+     action. The feature list beside it keeps the start spine. */
   .tori-lp .tori-price-grid {
-    gap: 22px !important;
+    gap: 26px !important;
+  }
+  .tori-lp #pricing div:has(> h2) {
+    justify-items: center !important;
+    text-align: center !important;
+  }
+  .tori-lp #pricing h2 {
+    text-align: center !important;
+  }
+  .tori-lp .tori-price-grid > div:first-child {
+    justify-items: center !important;
+    text-align: center !important;
+    gap: 20px !important;
+  }
+  /* number + unit stack sit together on the centre line */
+  .tori-lp .tori-price-grid > div:first-child > div:first-child {
+    justify-content: center !important;
+  }
+  .tori-lp .tori-price-grid p {
+    text-align: center !important;
+    margin-inline: auto !important;
+    max-width: 30ch !important;
+  }
+  .tori-lp #pricing .tori-cta {
+    justify-content: center !important;
+    gap: 14px !important;
+    padding: 0 16px 0 24px !important;
+    font-size: 17px !important;
+    min-height: 58px !important;
   }
   .tori-lp .tori-feat-media {
     aspect-ratio: 4 / 3;
