@@ -1,6 +1,7 @@
 import { invokeEdgeFunction } from "./supabase-admin";
 
 export type SmsBalance = {
+  ok: boolean;
   total: number;
   packageCredits: number;
   prepaidCredits: number;
@@ -17,7 +18,9 @@ export async function loadSmsBalance(businessId: string): Promise<SmsBalance> {
     { businessId },
   );
   const data = result.data ?? {};
+  const hasCredits = data.directSmsCredits != null && data.directSmsCredits !== "";
   return {
+    ok: Boolean(result.ok && data.ok === true && hasCredits),
     total: toNumber(data.directSmsCredits),
     packageCredits: toNumber(data.packageSmsCredits),
     prepaidCredits: toNumber(data.prepaidSmsCredits),

@@ -12,6 +12,20 @@ export async function sendLoginOtp(businessId: string, phone: string) {
     phone,
   });
   const code = findOtpErrorCode(result.data);
+  const warning =
+    result.data && typeof result.data === "object" && "warning" in result.data
+      ? String((result.data as { warning?: unknown }).warning ?? "")
+      : "";
+  if (warning === "sender_same_as_recipient") {
+    return {
+      ok: false as const,
+      code: "sender_same_as_recipient",
+      message: otpErrorMessage(
+        "sender_same_as_recipient",
+        "שליחת ה-SMS נחסמה כי מספר השולח זהה למספר היעד.",
+      ),
+    };
+  }
   if (!result.ok || code) {
     return {
       ok: false as const,

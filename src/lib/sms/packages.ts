@@ -8,14 +8,14 @@ export const SMS_PACKAGE_IDS = [
 export type SmsPackageId = (typeof SMS_PACKAGE_IDS)[number];
 
 export type SmsPackage = {
-  id: SmsPackageId;
+  id: string;
   smsCredits: number;
   amountIls: number;
   label: string;
   featured?: boolean;
 };
 
-const SMS_PACKAGES: readonly SmsPackage[] = [
+export const DEFAULT_SMS_PACKAGES: readonly SmsPackage[] = [
   {
     id: "pack_10",
     smsCredits: 10,
@@ -44,11 +44,11 @@ const SMS_PACKAGES: readonly SmsPackage[] = [
 ];
 
 export function listSmsPackages(): SmsPackage[] {
-  return SMS_PACKAGES.map((pack) => ({ ...pack }));
+  return DEFAULT_SMS_PACKAGES.map((pack) => ({ ...pack }));
 }
 
 export function getSmsPackage(packageId: string): SmsPackage | null {
-  return SMS_PACKAGES.find((pack) => pack.id === packageId) ?? null;
+  return DEFAULT_SMS_PACKAGES.find((pack) => pack.id === packageId) ?? null;
 }
 
 export function isSmsPackageId(value: unknown): value is SmsPackageId {

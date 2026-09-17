@@ -1,4 +1,4 @@
-export default function LeadFormSection() {
+export default function LeadFormSection({ monthlyPrice = 299 }) {
   return (
     <section
       id="lead-form"
@@ -143,7 +143,7 @@ export default function LeadFormSection() {
                     color: "var(--ink-900)",
                   }}
                 >
-                  {"‎299 ₪ לחודש, מחיר קבוע"}
+                  {`‎${monthlyPrice} ₪ לחודש, מחיר קבוע`}
                 </span>
                 <span
                   style={{

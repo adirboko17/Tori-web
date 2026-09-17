@@ -6,7 +6,7 @@ import {
   createPendingOrder,
   markOrderFailed,
 } from "@/lib/sms/orders";
-import { getSmsPackage, isSmsPackageId } from "@/lib/sms/packages";
+import { loadSmsPackage } from "@/lib/admin/catalog";
 import { generatePayplusLink } from "@/lib/sms/payplus";
 import { readSmsSession } from "@/lib/sms/session";
 
@@ -20,11 +20,8 @@ export async function POST(request: Request) {
 
   const body = await readJsonBody(request);
   if (!body) return jsonError("בקשה לא תקינה.");
-  const packageId = body.packageId;
-  if (!isSmsPackageId(packageId)) {
-    return jsonError("חבילה לא מוכרת.");
-  }
-  const pack = getSmsPackage(packageId);
+  const packageId = String(body.packageId ?? "");
+  const pack = await loadSmsPackage(packageId);
   if (!pack) return jsonError("חבילה לא מוכרת.");
 
   if (!payplusConfigured()) {

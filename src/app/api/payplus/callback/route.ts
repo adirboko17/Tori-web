@@ -13,6 +13,7 @@ import {
   parsePayplusCallback,
   verifyPayplusHash,
 } from "@/lib/sms/payplus";
+import { loadMonthlyPriceIls } from "@/lib/admin/catalog";
 import {
   parseSubscriptionMoreInfo,
   subscriptionChargeIls,
@@ -123,7 +124,10 @@ async function handleCallback(request: Request) {
     const paidSubscriptionId = parseSubscriptionMoreInfo(payment.moreInfo);
     if (
       paidSubscriptionId &&
-      isConfirmedPayplusPayment(payment, subscriptionChargeIls())
+      isConfirmedPayplusPayment(
+        payment,
+        subscriptionChargeIls(await loadMonthlyPriceIls()),
+      )
     ) {
       const result = await fulfillPaidSubscription({
         businessId: paidSubscriptionId,

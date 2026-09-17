@@ -1,3 +1,4 @@
+import { loadMonthlyPriceIls } from "@/lib/admin/catalog";
 import { priceSummary } from "@/lib/booking";
 import { amountsMatch } from "@/lib/sms/payplus";
 import { getServiceSupabase } from "@/lib/sms/supabase-admin";
@@ -34,7 +35,7 @@ export async function markSubscriptionCheckoutStarted(businessId: string) {
       .from("businesses")
       .update({
         plan: SUBSCRIPTION_PLAN,
-        price: String(priceSummary().total),
+        price: String(priceSummary(await loadMonthlyPriceIls()).total),
         commitment: "pending-payment",
       })
       .eq("id", businessId)
@@ -51,7 +52,7 @@ export async function fulfillPaidSubscription(input: {
   businessId: string;
   amount: number;
 }) {
-  if (!amountsMatch(input.amount, subscriptionChargeIls())) {
+  if (!amountsMatch(input.amount, subscriptionChargeIls(await loadMonthlyPriceIls()))) {
     return { ok: false as const, message: "סכום התשלום אינו תואם למנוי." };
   }
   const business = await loadBusinessForSubscription(input.businessId);
@@ -66,7 +67,7 @@ export async function fulfillPaidSubscription(input: {
     .from("businesses")
     .update({
       plan: SUBSCRIPTION_PLAN,
-      price: String(subscriptionChargeIls()),
+      price: String(subscriptionChargeIls(await loadMonthlyPriceIls())),
       commitment: "paid",
     })
     .eq("id", input.businessId)

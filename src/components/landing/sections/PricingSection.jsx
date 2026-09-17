@@ -1,4 +1,4 @@
-export default function PricingSection() {
+export default function PricingSection({ monthlyPrice = 299 }) {
   return (
     <section
       id="pricing"
@@ -99,7 +99,7 @@ export default function PricingSection() {
                   }}
                 >
                   {"‎"}
-                  <span data-count="299">{"299"}</span>
+                  <span data-count={String(monthlyPrice)}>{String(monthlyPrice)}</span>
                 </span>
                 <span
                   style={{ display: "grid", gap: "2px", paddingBottom: "6px" }}

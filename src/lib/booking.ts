@@ -92,9 +92,9 @@ export function cancelAppointment(appointments: Appointment[], id: string) {
     a.id === id ? { ...a, status: "cancelled" as const } : a,
   );
 }
-export function priceSummary() {
+export function priceSummary(monthlyPriceIls = 299) {
   const sms = 0;
-  const subtotal = 299;
+  const subtotal = monthlyPriceIls;
   return {
     sms,
     subtotal,

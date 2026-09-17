@@ -16,7 +16,7 @@ import LeadFormSection from "./sections/LeadFormSection";
 import Footer25Section from "./sections/Footer25Section";
 import ToriA11ySection from "./sections/ToriA11ySection";
 import ToriChatSection from "./sections/ToriChatSection";
-export default function Landing() {
+export default function Landing({ monthlyPrice = 299 }) {
   const rootRef = useRef(null);
   useEffect(() => initializeLanding(rootRef.current), []);
   return (
@@ -36,14 +36,14 @@ export default function Landing() {
       <ToriNavSection />
       <TopSection />
       <CapabilitiesSection />
-      <PainSection />
+      <PainSection monthlyPrice={monthlyPrice} />
       <ProcessSection />
       <BrandSection />
       <FeaturesSection />
       <CompareSection />
-      <PricingSection />
+      <PricingSection monthlyPrice={monthlyPrice} />
       <FaqSection />
-      <LeadFormSection />
+      <LeadFormSection monthlyPrice={monthlyPrice} />
       <Footer25Section />
       <ToriA11ySection />
       <ToriChatSection />

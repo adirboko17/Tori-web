@@ -4,6 +4,7 @@ export const OTP_ERROR_MESSAGES: Record<string, string> = {
   rate_limit_sends: "נשלחו יותר מדי קודים. נסו שוב בעוד כמה דקות.",
   sms_send_failed: "שליחת ה-SMS נכשלה. נסו שוב.",
   pulseem_not_configured: "שליחת הודעות עדיין לא הוגדרה. פנו לתמיכה.",
+  sender_same_as_recipient: "שליחת ה-SMS נחסמה כי מספר השולח זהה למספר היעד.",
   no_active_code: "אין קוד פעיל. בקשו קוד חדש.",
   wrong_code: "הקוד שגוי. בדקו ונסו שוב.",
   too_many_attempts: "יותר מדי ניסיונות. בקשו קוד חדש.",

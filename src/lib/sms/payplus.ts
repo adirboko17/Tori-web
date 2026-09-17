@@ -1,3 +1,4 @@
+import { loadMonthlyPriceIls } from "@/lib/admin/catalog";
 import { priceSummary } from "@/lib/booking";
 import {
   SUBSCRIPTION_ITEM_NAME,
@@ -117,7 +118,7 @@ export async function generatePayplusSubscriptionLink(
     return { ok: false as const, message: "סליקת המנוי החודשי עדיין לא הוגדרה." };
   }
   const appUrl = checkoutReturnUrl(input.request);
-  const amount = priceSummary().total;
+  const amount = priceSummary(await loadMonthlyPriceIls()).total;
   const customer: Record<string, string> = {
     customer_name: input.customer.customer_name,
     phone: input.customer.phone,

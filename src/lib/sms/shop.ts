@@ -1,7 +1,7 @@
+import { loadSmsPackages } from "@/lib/admin/catalog";
 import { loadSmsBalance } from "./balance";
 import { payplusConfigured } from "./env";
 import { reconcilePendingOrders } from "./orders";
-import { listSmsPackages } from "./packages";
 import type { SmsSession } from "./session";
 
 export async function shopPayload(session: SmsSession) {
@@ -19,7 +19,7 @@ export async function shopPayload(session: SmsSession) {
       businessName: session.businessName,
     },
     balance,
-    packages: listSmsPackages().map((pack) => ({
+    packages: (await loadSmsPackages()).map((pack) => ({
       id: pack.id,
       smsCredits: pack.smsCredits,
       amountIls: pack.amountIls,

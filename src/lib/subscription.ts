@@ -1,9 +1,12 @@
 export const SUBSCRIPTION_MORE_INFO_PREFIX = "sub:";
 export const SUBSCRIPTION_PLAN = "monthly";
 export const SUBSCRIPTION_ITEM_NAME = "מנוי חודשי tori";
+export const DEFAULT_MONTHLY_PRICE_ILS = 299;
 
-export function subscriptionChargeIls() {
-  return Math.round(299 * 118) / 100;
+export function subscriptionChargeIls(
+  monthlyPriceIls = DEFAULT_MONTHLY_PRICE_ILS,
+) {
+  return Math.round(monthlyPriceIls * 118) / 100;
 }
 
 export function subscriptionMoreInfo(businessId: string) {

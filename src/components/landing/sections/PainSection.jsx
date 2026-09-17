@@ -1,4 +1,4 @@
-export default function PainSection() {
+export default function PainSection({ monthlyPrice = 299 }) {
   return (
     <section
       id="pain"
@@ -500,7 +500,7 @@ export default function PainSection() {
                 marginBottom: "6px",
               }}
             >
-              {"הזמן שלך שווה הרבה יותר מ־299 ₪ לחודש."}
+              {`הזמן שלך שווה הרבה יותר מ־${monthlyPrice} ₪ לחודש.`}
             </div>
             <div
               style={{
