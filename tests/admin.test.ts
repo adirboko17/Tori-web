@@ -14,6 +14,11 @@ import {
 } from "../src/lib/admin/otp-business.ts";
 import { resolveSmsRemaining } from "../src/lib/admin/sms-remaining.ts";
 import { parseSmsTransferInput } from "../src/lib/admin/sms-transfer.ts";
+import {
+  cancellationStatusLabel,
+  isOpenCancellationStatus,
+  parseCancellationInput,
+} from "../src/lib/admin/cancellation-parse.ts";
 
 test("signs and expires admin sessions", async () => {
   const secret = "test-admin-session-secret";
@@ -117,6 +122,24 @@ test("validates SMS transfers to another customer or the main Pulseem account", 
     }).ok,
     false,
   );
+});
+
+test("accepts a business-admin cancellation request payload", () => {
+  const parsed = parseCancellationInput({
+    businessId: "464cb35b-0fbb-413f-91fe-1ad49addcb77",
+    userId: "32b53b60-9bef-43b7-a68c-30f7c71e9544",
+    phone: "050-230-7500",
+    name: "איתי בן יאיר",
+  });
+  assert.equal(parsed.ok, true);
+  if (parsed.ok) {
+    assert.equal(parsed.phone, "0502307500");
+    assert.equal(parsed.businessId, "464cb35b-0fbb-413f-91fe-1ad49addcb77");
+  }
+  assert.equal(isOpenCancellationStatus("requested"), true);
+  assert.equal(isOpenCancellationStatus("done"), false);
+  assert.equal(cancellationStatusLabel("requested"), "ממתין לטיפול");
+  assert.equal(parseCancellationInput({ phone: "0502307500" }).ok, false);
 });
 
 test("monthly price helper keeps VAT math for custom amounts", () => {

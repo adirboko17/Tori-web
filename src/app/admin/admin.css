@@ -150,6 +150,7 @@
 .admin-nav-links button {
   display: flex;
   align-items: center;
+  gap: 8px;
   min-height: var(--hit-min);
   padding: 0 12px;
   border: 0;
@@ -273,6 +274,40 @@
 .admin-status.is-failed {
   background: var(--status-cancelled-bg);
   color: var(--status-cancelled-fg);
+}
+
+.admin-nav-count {
+  margin-inline-start: auto;
+  min-width: 22px;
+  min-height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--status-cancelled-bg);
+  color: var(--status-cancelled-fg);
+  font: var(--type-caption);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-alert {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  background: var(--status-pending-bg);
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+}
+
+.admin-alert .admin-title {
+  font: var(--type-heading);
+}
+
+.admin-alert .admin-note {
+  max-width: 52ch;
 }
 
 @media (max-width: 800px) {

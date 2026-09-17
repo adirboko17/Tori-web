@@ -79,7 +79,10 @@ export async function loadSmsPackageRows(activeOnly = false) {
     if (activeOnly) query = query.eq("is_active", true);
     const { data, error } = await query;
     if (error || !data) return [];
-    return data as SiteSmsPackageRow[];
+    return (data as SiteSmsPackageRow[]).filter((row) => {
+      const key = String(row.package_key ?? "");
+      return !key.startsWith("app_cancel_") && !key.startsWith("payplus_sub_");
+    });
   } catch {
     return [];
   }

@@ -6,6 +6,7 @@ import {
 } from "@/lib/sms/orders";
 import {
   amountsMatch,
+  extractPayplusRecurringRef,
   isConfirmedPayplusPayment,
   isPayplusUserAgent,
   isSuccessfulPayplusStatus,
@@ -38,6 +39,9 @@ async function handleCallback(request: Request) {
     statusCode: string;
     amount: number;
     moreInfo: string;
+    recurringUid: string;
+    terminalUid: string;
+    customerUid: string;
   } | null = null;
 
   if (rawBody) {
@@ -48,6 +52,12 @@ async function handleCallback(request: Request) {
     }
   }
   if (!parsed) {
+    const fromQuery = extractPayplusRecurringRef({
+      recurring_payment_uid: url.searchParams.get("recurring_payment_uid"),
+      recurring_uid: url.searchParams.get("recurring_uid"),
+      terminal_uid: url.searchParams.get("terminal_uid"),
+      customer_uid: url.searchParams.get("customer_uid"),
+    });
     parsed = {
       uid: url.searchParams.get("transaction_uid") || url.searchParams.get("uid") || "",
       statusCode: url.searchParams.get("status_code") || "",
@@ -56,6 +66,9 @@ async function handleCallback(request: Request) {
         url.searchParams.get("more_info") ||
         url.searchParams.get("moreInfo") ||
         "",
+      recurringUid: fromQuery.recurringUid,
+      terminalUid: fromQuery.terminalUid,
+      customerUid: fromQuery.customerUid,
     };
   }
 
@@ -67,9 +80,25 @@ async function handleCallback(request: Request) {
   const subscriptionId = parseSubscriptionMoreInfo(parsed.moreInfo);
   if (subscriptionId) {
     if (signed && isSuccessfulPayplusStatus(parsed.statusCode)) {
+      let recurringUid = parsed.recurringUid;
+      let terminalUid = parsed.terminalUid;
+      let customerUid = parsed.customerUid;
+      if (!recurringUid) {
+        const lookedUp = await lookupPayplusPayment({
+          moreInfo: parsed.moreInfo || undefined,
+          transactionUid: parsed.uid || undefined,
+        });
+        recurringUid = lookedUp?.recurringUid ?? "";
+        terminalUid = terminalUid || lookedUp?.terminalUid || "";
+        customerUid = customerUid || lookedUp?.customerUid || "";
+      }
       const result = await fulfillPaidSubscription({
         businessId: subscriptionId,
         amount: parsed.amount,
+        recurringUid,
+        terminalUid,
+        customerUid,
+        transactionUid: parsed.uid,
       });
       if (!result.ok) return jsonError(result.message, 502);
       return jsonOk({ ok: true, kind: "subscription", idempotent: result.idempotent });
@@ -132,6 +161,10 @@ async function handleCallback(request: Request) {
       const result = await fulfillPaidSubscription({
         businessId: paidSubscriptionId,
         amount: payment.amount,
+        recurringUid: payment.recurringUid || parsed.recurringUid,
+        terminalUid: payment.terminalUid || parsed.terminalUid,
+        customerUid: payment.customerUid || parsed.customerUid,
+        transactionUid: payment.uid || parsed.uid,
       });
       if (!result.ok) return jsonError(result.message, 502);
       return jsonOk({ ok: true, kind: "subscription", via: "ipn" });

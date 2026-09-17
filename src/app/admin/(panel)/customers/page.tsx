@@ -14,6 +14,12 @@ type Customer = {
   adminCount: number;
   purchaseCount: number;
   purchaseTotalIls: number;
+  openCancellation: { id: string; status: string; requestedAt: string } | null;
+  payplusSubscription: {
+    status: string;
+    amountIls: number | null;
+    nextChargeAt: string | null;
+  } | null;
 };
 
 export default function AdminCustomersPage() {
@@ -69,6 +75,8 @@ export default function AdminCustomersPage() {
                 <th>יתרת SMS</th>
                 <th>מנהלים</th>
                 <th>רכישות</th>
+                <th>ביטול</th>
+                <th>הוראת קבע</th>
               </tr>
             </thead>
             <tbody>
@@ -89,6 +97,32 @@ export default function AdminCustomersPage() {
                   <td>
                     {customer.purchaseCount} /{" "}
                     {customer.purchaseTotalIls.toLocaleString("he-IL")} ₪
+                  </td>
+                  <td>
+                    {customer.openCancellation ? (
+                      <span className="admin-status is-pending">ביקש לבטל</span>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+                  <td>
+                    {customer.payplusSubscription?.status === "active" ? (
+                      <div>
+                        <span className="admin-status is-paid">פעילה</span>
+                        <div>
+                          {customer.payplusSubscription.amountIls
+                            ? `${customer.payplusSubscription.amountIls.toLocaleString("he-IL")} ₪`
+                            : ""}
+                          {customer.payplusSubscription.nextChargeAt
+                            ? ` · ${new Date(customer.payplusSubscription.nextChargeAt).toLocaleDateString("he-IL")}`
+                            : ""}
+                        </div>
+                      </div>
+                    ) : customer.payplusSubscription?.status === "cancelled" ? (
+                      <span className="admin-status is-failed">בוטלה</span>
+                    ) : (
+                      "—"
+                    )}
                   </td>
                 </tr>
               ))}

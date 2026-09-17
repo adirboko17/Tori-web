@@ -1,5 +1,14 @@
 import { loadSmsBalance } from "@/lib/sms/balance";
 import { getServiceSupabase } from "@/lib/sms/supabase-admin";
+import {
+  loadOpenCancellationsByBusiness,
+  type OpenCancellation,
+} from "./cancellations";
+import {
+  enrichPayplusSubscriptionsWithLive,
+  loadPayplusSubscriptionsByBusiness,
+  type PayplusSubscription,
+} from "./payplus-subscriptions";
 import { resolveSmsRemaining } from "./sms-remaining";
 
 export type AdminCustomer = {
@@ -13,6 +22,8 @@ export type AdminCustomer = {
   adminCount: number;
   purchaseCount: number;
   purchaseTotalIls: number;
+  openCancellation: OpenCancellation | null;
+  payplusSubscription: PayplusSubscription | null;
 };
 
 export type AdminPurchase = {
@@ -97,6 +108,15 @@ export async function listCustomers(): Promise<AdminCustomer[]> {
     .map((record) => String(record.id ?? ""))
     .filter(Boolean);
   const liveTotals = await loadLiveSmsTotals(liveIds);
+  const profileIds = (profiles.data ?? [])
+    .map((row) => String(asRecord(row).id ?? ""))
+    .filter(Boolean);
+  const [cancellations, subscriptions] = await Promise.all([
+    loadOpenCancellationsByBusiness(profileIds),
+    loadPayplusSubscriptionsByBusiness(profileIds).then(
+      enrichPayplusSubscriptionsWithLive,
+    ),
+  ]);
 
   return (profiles.data ?? []).map((row) => {
     const record = asRecord(row);
@@ -114,6 +134,8 @@ export async function listCustomers(): Promise<AdminCustomer[]> {
       adminCount: adminCounts.get(id) ?? 0,
       purchaseCount: purchases.count,
       purchaseTotalIls: purchases.total,
+      openCancellation: cancellations.get(id) ?? null,
+      payplusSubscription: subscriptions.get(id) ?? null,
     };
   });
 }

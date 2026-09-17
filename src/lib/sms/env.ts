@@ -46,6 +46,10 @@ export function payplusSubscriptionPageUid() {
   return trimEnv(process.env.PAYPLUS_SUBSCRIPTION_PAGE_UID);
 }
 
+export function payplusTerminalUid() {
+  return trimEnv(process.env.PAYPLUS_TERMINAL_UID);
+}
+
 export function payplusBaseUrl() {
   return trimEnv(process.env.PAYPLUS_ENV).toLowerCase() === "staging"
     ? "https://restapidev.payplus.co.il/api/v1.0"
@@ -86,4 +90,6 @@ export const CONFIG_ERRORS = {
   session: "חסר מפתח הפעלה בשרת. פנו לתמיכה.",
   payplus: "סליקה עדיין לא הוגדרה.",
   subscription: "סליקת המנוי החודשי עדיין לא הוגדרה.",
+  recurring:
+    "חסר מזהה מסוף PayPlus. הוסיפו PAYPLUS_TERMINAL_UID כדי לבטל הוראת קבע.",
 } as const;

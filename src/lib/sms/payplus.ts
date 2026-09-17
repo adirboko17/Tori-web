@@ -10,6 +10,7 @@ import {
   payplusConfigured,
   payplusSubscriptionConfigured,
   payplusSubscriptionPageUid,
+  payplusTerminalUid,
   checkoutReturnUrl,
   publicAppUrl,
 } from "./env";
@@ -17,6 +18,7 @@ import type { SmsPackage } from "./packages";
 
 export {
   amountsMatch,
+  extractPayplusRecurringRef,
   isPayplusUserAgent,
   isSuccessfulPayplusStatus,
   parsePayplusCallback,
@@ -24,8 +26,16 @@ export {
 } from "./payplus-crypto";
 import {
   amountsMatch,
+  extractPayplusRecurringRef,
   isSuccessfulPayplusStatus,
 } from "./payplus-crypto";
+import {
+  parsePayplusRecurringList,
+  parsePayplusRecurringRow,
+} from "./payplus-recurring";
+
+export type { PayplusRecurringMatch } from "./payplus-recurring";
+export { isPayplusUid } from "./payplus-recurring";
 
 export type PayplusCustomer = {
   customer_name: string;
@@ -164,6 +174,7 @@ export async function generatePayplusSubscriptionLink(
       successful_invoice: true,
       customer_failure_email: true,
       send_customer_success_email: true,
+      extra_info: subscriptionMoreInfo(input.businessId),
     },
   };
 
@@ -230,6 +241,9 @@ export type PayplusIpnPayment = {
   statusCode: string;
   amount: number;
   moreInfo: string;
+  recurringUid: string;
+  terminalUid: string;
+  customerUid: string;
 };
 
 export async function lookupPayplusPayment(input: {
@@ -273,7 +287,107 @@ export async function lookupPayplusPayment(input: {
     data.more_info ?? pickDeep(json, ["more_info", "moreInfo"]) ?? "",
   );
   if (!uid && !statusCode) return null;
-  return { uid, statusCode, amount, moreInfo };
+  const recurring = extractPayplusRecurringRef(json);
+  return {
+    uid,
+    statusCode,
+    amount,
+    moreInfo,
+    recurringUid: recurring.recurringUid,
+    terminalUid: recurring.terminalUid,
+    customerUid: recurring.customerUid,
+  };
+}
+
+export async function listPayplusRecurrings(search = "") {
+  const terminalUid = payplusTerminalUid();
+  if (!terminalUid) {
+    return { ok: false as const, error: "חסר מזהה מסוף PayPlus." };
+  }
+  const query = new URLSearchParams({
+    terminal_uid: terminalUid,
+    skip: "0",
+    take: "100",
+  });
+  const trimmed = search.trim();
+  if (trimmed) query.set("search", trimmed);
+  const response = await fetch(
+    `${payplusBaseUrl()}/RecurringPayments/View?${query.toString()}`,
+    {
+      headers: payplusAuthHeaders(),
+      signal: AbortSignal.timeout(8000),
+    },
+  );
+  const json = (await response.json().catch(() => ({}))) as unknown;
+  if (!response.ok) {
+    return { ok: false as const, error: "טעינת הוראות הקבע מ-PayPlus נכשלה." };
+  }
+  return { ok: true as const, recurrings: parsePayplusRecurringList(json) };
+}
+
+export async function viewPayplusRecurring(recurringUid: string) {
+  const terminalUid = payplusTerminalUid();
+  if (!terminalUid) {
+    return { ok: false as const, error: "חסר מזהה מסוף PayPlus." };
+  }
+  const response = await fetch(
+    `${payplusBaseUrl()}/RecurringPayments/${recurringUid}/ViewRecurring?terminal_uid=${encodeURIComponent(terminalUid)}`,
+    {
+      headers: payplusAuthHeaders(),
+      signal: AbortSignal.timeout(8000),
+    },
+  );
+  const json = (await response.json().catch(() => ({}))) as Record<
+    string,
+    unknown
+  >;
+  const data = (json.data ?? json) as unknown;
+  const recurring = parsePayplusRecurringRow(data);
+  if (!response.ok || !recurring) {
+    return { ok: false as const, error: "הוראת הקבע לא נמצאה ב-PayPlus." };
+  }
+  return { ok: true as const, recurring, terminalUid };
+}
+
+export async function deletePayplusRecurring(input: {
+  recurringUid: string;
+  terminalUid?: string | null;
+}) {
+  const terminalUid = String(input.terminalUid ?? "").trim() || payplusTerminalUid();
+  if (!terminalUid) {
+    return { ok: false as const, error: "חסר מזהה מסוף PayPlus לביטול הוראת הקבע." };
+  }
+  const response = await fetch(
+    `${payplusBaseUrl()}/RecurringPayments/DeleteRecurring/${input.recurringUid}`,
+    {
+      method: "POST",
+      headers: payplusAuthHeaders(),
+      body: JSON.stringify({ terminal_uid: terminalUid }),
+      signal: AbortSignal.timeout(8000),
+    },
+  );
+  const json = (await response.json().catch(() => ({}))) as Record<
+    string,
+    unknown
+  >;
+  const result = (json.result ?? json) as Record<string, unknown>;
+  const status = String(result.status ?? "").toLowerCase();
+  const code = Number(result.code ?? -1);
+  const description = String(result.description ?? json.message ?? "");
+  if (response.ok && (status === "success" || code === 0)) {
+    return { ok: true as const };
+  }
+  if (/already|deleted|not found|לא קיימ/i.test(description)) {
+    return { ok: true as const, alreadyCancelled: true };
+  }
+  console.error("payplus delete recurring failed", {
+    status: response.status,
+    results: json.results ?? json.result ?? json.error,
+  });
+  return {
+    ok: false as const,
+    error: description || "ביטול הוראת הקבע ב-PayPlus נכשל.",
+  };
 }
 
 export function isConfirmedPayplusPayment(

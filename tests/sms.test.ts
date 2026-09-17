@@ -12,9 +12,15 @@ import {
   amountsMatch,
   isPayplusUserAgent,
   isSuccessfulPayplusStatus,
+  extractPayplusRecurringRef,
   parsePayplusCallback,
   verifyPayplusHash,
 } from "../src/lib/sms/payplus-crypto.ts";
+import {
+  isPayplusUid,
+  nextPayplusChargeDate,
+  parsePayplusRecurringList,
+} from "../src/lib/sms/payplus-recurring.ts";
 import { normalizeIsraeliMobile } from "../src/lib/sms/phone.ts";
 import { signSmsSession, verifySmsSession } from "../src/lib/sms/session-token.ts";
 
@@ -111,12 +117,73 @@ test("verifies PayPlus callback hash against the raw body", () => {
   assert.equal(verifyPayplusHash(raw, null, secret), false);
   const parsed = parsePayplusCallback(raw);
   assert.equal(parsed.uid, "tx-1");
+  assert.equal(parsed.recurringUid, "");
   assert.equal(isSuccessfulPayplusStatus(parsed.statusCode), true);
   assert.equal(isSuccessfulPayplusStatus("001"), false);
   assert.equal(isPayplusUserAgent("PayPlus"), true);
   assert.equal(isPayplusUserAgent("PayPlus/1.0"), true);
   assert.equal(isPayplusUserAgent(null), true);
   assert.equal(isPayplusUserAgent("Mozilla"), false);
+});
+
+test("parses PayPlus recurring list rows for admin linking", () => {
+  assert.equal(isPayplusUid("67323068-d8fc-417e-8cce-89761d72effd"), true);
+  assert.equal(isPayplusUid("not-a-uid"), false);
+  const rows = parsePayplusRecurringList({
+    data: [
+      {
+        uid: "67323068-d8fc-417e-8cce-89761d72effd",
+        customer_name: "מורית שפירא",
+        customer_phone: "0501234567",
+        each_payment_amount: 366,
+        start_date: "09/09/2026",
+        valid: true,
+      },
+    ],
+  });
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0]?.customerName, "מורית שפירא");
+  assert.equal(rows[0]?.amount, 366);
+  assert.ok(rows[0]?.nextChargeAt);
+});
+
+test("computes the next monthly PayPlus charge from the last charge date", () => {
+  const next = nextPayplusChargeDate({
+    lastChargeDate: "10/09/2026",
+    recurringType: "monthly",
+    recurringRange: 1,
+    now: new Date(2026, 8, 18),
+  });
+  assert.ok(next);
+  assert.equal(new Date(next ?? "").toLocaleDateString("he-IL"), "10.10.2026");
+});
+
+test("extracts PayPlus recurring ids from nested callback payloads", () => {
+  const parsed = parsePayplusCallback(
+    JSON.stringify({
+      transaction: {
+        uid: "tx-2",
+        status_code: "000",
+        amount: 352.82,
+        more_info: "sub:2f1c0a2a-4b3d-4e5f-8a91-0b1c2d3e4f50",
+      },
+      recurring_payment: {
+        recurring_payment_uid: "rec-99",
+        terminal_uid: "term-1",
+        customer_uid: "cus-1",
+      },
+    }),
+  );
+  assert.equal(parsed.recurringUid, "rec-99");
+  assert.equal(parsed.terminalUid, "term-1");
+  assert.equal(parsed.customerUid, "cus-1");
+  assert.deepEqual(
+    extractPayplusRecurringRef({
+      recurring_uid: "rec-88",
+      terminalUid: "term-2",
+    }),
+    { recurringUid: "rec-88", terminalUid: "term-2", customerUid: "" },
+  );
 });
 
 test("allows a 5 agorot amount tolerance and locks fulfillment once", () => {

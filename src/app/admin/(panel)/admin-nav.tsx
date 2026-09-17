@@ -9,9 +9,16 @@ const LINKS = [
   { href: "/admin/pricing", label: "מחיר חודשי" },
   { href: "/admin/customers", label: "לקוחות" },
   { href: "/admin/purchases", label: "רכישות" },
+  { href: "/admin/cancellations", label: "בקשות ביטול" },
 ];
 
-export function AdminNav({ phone }: { phone: string }) {
+export function AdminNav({
+  phone,
+  pendingCancellations = 0,
+}: {
+  phone: string;
+  pendingCancellations?: number;
+}) {
   const pathname = usePathname();
 
   async function logout() {
@@ -39,6 +46,9 @@ export function AdminNav({ phone }: { phone: string }) {
               aria-current={current ? "page" : undefined}
             >
               {link.label}
+              {link.href === "/admin/cancellations" && pendingCancellations > 0 ? (
+                <span className="admin-nav-count">{pendingCancellations}</span>
+              ) : null}
             </Link>
           );
         })}
