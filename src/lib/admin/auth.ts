@@ -86,15 +86,30 @@ export async function sendSiteAdminOtp(rawPhone: string) {
 
   const businesses = await findAdminBusinesses(foundAdmin.admin.phone);
   if (!businesses.ok) return { ok: false as const, error: businesses.error };
-  if (businesses.admins.length === 0) {
+
+  const pinnedBusinessId = foundAdmin.admin.otpBusinessId;
+  const admins = [...businesses.admins];
+  if (
+    pinnedBusinessId &&
+    !admins.some((admin) => admin.businessId === pinnedBusinessId)
+  ) {
+    admins.push({
+      userId: foundAdmin.admin.id,
+      businessId: pinnedBusinessId,
+      name: foundAdmin.admin.name,
+      businessName: "מנהל אתר",
+      phone: businesses.phone,
+    });
+  }
+  if (admins.length === 0) {
     return { ok: false as const, error: "לא ניתן לשלוח קוד כרגע." };
   }
 
   const meta = await loadOtpBusinessMeta(
-    businesses.admins.map((admin) => admin.businessId),
+    admins.map((admin) => admin.businessId),
   );
-  const ranked = rankOtpBusinesses(businesses.admins, meta, businesses.phone);
-  const candidates = orderOtpBusinesses(ranked, foundAdmin.admin.otpBusinessId);
+  const ranked = rankOtpBusinesses(admins, meta, businesses.phone);
+  const candidates = orderOtpBusinesses(ranked, pinnedBusinessId);
 
   let lastMessage = "שליחת ה-SMS נכשלה. נסו שוב.";
   for (const business of candidates) {
