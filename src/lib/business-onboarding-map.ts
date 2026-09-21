@@ -136,6 +136,19 @@ export function mapBusinessFields(input: OnboardingFormInput): MappedBusiness {
   };
 }
 
+/** Tori App stores one address. Lead category and note ride along when there is no street address. */
+export function webhookAddress(business: MappedBusiness) {
+  const extras = [
+    business.business_type ? `תחום: ${business.business_type}` : "",
+    business.note ?? "",
+  ].filter(Boolean);
+  if (!extras.length) return business.address;
+  if (!business.address || business.address === DEFAULT_ADDRESS) {
+    return extras.join(" · ");
+  }
+  return `${business.address} · ${extras.join(" · ")}`;
+}
+
 export function mapServices(
   services: OnboardingServiceInput[] | undefined,
 ): MappedService[] {

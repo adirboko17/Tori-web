@@ -5,6 +5,7 @@ import {
   mapServices,
   toAppNameEn,
   toEnglishName,
+  webhookAddress,
 } from "../src/lib/business-onboarding-map.ts";
 import {
   canFinishWithoutCards,
@@ -55,6 +56,17 @@ test("demo save can finish without credit card details", () => {
     }),
     true,
   );
+});
+
+test("lead category and note are kept when the form has no address", () => {
+  const mapped = mapBusinessFields({
+    managerName: "דנה לוי",
+    phone: "050-000-0000",
+    businessNameHe: "סטודיו נועה",
+    businessType: "קוסמטיקה",
+    note: "שני עובדים",
+  });
+  assert.equal(webhookAddress(mapped), "תחום: קוסמטיקה · שני עובדים");
 });
 
 test("services skip empty rows and keep numeric price and duration", () => {

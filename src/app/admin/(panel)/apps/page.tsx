@@ -15,6 +15,8 @@ export default function AppsPage() {
   const [query, setQuery] = useState("");
   const [error, setError] = useState("");
   const [loaded, setLoaded] = useState(false);
+  const [deletingId, setDeletingId] = useState("");
+  const [notice, setNotice] = useState("");
 
   useEffect(() => {
     adminJson<{ businesses: BusinessOverview[]; stats: BusinessStats }>("/api/admin/apps")
@@ -47,6 +49,42 @@ export default function AppsPage() {
     );
   }, [businesses, query]);
 
+  async function removeApp(item: BusinessOverview) {
+    const name = item.display_name || item.branding_client_name || "האפליקציה";
+    const confirmed = window.confirm(
+      `למחוק את ${name}?\nיימחקו כל הנתונים של האפליקציה: משתמשים, תורים, שירותים, הודעות, פולסים וקבצי מיתוג.`,
+    );
+    if (!confirmed) return;
+    setDeletingId(item.id);
+    setError("");
+    setNotice("");
+    try {
+      const result = await adminJson<{
+        success?: boolean;
+        tableErrors?: Record<string, string>;
+      }>(`/api/admin/apps/${item.id}`, { method: "DELETE" });
+      const problems = Object.values(result.tableErrors ?? {});
+      if (!result.success) {
+        throw new Error(problems[0] || "המחיקה לא הושלמה");
+      }
+      setBusinesses((current) => current.filter((row) => row.id !== item.id));
+      setStats((current) =>
+        current
+          ? {
+              businesses: Math.max(0, current.businesses - 1),
+              clients: Math.max(0, current.clients - item.clientCount),
+              admins: Math.max(0, current.admins - item.adminCount),
+            }
+          : current,
+      );
+      setNotice(`${name} נמחקה`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "המחיקה נכשלה");
+    } finally {
+      setDeletingId("");
+    }
+  }
+
   return (
     <>
       <div className="admin-toolbar">
@@ -59,6 +97,7 @@ export default function AppsPage() {
         </Link>
       </div>
       {error ? <p className="admin-error">{error}</p> : null}
+      {notice ? <p className="admin-note">{notice}</p> : null}
       <section className="admin-stats">
         <article className="admin-stat">
           <span>אפליקציות</span>
@@ -90,6 +129,7 @@ export default function AppsPage() {
               <th>מנהלים</th>
               <th>יתרת SMS</th>
               <th>נוצר</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -112,6 +152,16 @@ export default function AppsPage() {
                       : balance?.message || "…"}
                   </td>
                   <td>{formatDateHe(item.created_at)}</td>
+                  <td>
+                    <button
+                      className="admin-btn-ghost"
+                      type="button"
+                      disabled={deletingId !== ""}
+                      onClick={() => void removeApp(item)}
+                    >
+                      {deletingId === item.id ? "מוחק…" : "מחיקה"}
+                    </button>
+                  </td>
                 </tr>
               );
             })}

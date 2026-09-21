@@ -13,18 +13,42 @@ import { deletePulseemSubAccount } from './pulseem-edge';
  * Child tables, deleted before `business_profile`.
  * Order mirrors the RN app: leaves first so nothing is orphaned mid-way.
  */
+/**
+ * Every public table that stores rows for one app.
+ * Dependents come first so a foreign key cannot block the parent delete.
+ */
 const CHILD_TABLES = [
+  'health_form_submissions',
+  'health_form_questions',
+  'health_form_assignments',
+  'health_forms',
+  'swap_request_dismissals',
+  'swap_requests',
+  'calendar_reminders',
   'notifications',
   'waitlist_entries',
   'appointments',
   'recurring_appointments',
-  'services',
-  'business_hours',
-  'business_constraints',
+  'client_service_durations',
+  'scheduled_broadcasts',
+  'messages',
   'designs',
   'products',
-  'messages',
   'business_expenses',
+  'business_insights',
+  'business_hours_overrides',
+  'business_hours',
+  'business_constraints',
+  'services',
+  'branches',
+  'assistant_personal_memory',
+  'assistant_usage_months',
+  'auth_otp_send_log',
+  'auth_phone_otp_challenges',
+  'auth_register_profile_tokens',
+  'sms_topup_orders',
+  'site_cancellation_requests',
+  'site_payplus_subscriptions',
   'users',
 ] as const;
 
@@ -97,11 +121,26 @@ export async function deleteBusiness(businessId: string): Promise<DeleteBusiness
       .eq('business_id', businessId);
 
     if (error) {
-      console.error(`[deleteBusiness] ${table}:`, error.message);
-      tableErrors[table] = error.message;
+      const missing =
+        error.code === '42P01' ||
+        error.code === 'PGRST205' ||
+        /does not exist|schema cache/i.test(error.message);
+      if (!missing) {
+        console.error(`[deleteBusiness] ${table}:`, error.message);
+        tableErrors[table] = error.message;
+      }
     } else {
       deletedRows[table] = count ?? 0;
     }
+  }
+
+  const { error: adminPhoneError } = await db
+    .from('site_admin_phones')
+    .update({ otp_business_id: null })
+    .eq('otp_business_id', businessId);
+  if (adminPhoneError && adminPhoneError.code !== '42P01' && adminPhoneError.code !== 'PGRST205') {
+    console.error('[deleteBusiness] site_admin_phones:', adminPhoneError.message);
+    tableErrors.site_admin_phones = adminPhoneError.message;
   }
 
   // 4. The profile row itself.

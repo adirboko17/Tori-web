@@ -2,11 +2,24 @@
 
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { adminJson, readFileAsDataUrl } from "@/lib/superadmin/browser";
-import { formatBytes, formatDateHe, formatSmsCredits, hasPulseemCredentials } from "@/lib/superadmin/format";
-import { STARTING_SMS } from "@/lib/superadmin/pulseem-plans";
+import {
+  contrastText,
+  formatBytes,
+  formatDateHe,
+  formatSmsCredits,
+  hasPulseemCredentials,
+  initialOf,
+} from "@/lib/superadmin/format";
+import { INCLUDED_SMS, STARTING_SMS } from "@/lib/superadmin/pulseem-plans";
 import type { BusinessDetails, PulseemEditorState } from "@/lib/superadmin/types";
+
+type Banner = { kind: "success" | "error"; text: string } | null;
+
+const TOPUP_PRESETS = [100, 250, 500, 1000] as const;
+const LOW_BALANCE = 200;
+const MAX_TRANSFER = 10_000;
 
 export default function AppDetailPage() {
   const params = useParams<{ id: string }>();
@@ -14,7 +27,8 @@ export default function AppDetailPage() {
   const businessId = params.id;
   const [details, setDetails] = useState<BusinessDetails | null>(null);
   const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
+  const [banner, setBanner] = useState<Banner>(null);
+  const [copied, setCopied] = useState(false);
 
   const load = useCallback(async () => {
     const data = await adminJson<BusinessDetails & { ok: true }>(`/api/admin/apps/${businessId}`);
@@ -27,146 +41,266 @@ export default function AppDetailPage() {
     });
   }, [load]);
 
+  useEffect(() => {
+    if (!banner) return;
+    const timer = window.setTimeout(() => setBanner(null), 7000);
+    return () => window.clearTimeout(timer);
+  }, [banner]);
+
+  const notify = useCallback(
+    (text: string, kind: "success" | "error" = "success") => {
+      setBanner({ kind, text });
+      void load();
+    },
+    [load],
+  );
+
   if (error) return <p className="admin-error">{error}</p>;
   if (!details?.profile) return <p className="admin-note">טוען…</p>;
 
   const profile = details.profile;
   const name = String(profile.display_name || "ללא שם");
+  const phone = typeof profile.phone === "string" && profile.phone ? profile.phone : null;
+  const primaryColor = typeof profile.primary_color === "string" ? profile.primary_color : null;
+  const iconFile = details.brandingFiles.find((file) => file.name === "icon.png");
   const pulseemReady = hasPulseemCredentials({
     pulseemHasApiKey: profile.pulseem_has_api_key === true,
     pulseem_user_id: typeof profile.pulseem_user_id === "string" ? profile.pulseem_user_id : null,
     pulseemHasPassword: profile.pulseem_has_password === true,
   });
+  const clients = details.users.filter((user) => user.user_type === "client");
+  const admins = details.users.filter((user) => user.user_type === "admin");
+  const activeServices = details.services.filter((service) => service.is_active).length;
+
+  async function copyId() {
+    try {
+      await navigator.clipboard.writeText(businessId);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      setBanner({ kind: "error", text: "לא ניתן להעתיק את המזהה" });
+    }
+  }
 
   return (
     <>
-      <div className="admin-toolbar">
+      <header className="admin-app-hero">
         <div>
-          <p className="admin-kicker">
-            <Link href="/admin/apps">אפליקציות</Link>
-          </p>
-          <h1 className="admin-title">{name}</h1>
-          <p className="admin-note">
-            {details.brandingFolder || "בלי תיקיית מיתוג"} · {String(profile.phone || "—")} · נוצר{" "}
-            {formatDateHe(String(profile.created_at || ""))}
-          </p>
+          <Link href="/admin/apps" className="admin-back">
+            <span aria-hidden>→</span> כל האפליקציות
+          </Link>
+          <div className="admin-app-identity">
+            <div
+              className="admin-app-avatar"
+              style={primaryColor ? { background: primaryColor, color: contrastText(primaryColor) } : undefined}
+            >
+              {iconFile ? <img src={iconFile.publicUrl} alt="" /> : initialOf(name)}
+            </div>
+            <div>
+              <h1 className="admin-title">{name}</h1>
+              <div className="admin-app-meta">
+                {phone ? <span dir="ltr">{phone}</span> : null}
+                <span dir="ltr">{details.brandingFolder || "בלי תיקיית מיתוג"}</span>
+                <span>נוצר {formatDateHe(String(profile.created_at || ""))}</span>
+              </div>
+            </div>
+          </div>
         </div>
+        <div className="admin-app-hero-side">
+          <span className={`admin-status ${pulseemReady ? "is-paid" : "is-pending"}`}>
+            {pulseemReady ? "פולסים מחובר" : "פולסים לא מחובר"}
+          </span>
+          <button className="admin-chip" type="button" onClick={() => void copyId()} title={businessId}>
+            {copied ? "הועתק ✓" : "העתקת מזהה"}
+          </button>
+        </div>
+      </header>
+
+      {banner ? (
+        <div className={`admin-banner is-${banner.kind}`} role="status">
+          <span>{banner.text}</span>
+          <button type="button" onClick={() => setBanner(null)} aria-label="סגירה">
+            ✕
+          </button>
+        </div>
+      ) : null}
+
+      <div className="admin-app-grid">
+        <SmsCard businessId={businessId} displayName={name} pulseemReady={pulseemReady} onChange={notify} />
+
+        <aside className="admin-side-stats">
+          <div className="admin-side-stat">
+            <span>
+              לקוחות
+              <small>רשומים באפליקציה</small>
+            </span>
+            <strong>{clients.length}</strong>
+          </div>
+          <div className="admin-side-stat">
+            <span>
+              מנהלים
+              <small>{admins[0]?.phone ? <span dir="ltr">{admins[0].phone}</span> : "אין מנהל"}</small>
+            </span>
+            <strong>{admins.length}</strong>
+          </div>
+          <div className="admin-side-stat">
+            <span>
+              שירותים
+              <small>{activeServices} פעילים</small>
+            </span>
+            <strong>{details.services.length}</strong>
+          </div>
+          <div className="admin-side-stat">
+            <span>
+              קבצי מיתוג
+              <small>{details.brandingFolder ? "תיקייה קיימת" : "אין תיקייה"}</small>
+            </span>
+            <strong>{details.brandingFiles.length}</strong>
+          </div>
+        </aside>
       </div>
-      {notice ? <p className="admin-note">{notice}</p> : null}
-      <section className="admin-stats">
-        <article className="admin-stat">
-          <span>משתמשים</span>
-          <strong>{details.users.length}</strong>
-        </article>
-        <article className="admin-stat">
-          <span>שירותים</span>
-          <strong>{details.services.length}</strong>
-        </article>
-        <article className="admin-stat">
-          <span>פולסים</span>
-          <strong>{pulseemReady ? "מחובר" : "לא מחובר"}</strong>
-        </article>
-      </section>
-      <p className="admin-note" dir="ltr">
-        {businessId}
-      </p>
-
-      <PulseemPanel
-        businessId={businessId}
-        displayName={name}
-        onChange={(message) => {
-          setNotice(message);
-          void load();
-        }}
-      />
 
       <section className="admin-card">
-        <h2 className="admin-title">משתמשים</h2>
-        <div className="admin-table-wrap">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>שם</th>
-                <th>טלפון</th>
-                <th>סוג</th>
-                <th>נוצר</th>
-              </tr>
-            </thead>
-            <tbody>
-              {details.users.map((user) => (
-                <tr key={user.id}>
-                  <td>{user.name || "—"}</td>
-                  <td dir="ltr">{user.phone || "—"}</td>
-                  <td>{user.user_type || "—"}</td>
-                  <td>{formatDateHe(user.created_at)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="admin-card-head">
+          <h2>משתמשים</h2>
+          <span className="admin-count">{details.users.length}</span>
         </div>
+        {details.users.length === 0 ? (
+          <div className="admin-empty">אין משתמשים עדיין</div>
+        ) : (
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>שם</th>
+                  <th>טלפון</th>
+                  <th>סוג</th>
+                  <th>נרשם</th>
+                </tr>
+              </thead>
+              <tbody>
+                {details.users.map((user) => (
+                  <tr key={user.id}>
+                    <td>
+                      <div className="admin-user-cell">
+                        <div className="admin-mini-avatar">
+                          {user.image_url ? <img src={user.image_url} alt="" /> : initialOf(user.name)}
+                        </div>
+                        <span>{user.name || "—"}</span>
+                      </div>
+                    </td>
+                    <td dir="ltr">{user.phone || "—"}</td>
+                    <td>
+                      <span className={`admin-status ${user.user_type === "admin" ? "is-paid" : "is-info"}`}>
+                        {user.user_type === "admin" ? "מנהל" : user.user_type === "client" ? "לקוח" : user.user_type || "—"}
+                      </span>
+                    </td>
+                    <td>{formatDateHe(user.created_at)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
 
       <section className="admin-card">
-        <h2 className="admin-title">שירותים</h2>
-        <div className="admin-table-wrap">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>שם</th>
-                <th>מחיר</th>
-                <th>דקות</th>
-                <th>פעיל</th>
-              </tr>
-            </thead>
-            <tbody>
-              {details.services.map((service) => (
-                <tr key={service.id}>
-                  <td>{service.name || "—"}</td>
-                  <td>{service.price ?? "—"}</td>
-                  <td>{service.duration_minutes ?? "—"}</td>
-                  <td>{service.is_active ? "כן" : "לא"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="admin-card-head">
+          <h2>שירותים</h2>
+          <span className="admin-count">{details.services.length}</span>
         </div>
+        {details.services.length === 0 ? (
+          <div className="admin-empty">אין שירותים עדיין</div>
+        ) : (
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>שם</th>
+                  <th>מחיר</th>
+                  <th>משך</th>
+                  <th>סטטוס</th>
+                </tr>
+              </thead>
+              <tbody>
+                {details.services.map((service) => (
+                  <tr key={service.id}>
+                    <td>{service.name || "—"}</td>
+                    <td>{service.price != null ? `₪${service.price.toLocaleString("he-IL")}` : "—"}</td>
+                    <td>{service.duration_minutes != null ? `${service.duration_minutes} דק׳` : "—"}</td>
+                    <td>
+                      <span className={`admin-status ${service.is_active ? "is-paid" : ""}`}>
+                        {service.is_active ? "פעיל" : "לא פעיל"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
 
-      <BrandingPanel
-        businessId={businessId}
-        details={details}
-        onUploaded={(message) => {
-          setNotice(message);
-          void load();
-        }}
-      />
+      <BrandingPanel businessId={businessId} details={details} onUploaded={notify} />
 
       <DeletePanel businessId={businessId} name={name} onDeleted={() => router.push("/admin/apps")} />
     </>
   );
 }
 
-function PulseemPanel({
+/* ------------------------------------------------------------------ *
+ * SMS balance + top-up
+ * ------------------------------------------------------------------ */
+
+function SmsCard({
   businessId,
   displayName,
+  pulseemReady,
   onChange,
 }: {
   businessId: string;
   displayName: string;
-  onChange: (message: string) => void;
+  pulseemReady: boolean;
+  onChange: (message: string, kind?: "success" | "error") => void;
 }) {
   const [state, setState] = useState<PulseemEditorState | null>(null);
-  const [balance, setBalance] = useState<string | null>(null);
-  const [message, setMessage] = useState("");
+  const [balance, setBalance] = useState<number | null>(null);
+  const [balanceError, setBalanceError] = useState("");
+  const [refreshedAt, setRefreshedAt] = useState<Date | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [busy, setBusy] = useState("");
+  const [preset, setPreset] = useState<number | null>(500);
+  const [custom, setCustom] = useState("");
+  const [lastTopup, setLastTopup] = useState<{ amount: number; after: number | null } | null>(null);
+
+  // Advanced / connection fields
   const [subPassword, setSubPassword] = useState("");
   const [fromNumber, setFromNumber] = useState("");
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [sender, setSender] = useState("");
-  const [credits, setCredits] = useState("100");
-  const [busy, setBusy] = useState("");
 
-  const refresh = useCallback(async () => {
+  const hasAccount = Boolean(state?.hasApiKey || (state?.userId && state.hasPassword)) || pulseemReady;
+
+  const loadBalance = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      const data = await adminJson<{ directSmsCredits?: string }>("/api/admin/pulseem/balance", {
+        method: "POST",
+        body: JSON.stringify({ businessId, subAccountName: displayName }),
+      });
+      const parsed = Number(data.directSmsCredits);
+      setBalance(Number.isFinite(parsed) ? parsed : null);
+      setBalanceError("");
+      setRefreshedAt(new Date());
+    } catch (err) {
+      setBalanceError(err instanceof Error ? err.message : "לא ניתן לטעון יתרה");
+    } finally {
+      setRefreshing(false);
+    }
+  }, [businessId, displayName]);
+
+  const loadState = useCallback(async () => {
     const data = await adminJson<{ state: PulseemEditorState }>("/api/admin/pulseem/state", {
       method: "POST",
       body: JSON.stringify({ businessId }),
@@ -174,173 +308,309 @@ function PulseemPanel({
     setState(data.state);
     setUserId(data.state.userId);
     setSender(data.state.fromNumber);
-    const balanceData = await adminJson<{ directSmsCredits?: string }>(
-      "/api/admin/pulseem/balance",
-      {
-        method: "POST",
-        body: JSON.stringify({ businessId, subAccountName: displayName }),
-      },
-    ).catch((error: unknown) => {
-      setMessage(error instanceof Error ? error.message : "לא ניתן לטעון יתרה");
-      return null;
-    });
-    if (balanceData?.directSmsCredits) {
-      setBalance(balanceData.directSmsCredits);
-      setMessage("");
-    }
-  }, [businessId, displayName]);
+  }, [businessId]);
 
   useEffect(() => {
-    void refresh().catch((error: unknown) => {
-      setMessage(error instanceof Error ? error.message : "טעינת פולסים נכשלה");
-    });
-  }, [refresh]);
+    void loadState().catch(() => undefined);
+    void loadBalance();
+  }, [loadState, loadBalance]);
+
+  const amount = useMemo(() => {
+    if (preset != null) return preset;
+    const n = Number(custom);
+    return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
+  }, [preset, custom]);
+
+  const amountValid = amount > 0 && amount <= MAX_TRANSFER;
+  const pct = balance == null ? 0 : Math.max(0, Math.min(100, (balance / INCLUDED_SMS) * 100));
+  const tone = balance == null ? "" : balance < LOW_BALANCE ? "is-low" : balance < INCLUDED_SMS / 2 ? "is-mid" : "";
 
   async function run(label: string, action: () => Promise<string>) {
     setBusy(label);
-    setMessage("");
     try {
       const text = await action();
-      setMessage(text);
       onChange(text);
-      await refresh();
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "הפעולה נכשלה");
+      await Promise.all([loadState().catch(() => undefined), loadBalance()]);
+    } catch (err) {
+      onChange(err instanceof Error ? err.message : "הפעולה נכשלה", "error");
     } finally {
       setBusy("");
     }
   }
 
+  function topUp() {
+    if (!amountValid) return;
+    void run("transfer", async () => {
+      const data = await adminJson<{ directSmsCreditsAfter?: number | null }>("/api/admin/pulseem/transfer", {
+        method: "POST",
+        body: JSON.stringify({ businessId, directSmsCredits: amount }),
+      });
+      const after = typeof data.directSmsCreditsAfter === "number" ? data.directSmsCreditsAfter : null;
+      setLastTopup({ amount, after });
+      return `הוטענו ${amount.toLocaleString("he-IL")} הודעות ל${displayName}${
+        after != null ? ` · יתרה חדשה: ${after.toLocaleString("he-IL")}` : ""
+      }`;
+    });
+  }
+
+  function provision() {
+    const replace = Boolean(state?.hasApiKey || (state?.userId && state.hasPassword));
+    if (replace && !window.confirm("לעסק כבר יש חשבון פולסים. ליצור חשבון חדש שיחליף את המפתחות?")) return;
+    void run("provision", async () => {
+      const data = await adminJson<{ loginUserName?: string | null }>("/api/admin/pulseem/provision", {
+        method: "POST",
+        body: JSON.stringify({
+          businessId,
+          subPassword,
+          fromNumber,
+          replaceExisting: replace,
+          directSmsCredits: STARTING_SMS,
+        }),
+      });
+      setSubPassword("");
+      setFromNumber("");
+      return `תת-חשבון פולסים נוצר${data.loginUserName ? `: ${data.loginUserName}` : ""} עם ${STARTING_SMS.toLocaleString(
+        "he-IL",
+      )} הודעות`;
+    });
+  }
+
   return (
-    <section className="admin-card">
-      <div className="admin-toolbar">
-        <h2 className="admin-title">פולסים</h2>
-        <strong>{balance ? `${formatSmsCredits(balance)} הודעות` : "אין יתרה"}</strong>
-      </div>
-      {message ? <p className="admin-note">{message}</p> : null}
-      <p className="admin-note">
-        כל עסק מתחיל עם 1,000 הודעות. בכל 1 לחודש היתרה המוכללת מושלמת עד 1,000, ומעבר לזה אפשר רק להטעין.
-      </p>
-      <div className="admin-grid-form">
-        <label className="admin-field">
-          סיסמה לתת-חשבון
-          <input dir="ltr" value={subPassword} onChange={(event) => setSubPassword(event.target.value)} placeholder="ריק = אקראית" />
-        </label>
-        <label className="admin-field">
-          מספר / שם שולח ליצירה
-          <input dir="ltr" value={fromNumber} onChange={(event) => setFromNumber(event.target.value)} />
-        </label>
-      </div>
-      <div className="admin-actions">
+    <section className="admin-sms-card">
+      <div className="admin-sms-head">
+        <div>
+          <h2>יתרת הודעות SMS</h2>
+          <p>
+            {!hasAccount
+              ? "אין חשבון פולסים מחובר"
+              : refreshedAt
+                ? `עודכן ${refreshedAt.toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" })}`
+                : "טוען יתרה מפולסים…"}
+          </p>
+        </div>
         <button
-          className="admin-btn"
+          className={`admin-icon-btn ${refreshing ? "is-spinning" : ""}`}
           type="button"
-          disabled={busy !== ""}
-          onClick={() => {
-            const replace = Boolean(state?.hasApiKey || (state?.userId && state.hasPassword));
-            if (replace && !window.confirm("לעסק כבר יש חשבון פולסים. ליצור חשבון חדש שיחליף את המפתחות?")) {
-              return;
-            }
-            void run("provision", async () => {
-              const data = await adminJson<{ loginUserName?: string | null; directSmsCredits?: number | null }>(
-                "/api/admin/pulseem/provision",
-                {
-                  method: "POST",
-                  body: JSON.stringify({
-                    businessId,
-                    subPassword,
-                    fromNumber,
-                    replaceExisting: replace,
-                    directSmsCredits: STARTING_SMS,
-                  }),
-                },
-              );
-              return `תת-חשבון נוצר${data.loginUserName ? `: ${data.loginUserName}` : ""}`;
-            });
-          }}
+          onClick={() => void loadBalance()}
+          disabled={refreshing}
+          aria-label="רענון יתרה"
+          title="רענון יתרה"
         >
-          {busy === "provision" ? "יוצר…" : "צור תת-חשבון"}
+          ↻
         </button>
       </div>
-      <div className="admin-actions">
-        <label className="admin-field">
-          כמות קרדיטים
-          <input dir="ltr" type="number" min={1} max={10000} value={credits} onChange={(event) => setCredits(event.target.value)} />
-        </label>
-        <button
-          className="admin-btn"
-          type="button"
-          disabled={busy !== ""}
-          onClick={() =>
-            void run("transfer", async () => {
-              const data = await adminJson<{ directSmsCreditsAfter?: number | null }>(
-                "/api/admin/pulseem/transfer",
-                {
-                  method: "POST",
-                  body: JSON.stringify({ businessId, directSmsCredits: Number(credits) }),
-                },
-              );
-              return `הועברו קרדיטים. יתרה: ${data.directSmsCreditsAfter ?? "—"}`;
-            })
-          }
-        >
-          העבר קרדיטים
-        </button>
-      </div>
-      <div className="admin-grid-form">
-        <label className="admin-field">
-          מזהה משתמש WS
-          <input dir="ltr" value={userId} onChange={(event) => setUserId(event.target.value)} />
-        </label>
-        <label className="admin-field">
-          סיסמה
-          <input dir="ltr" type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder={state?.hasPassword ? "שמורה — השאר ריק כדי לא לשנות" : ""} />
-        </label>
-        <label className="admin-field">
-          מספר שולח
-          <input dir="ltr" value={sender} onChange={(event) => setSender(event.target.value)} />
-        </label>
-      </div>
-      <div className="admin-actions">
-        <button
-          className="admin-btn-ghost"
-          type="button"
-          disabled={busy !== ""}
-          onClick={() =>
-            void run("test", async () => {
-              const data = await adminJson<{ credits?: string; balanceNote?: string | null }>(
-                "/api/admin/pulseem/test",
-                {
-                  method: "POST",
-                  body: JSON.stringify({ businessId, userId, password, subAccountName: displayName }),
-                },
-              );
-              return `החיבור תקין. יתרה: ${data.credits ?? "—"}${data.balanceNote ? ` · ${data.balanceNote}` : ""}`;
-            })
-          }
-        >
-          בדיקת חיבור
-        </button>
-        <button
-          className="admin-btn"
-          type="button"
-          disabled={busy !== ""}
-          onClick={() =>
-            void run("save", async () => {
-              await adminJson("/api/admin/pulseem/save", {
-                method: "POST",
-                body: JSON.stringify({ businessId, userId, password, fromNumber: sender }),
-              });
-              return "פרטי פולסים נשמרו וסונכרנו ל-.env";
-            })
-          }
-        >
-          שמירה
-        </button>
-      </div>
+
+      {hasAccount ? (
+        <>
+          <div className={`admin-sms-balance ${tone}`}>
+            {balance == null && refreshing ? (
+              <div className="admin-sms-skeleton" />
+            ) : balance == null ? (
+              <strong>—</strong>
+            ) : (
+              <strong>{formatSmsCredits(String(balance))}</strong>
+            )}
+            <span>הודעות זמינות</span>
+          </div>
+          <div className={`admin-sms-bar ${tone}`} aria-hidden>
+            <i style={{ width: `${pct}%` }} />
+          </div>
+          <p className="admin-sms-caption">
+            <span>
+              {balance == null
+                ? `${INCLUDED_SMS.toLocaleString("he-IL")} הודעות כלולות בחודש`
+                : balance >= INCLUDED_SMS
+                  ? `${(balance - INCLUDED_SMS).toLocaleString("he-IL")}+ מעבר ל-${INCLUDED_SMS.toLocaleString("he-IL")} הכלולות`
+                  : balance < LOW_BALANCE
+                    ? "יתרה נמוכה — כדאי להטעין"
+                    : `${Math.round(pct)}% מהחבילה החודשית`}
+            </span>
+            <span>מתחדש ל-{INCLUDED_SMS.toLocaleString("he-IL")} בכל 1 לחודש</span>
+          </p>
+          {balanceError ? <p className="admin-sms-error">{balanceError}</p> : null}
+
+          <div className="admin-sms-topup">
+            <h3>הטענת הודעות</h3>
+            <div className="admin-sms-presets">
+              {TOPUP_PRESETS.map((value) => (
+                <button
+                  key={value}
+                  className="admin-chip"
+                  type="button"
+                  aria-pressed={preset === value}
+                  onClick={() => {
+                    setPreset(value);
+                    setCustom("");
+                  }}
+                >
+                  +{value.toLocaleString("he-IL")}
+                </button>
+              ))}
+              <input
+                className="admin-sms-custom"
+                dir="ltr"
+                type="number"
+                inputMode="numeric"
+                min={1}
+                max={MAX_TRANSFER}
+                placeholder="כמות אחרת"
+                value={custom}
+                onFocus={() => setPreset(null)}
+                onChange={(event) => {
+                  setPreset(null);
+                  setCustom(event.target.value);
+                }}
+              />
+            </div>
+            <div className="admin-sms-submit">
+              <button className="admin-btn-lime" type="button" disabled={busy !== "" || !amountValid} onClick={topUp}>
+                {busy === "transfer"
+                  ? "מטעין…"
+                  : amountValid
+                    ? `הטענת ${amount.toLocaleString("he-IL")} הודעות`
+                    : "בחרי כמות להטענה"}
+              </button>
+              {lastTopup ? (
+                <p className="admin-sms-after">
+                  הוטענו <b>+{lastTopup.amount.toLocaleString("he-IL")}</b>
+                  {lastTopup.after != null ? (
+                    <>
+                      {" "}
+                      · יתרה: <b>{lastTopup.after.toLocaleString("he-IL")}</b>
+                    </>
+                  ) : null}
+                </p>
+              ) : amount > MAX_TRANSFER ? (
+                <p className="admin-sms-after">מקסימום {MAX_TRANSFER.toLocaleString("he-IL")} בהעברה אחת</p>
+              ) : null}
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="admin-sms-empty">
+          <h3>לעסק אין עדיין חשבון פולסים</h3>
+          <p>
+            יצירת תת-חשבון תפתח לעסק חשבון SMS משלו עם {STARTING_SMS.toLocaleString("he-IL")} הודעות ותשמור את
+            המפתחות אוטומטית.
+          </p>
+          <div className="admin-grid-form">
+            <label className="admin-field">
+              מספר / שם שולח (אופציונלי)
+              <input dir="ltr" value={fromNumber} onChange={(event) => setFromNumber(event.target.value)} />
+            </label>
+            <label className="admin-field">
+              סיסמה לתת-חשבון (ריק = אקראית)
+              <input dir="ltr" value={subPassword} onChange={(event) => setSubPassword(event.target.value)} />
+            </label>
+          </div>
+          <div>
+            <button className="admin-btn-lime" type="button" disabled={busy !== ""} onClick={provision}>
+              {busy === "provision" ? "יוצר חשבון…" : "יצירת חשבון פולסים"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      <details className="admin-advanced">
+        <summary>הגדרות חיבור מתקדמות</summary>
+        <div className="admin-advanced-body">
+          <div className="admin-advanced-block">
+            <h4>פרטי חיבור (WS)</h4>
+            <p>המפתחות נשמרים מוצפנים ומסונכרנים לקובץ ה-.env של המיתוג.</p>
+            <div className="admin-grid-form">
+              <label className="admin-field">
+                מזהה משתמש
+                <input dir="ltr" value={userId} onChange={(event) => setUserId(event.target.value)} />
+              </label>
+              <label className="admin-field">
+                סיסמה
+                <input
+                  dir="ltr"
+                  type="password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  placeholder={state?.hasPassword ? "שמורה — השאר ריק כדי לא לשנות" : ""}
+                />
+              </label>
+              <label className="admin-field">
+                מספר שולח
+                <input dir="ltr" value={sender} onChange={(event) => setSender(event.target.value)} />
+              </label>
+            </div>
+            <div className="admin-actions">
+              <button
+                className="admin-btn"
+                type="button"
+                disabled={busy !== ""}
+                onClick={() =>
+                  void run("save", async () => {
+                    await adminJson("/api/admin/pulseem/save", {
+                      method: "POST",
+                      body: JSON.stringify({ businessId, userId, password, fromNumber: sender }),
+                    });
+                    setPassword("");
+                    return "פרטי פולסים נשמרו וסונכרנו ל-.env";
+                  })
+                }
+              >
+                {busy === "save" ? "שומר…" : "שמירה"}
+              </button>
+              <button
+                className="admin-btn-ghost"
+                type="button"
+                disabled={busy !== ""}
+                onClick={() =>
+                  void run("test", async () => {
+                    const data = await adminJson<{ credits?: string; balanceNote?: string | null }>(
+                      "/api/admin/pulseem/test",
+                      {
+                        method: "POST",
+                        body: JSON.stringify({ businessId, userId, password, subAccountName: displayName }),
+                      },
+                    );
+                    return `החיבור תקין · יתרה: ${formatSmsCredits(data.credits) ?? "—"}${
+                      data.balanceNote ? ` · ${data.balanceNote}` : ""
+                    }`;
+                  })
+                }
+              >
+                {busy === "test" ? "בודק…" : "בדיקת חיבור"}
+              </button>
+            </div>
+          </div>
+
+          {hasAccount ? (
+            <div className="admin-advanced-block">
+              <h4>יצירת תת-חשבון מחדש</h4>
+              <p>מחליף את המפתחות הקיימים בחשבון פולסים חדש. לשימוש רק אם החשבון הנוכחי לא תקין.</p>
+              <div className="admin-grid-form">
+                <label className="admin-field">
+                  סיסמה לתת-חשבון (ריק = אקראית)
+                  <input dir="ltr" value={subPassword} onChange={(event) => setSubPassword(event.target.value)} />
+                </label>
+                <label className="admin-field">
+                  מספר / שם שולח
+                  <input dir="ltr" value={fromNumber} onChange={(event) => setFromNumber(event.target.value)} />
+                </label>
+              </div>
+              <div className="admin-actions">
+                <button className="admin-btn-ghost" type="button" disabled={busy !== ""} onClick={provision}>
+                  {busy === "provision" ? "יוצר…" : "צור תת-חשבון חדש"}
+                </button>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </details>
     </section>
   );
 }
+
+/* ------------------------------------------------------------------ *
+ * Branding
+ * ------------------------------------------------------------------ */
+
+const IMAGE_RE = /\.(png|jpe?g|webp|gif|svg)$/i;
 
 function BrandingPanel({
   businessId,
@@ -356,6 +626,10 @@ function BrandingPanel({
   const [splash, setSplash] = useState<File | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+
+  const images = details.brandingFiles.filter((file) => IMAGE_RE.test(file.name));
+  const textFiles = details.brandingFiles.filter((file) => !IMAGE_RE.test(file.name));
+  const hasSelection = Boolean(logo || icon || splash);
 
   async function upload() {
     setPending(true);
@@ -382,32 +656,75 @@ function BrandingPanel({
 
   return (
     <section className="admin-card">
-      <h2 className="admin-title">מיתוג · {details.brandingFolder || "אין תיקייה"}</h2>
-      {details.brandingFiles.map((file) => (
-        <details key={file.path}>
-          <summary>
-            {file.name} · {formatBytes(file.size)}
-          </summary>
-          {file.content ? <pre className="admin-pre" dir="ltr">{file.content}</pre> : null}
-          {file.publicUrl ? (
-            <a href={file.publicUrl} target="_blank" rel="noreferrer">
-              פתיחת הקובץ
+      <div className="admin-card-head">
+        <h2>מיתוג</h2>
+        <span className="admin-note" dir="ltr">
+          {details.brandingFolder || "אין תיקייה"}
+        </span>
+      </div>
+
+      {images.length > 0 ? (
+        <div className="admin-branding-grid">
+          {images.map((file) => (
+            <a key={file.path} className="admin-branding-tile" href={file.publicUrl} target="_blank" rel="noreferrer">
+              <div className="admin-branding-preview">
+                <img src={`${file.publicUrl}?v=${encodeURIComponent(file.updatedAt ?? "")}`} alt={file.name} />
+              </div>
+              <strong>{file.name}</strong>
+              <span>{formatBytes(file.size)}</span>
             </a>
-          ) : null}
-        </details>
-      ))}
+          ))}
+        </div>
+      ) : null}
+
+      {textFiles.length > 0 ? (
+        <div className="admin-branding-files">
+          {textFiles.map((file) => (
+            <details key={file.path}>
+              <summary>
+                {file.name} · {formatBytes(file.size)}
+              </summary>
+              {file.content ? (
+                <pre className="admin-pre" dir="ltr">
+                  {file.content}
+                </pre>
+              ) : (
+                <a href={file.publicUrl} target="_blank" rel="noreferrer">
+                  פתיחת הקובץ
+                </a>
+              )}
+            </details>
+          ))}
+        </div>
+      ) : null}
+
+      {details.brandingFiles.length === 0 ? <div className="admin-empty">אין קבצי מיתוג עדיין</div> : null}
+
       <div className="admin-grid-form">
-        <label className="admin-field">לוגו<input type="file" accept="image/*" onChange={(event) => setLogo(event.target.files?.[0] ?? null)} /></label>
-        <label className="admin-field">אייקון<input type="file" accept="image/*" onChange={(event) => setIcon(event.target.files?.[0] ?? null)} /></label>
-        <label className="admin-field">ספלאש<input type="file" accept="image/*" onChange={(event) => setSplash(event.target.files?.[0] ?? null)} /></label>
+        <label className="admin-field">
+          לוגו
+          <input type="file" accept="image/*" onChange={(event) => setLogo(event.target.files?.[0] ?? null)} />
+        </label>
+        <label className="admin-field">
+          אייקון
+          <input type="file" accept="image/*" onChange={(event) => setIcon(event.target.files?.[0] ?? null)} />
+        </label>
+        <label className="admin-field">
+          ספלאש
+          <input type="file" accept="image/*" onChange={(event) => setSplash(event.target.files?.[0] ?? null)} />
+        </label>
       </div>
       {error ? <p className="admin-error">{error}</p> : null}
-      <button className="admin-btn" type="button" disabled={pending} onClick={() => void upload()}>
+      <button className="admin-btn" type="button" disabled={pending || !hasSelection} onClick={() => void upload()}>
         {pending ? "מעלה…" : "עדכון תמונות"}
       </button>
     </section>
   );
 }
+
+/* ------------------------------------------------------------------ *
+ * Danger zone
+ * ------------------------------------------------------------------ */
 
 function DeletePanel({
   businessId,
@@ -456,20 +773,30 @@ function DeletePanel({
   }
 
   return (
-    <section className="admin-card">
-      <h2 className="admin-title">מחיקת עסק</h2>
+    <details className="admin-card admin-danger">
+      <summary className="admin-card-head">
+        <h2>מחיקת עסק</h2>
+        <span className="admin-note">פעולה בלתי הפיכה</span>
+      </summary>
       <p className="admin-note">
-        נמחקים תת-חשבון הפולסים, 12 טבלאות, שורת העסק וקבצי ה-Storage. להמשך הקלד את שם העסק: {name}
+        נמחקים תת-חשבון הפולסים, כל הנתונים של האפליקציה וקבצי המיתוג. להמשך הקלד את שם העסק: <b>{name}</b>
       </p>
-      <label className="admin-field">
-        שם העסק לאישור
-        <input value={typed} onChange={(event) => setTyped(event.target.value)} />
-      </label>
+      <div className="admin-danger-row">
+        <label className="admin-field">
+          שם העסק לאישור
+          <input value={typed} onChange={(event) => setTyped(event.target.value)} />
+        </label>
+        <button
+          className="admin-btn admin-btn-danger"
+          type="button"
+          disabled={pending || typed.trim() !== name.trim()}
+          onClick={() => void remove()}
+        >
+          {pending ? "מוחק…" : "מחק עסק"}
+        </button>
+      </div>
       {error ? <p className="admin-error">{error}</p> : null}
       {summary ? <p className="admin-note">{summary}</p> : null}
-      <button className="admin-btn" type="button" disabled={pending || typed.trim() !== name.trim()} onClick={() => void remove()}>
-        {pending ? "מוחק…" : "מחק עסק"}
-      </button>
-    </section>
+    </details>
   );
 }
