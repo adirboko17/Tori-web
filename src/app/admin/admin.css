@@ -89,6 +89,7 @@
   font: var(--type-body);
 }
 
+a.admin-btn,
 .admin-btn,
 .admin-btn-ghost {
   min-height: var(--hit-min);
@@ -99,6 +100,11 @@
   color: var(--white);
   font: var(--type-button);
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  text-decoration: none;
 }
 
 .admin-btn:disabled {
@@ -308,6 +314,50 @@
 
 .admin-alert .admin-note {
   max-width: 52ch;
+}
+
+.admin-field textarea,
+.admin-pre {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--radius-control);
+  background: var(--surface-card);
+  color: var(--text-body);
+  font: var(--type-body);
+}
+
+.admin-pre {
+  margin: 0;
+  max-height: 240px;
+  overflow: auto;
+  white-space: pre-wrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+}
+
+.admin-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-tabs button[aria-pressed="true"] {
+  background: var(--ink-900);
+  color: var(--white);
+}
+
+.admin-split {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
 }
 
 @media (max-width: 800px) {

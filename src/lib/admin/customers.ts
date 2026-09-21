@@ -15,7 +15,6 @@ export type AdminCustomer = {
   id: string;
   name: string;
   phone: string;
-  plan: string;
   prepaidCredits: number;
   smsRemaining: number | null;
   createdAt: string;
@@ -66,7 +65,7 @@ export async function listCustomers(): Promise<AdminCustomer[]> {
     supabase
       .from("business_profile")
       .select(
-        "id, display_name, phone, pulseem_plan, pulseem_prepaid_sms_credits, pulseem_user_id, created_at",
+        "id, display_name, phone, pulseem_prepaid_sms_credits, pulseem_user_id, created_at",
       )
       .order("created_at", { ascending: false }),
     supabase
@@ -127,7 +126,6 @@ export async function listCustomers(): Promise<AdminCustomer[]> {
       id,
       name: String(record.display_name ?? "").trim() || "עסק",
       phone: String(record.phone ?? ""),
-      plan: String(record.pulseem_plan ?? ""),
       prepaidCredits,
       smsRemaining: resolveSmsRemaining(liveTotals.get(id) ?? null, prepaidCredits),
       createdAt: String(record.created_at ?? ""),

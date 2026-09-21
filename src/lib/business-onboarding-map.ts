@@ -51,6 +51,8 @@ export type OnboardingFormInput = {
   plan?: string | null;
   price?: string | null;
   commitment?: string | null;
+  businessType?: string | null;
+  note?: string | null;
   logoFile?: File | null;
   services?: OnboardingServiceInput[];
 };
@@ -68,6 +70,8 @@ export type MappedBusiness = {
   plan: string | null;
   price: string | null;
   commitment: string | null;
+  business_type: string | null;
+  note: string | null;
 };
 
 export type MappedService = {
@@ -127,6 +131,8 @@ export function mapBusinessFields(input: OnboardingFormInput): MappedBusiness {
     plan: trim(input.plan) || null,
     price: trim(input.price) || null,
     commitment: trim(input.commitment) || null,
+    business_type: trim(input.businessType) || null,
+    note: trim(input.note) || null,
   };
 }
 

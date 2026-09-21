@@ -125,6 +125,8 @@ export async function submitBusinessOnboarding(
       duration_minutes,
       sort_order,
     })),
+    business_type: business.business_type,
+    note: business.note,
   };
 
   const { error: webhookError } = await supabase.functions.invoke(

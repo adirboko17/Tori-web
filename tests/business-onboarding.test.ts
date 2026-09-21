@@ -37,6 +37,9 @@ test("missing required fields fall back without inventing a new form", () => {
   assert.equal(mapped.brand_color, "#D4A574");
   assert.equal(mapped.manager_name, "דנה לוי");
   assert.equal(mapped.business_name_he, "סטודיו נועה");
+  assert.equal(mapped.plan, null);
+  assert.equal(mapped.business_type, null);
+  assert.equal(mapped.note, null);
   assert.match(mapped.app_name_en, /^[A-Za-z][A-Za-z0-9]*$/);
 });
 
