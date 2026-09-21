@@ -239,14 +239,23 @@ export interface CreditTransferResponse {
   smsCreditsAfter?: number;
   emailCreditsAfter?: number;
   directEmailCreditsAfter?: number;
+  /** Ledger of purchased extras kept on top of the monthly package (when `asPrepaid`). */
+  prepaidSmsCreditsAfter?: number;
 }
 
+/**
+ * Manual top-ups should use `smsCredits` — that is the «חבילת SMS» pool Pulseem bills
+ * SendSms from and the pool the balance endpoints read. `directSmsCredits` is the legacy
+ * Direct pool and is effectively invisible. `asPrepaid` (default true for smsCredits in the
+ * edge function) records the extra so the monthly refill does not eat it.
+ */
 export async function transferPulseemCredits(args: {
   businessId: string;
   directSmsCredits?: number;
   smsCredits?: number;
   emailCredits?: number;
   directEmailCredits?: number;
+  asPrepaid?: boolean;
 }): Promise<CreditTransferResponse & { ok: boolean }> {
   const { data, status } = await invokeEdge<CreditTransferResponse>('pulseem-credit-transfer', {
     businessId: args.businessId,
@@ -254,6 +263,7 @@ export async function transferPulseemCredits(args: {
       ? { directSmsCredits: args.directSmsCredits }
       : {}),
     ...(typeof args.smsCredits === 'number' ? { smsCredits: args.smsCredits } : {}),
+    ...(typeof args.asPrepaid === 'boolean' ? { asPrepaid: args.asPrepaid } : {}),
     ...(typeof args.emailCredits === 'number' ? { emailCredits: args.emailCredits } : {}),
     ...(typeof args.directEmailCredits === 'number'
       ? { directEmailCredits: args.directEmailCredits }

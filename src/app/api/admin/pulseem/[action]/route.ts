@@ -66,15 +66,23 @@ export async function POST(request: Request, context: RouteContext) {
     }
 
     if (action === "transfer") {
-      const amount = Number(body.directSmsCredits);
+      // Accept both names; the UI historically sent `directSmsCredits`.
+      const amount = Number(body.smsCredits ?? body.directSmsCredits);
       if (!Number.isFinite(amount) || amount <= 0) return fail("יש להזין כמות קרדיטים חיובית");
       if (amount > 10_000) return fail("מקסימום 10,000 קרדיטים בהעברה אחת");
+      // SendSms is billed from the «חבילת SMS» pool (`smsCredits`) — the same pool the
+      // balance endpoint reads and the monthly refill tops up. `directSmsCredits` lands in
+      // the legacy Direct pool, which is neither displayed nor billed.
       const result = await transferPulseemCredits({
         businessId,
-        directSmsCredits: Math.floor(amount),
+        smsCredits: Math.floor(amount),
+        asPrepaid: true,
       });
       return result.ok
-        ? ok({ directSmsCreditsAfter: result.directSmsCreditsAfter ?? null })
+        ? ok({
+            smsCreditsAfter: result.smsCreditsAfter ?? null,
+            prepaidSmsCreditsAfter: result.prepaidSmsCreditsAfter ?? null,
+          })
         : fail(result.errorMessage || "העברת קרדיטים נכשלה");
     }
 

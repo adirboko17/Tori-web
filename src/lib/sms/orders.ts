@@ -1,5 +1,7 @@
 import { transferPrepaidCredits } from "./balance";
 import { fulfillmentAfterMissedLock } from "./fulfillment";
+import { notifySmsPurchase } from "./purchase-notify";
+import { isSuccessfulPayplusStatus } from "./payplus-crypto";
 import type { SmsPackage } from "./packages";
 import {
   isConfirmedPayplusPayment,
@@ -111,6 +113,7 @@ async function claimOrder(
 export async function fulfillPaidOrder(input: {
   orderId: string;
   transactionUid: string;
+  payplusStatusCode: string;
 }) {
   const claimed = await claimOrder(input.orderId, input.transactionUid, "pending");
   let order = claimed;
@@ -153,6 +156,16 @@ export async function fulfillPaidOrder(input: {
     })
     .eq("id", order.id);
 
+  const saved = await loadOrder(order.id);
+  if (saved && isSuccessfulPayplusStatus(input.payplusStatusCode)) {
+    await notifySmsPurchase({
+      businessId: saved.business_id,
+      adminUserId: saved.admin_user_id,
+      credits: Number(saved.sms_credits),
+      payplusStatusCode: input.payplusStatusCode,
+    });
+  }
+
   return { ok: true as const, idempotent: false };
 }
 
@@ -188,6 +201,7 @@ export async function reconcilePendingOrders(businessId?: string) {
       const result = await fulfillPaidOrder({
         orderId: order.id,
         transactionUid: payment.uid || order.payplus_page_request_uid || order.id,
+        payplusStatusCode: payment.statusCode,
       });
       if (result.ok && !result.idempotent) fulfilled += 1;
     } catch (error) {

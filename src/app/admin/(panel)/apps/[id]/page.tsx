@@ -12,7 +12,7 @@ import {
   hasPulseemCredentials,
   initialOf,
 } from "@/lib/superadmin/format";
-import { INCLUDED_SMS, STARTING_SMS } from "@/lib/superadmin/pulseem-plans";
+import { INCLUDED_SMS } from "@/lib/superadmin/pulseem-plans";
 import type { BusinessDetails, PulseemEditorState } from "@/lib/superadmin/types";
 
 type Banner = { kind: "success" | "error"; text: string } | null;
@@ -219,6 +219,7 @@ export default function AppDetailPage() {
           <h2>שירותים</h2>
           <span className="admin-count">{details.services.length}</span>
         </div>
+        <AddServiceForm businessId={businessId} onAdded={notify} />
         {details.services.length === 0 ? (
           <div className="admin-empty">אין שירותים עדיין</div>
         ) : (
@@ -236,7 +237,9 @@ export default function AppDetailPage() {
                 {details.services.map((service) => (
                   <tr key={service.id}>
                     <td>{service.name || "—"}</td>
-                    <td>{service.price != null ? `₪${service.price.toLocaleString("he-IL")}` : "—"}</td>
+                    <td dir="ltr" style={{ textAlign: "start" }}>
+                      {service.price != null ? `₪${service.price.toLocaleString("he-IL")}` : "—"}
+                    </td>
                     <td>{service.duration_minutes != null ? `${service.duration_minutes} דק׳` : "—"}</td>
                     <td>
                       <span className={`admin-status ${service.is_active ? "is-paid" : ""}`}>
@@ -284,8 +287,6 @@ function SmsCard({
   const [lastTopup, setLastTopup] = useState<{ amount: number; after: number | null } | null>(null);
 
   // Advanced / connection fields
-  const [subPassword, setSubPassword] = useState("");
-  const [fromNumber, setFromNumber] = useState("");
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [sender, setSender] = useState("");
@@ -369,37 +370,17 @@ function SmsCard({
   function topUp() {
     if (!amountValid) return;
     void run("transfer", async () => {
-      const data = await adminJson<{ directSmsCreditsAfter?: number | null }>("/api/admin/pulseem/transfer", {
+      const data = await adminJson<{ smsCreditsAfter?: number | null }>("/api/admin/pulseem/transfer", {
         method: "POST",
-        body: JSON.stringify({ businessId, directSmsCredits: amount }),
+        body: JSON.stringify({ businessId, smsCredits: amount }),
       });
-      const after = typeof data.directSmsCreditsAfter === "number" ? data.directSmsCreditsAfter : null;
+      // Pulseem does not always echo the new balance; fall back to a fresh read.
+      const after =
+        typeof data.smsCreditsAfter === "number" ? data.smsCreditsAfter : await fetchBalance().catch(() => null);
       setLastTopup({ amount, after });
       return `הוטענו ${amount.toLocaleString("he-IL")} הודעות ל${displayName}${
         after != null ? ` · יתרה חדשה: ${after.toLocaleString("he-IL")}` : ""
       }`;
-    });
-  }
-
-  function provision() {
-    const replace = Boolean(state?.hasApiKey || (state?.userId && state.hasPassword));
-    if (replace && !window.confirm("לעסק כבר יש חשבון פולסים. ליצור חשבון חדש שיחליף את המפתחות?")) return;
-    void run("provision", async () => {
-      const data = await adminJson<{ loginUserName?: string | null }>("/api/admin/pulseem/provision", {
-        method: "POST",
-        body: JSON.stringify({
-          businessId,
-          subPassword,
-          fromNumber,
-          replaceExisting: replace,
-          directSmsCredits: STARTING_SMS,
-        }),
-      });
-      setSubPassword("");
-      setFromNumber("");
-      return `תת-חשבון פולסים נוצר${data.loginUserName ? `: ${data.loginUserName}` : ""} עם ${STARTING_SMS.toLocaleString(
-        "he-IL",
-      )} הודעות`;
     });
   }
 
@@ -466,6 +447,7 @@ function SmsCard({
                   className="admin-chip"
                   type="button"
                   aria-pressed={preset === value}
+                  dir="ltr"
                   onClick={() => {
                     setPreset(value);
                     setCustom("");
@@ -500,7 +482,7 @@ function SmsCard({
               </button>
               {lastTopup ? (
                 <p className="admin-sms-after">
-                  הוטענו <b>+{lastTopup.amount.toLocaleString("he-IL")}</b>
+                  הוטענו <b dir="ltr">+{lastTopup.amount.toLocaleString("he-IL")}</b>
                   {lastTopup.after != null ? (
                     <>
                       {" "}
@@ -516,26 +498,11 @@ function SmsCard({
         </>
       ) : (
         <div className="admin-sms-empty">
-          <h3>לעסק אין עדיין חשבון פולסים</h3>
+          <h3>לעסק אין חשבון פולסים מחובר</h3>
           <p>
-            יצירת תת-חשבון תפתח לעסק חשבון SMS משלו עם {STARTING_SMS.toLocaleString("he-IL")} הודעות ותשמור את
-            המפתחות אוטומטית.
+            תת-חשבון פולסים נוצר אוטומטית בעת יצירת אפליקציה חדשה. אם לעסק זה יש כבר חשבון, אפשר להזין את
+            פרטי החיבור שלו ב״הגדרות חיבור מתקדמות״ למטה.
           </p>
-          <div className="admin-grid-form">
-            <label className="admin-field">
-              מספר / שם שולח (אופציונלי)
-              <input dir="ltr" value={fromNumber} onChange={(event) => setFromNumber(event.target.value)} />
-            </label>
-            <label className="admin-field">
-              סיסמה לתת-חשבון (ריק = אקראית)
-              <input dir="ltr" value={subPassword} onChange={(event) => setSubPassword(event.target.value)} />
-            </label>
-          </div>
-          <div>
-            <button className="admin-btn-lime" type="button" disabled={busy !== ""} onClick={provision}>
-              {busy === "provision" ? "יוצר חשבון…" : "יצירת חשבון פולסים"}
-            </button>
-          </div>
         </div>
       )}
 
@@ -607,30 +574,102 @@ function SmsCard({
             </div>
           </div>
 
-          {hasAccount ? (
-            <div className="admin-advanced-block">
-              <h4>יצירת תת-חשבון מחדש</h4>
-              <p>מחליף את המפתחות הקיימים בחשבון פולסים חדש. לשימוש רק אם החשבון הנוכחי לא תקין.</p>
-              <div className="admin-grid-form">
-                <label className="admin-field">
-                  סיסמה לתת-חשבון (ריק = אקראית)
-                  <input dir="ltr" value={subPassword} onChange={(event) => setSubPassword(event.target.value)} />
-                </label>
-                <label className="admin-field">
-                  מספר / שם שולח
-                  <input dir="ltr" value={fromNumber} onChange={(event) => setFromNumber(event.target.value)} />
-                </label>
-              </div>
-              <div className="admin-actions">
-                <button className="admin-btn-ghost" type="button" disabled={busy !== ""} onClick={provision}>
-                  {busy === "provision" ? "יוצר…" : "צור תת-חשבון חדש"}
-                </button>
-              </div>
-            </div>
-          ) : null}
         </div>
       </details>
     </section>
+  );
+}
+
+function AddServiceForm({
+  businessId,
+  onAdded,
+}: {
+  businessId: string;
+  onAdded: (message: string) => void;
+}) {
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
+  const [duration, setDuration] = useState("60");
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState("");
+
+  const priceNumber = Number(price);
+  const durationNumber = Number(duration);
+  const valid =
+    name.trim().length > 0 &&
+    Number.isFinite(priceNumber) &&
+    priceNumber >= 0 &&
+    Number.isInteger(durationNumber) &&
+    durationNumber >= 5;
+
+  async function submit() {
+    if (!valid) return;
+    setPending(true);
+    setError("");
+    try {
+      await adminJson(`/api/admin/apps/${businessId}/services`, {
+        method: "POST",
+        body: JSON.stringify({
+          name: name.trim(),
+          price: priceNumber,
+          durationMinutes: durationNumber,
+        }),
+      });
+      setName("");
+      setPrice("");
+      setDuration("60");
+      onAdded(`השירות "${name.trim()}" נוסף`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "הוספת השירות נכשלה");
+    } finally {
+      setPending(false);
+    }
+  }
+
+  return (
+    <form
+      className="admin-service-add"
+      onSubmit={(event) => {
+        event.preventDefault();
+        void submit();
+      }}
+    >
+      <label className="admin-field">
+        שם השירות
+        <input value={name} maxLength={255} onChange={(event) => setName(event.target.value)} placeholder="למשל: הרמת גבות" />
+      </label>
+      <label className="admin-field">
+        מחיר (₪)
+        <input
+          dir="ltr"
+          type="number"
+          inputMode="decimal"
+          min={0}
+          max={100000}
+          step="1"
+          value={price}
+          onChange={(event) => setPrice(event.target.value)}
+          placeholder="0"
+        />
+      </label>
+      <label className="admin-field">
+        משך (דקות)
+        <input
+          dir="ltr"
+          type="number"
+          inputMode="numeric"
+          min={5}
+          max={1440}
+          step="5"
+          value={duration}
+          onChange={(event) => setDuration(event.target.value)}
+        />
+      </label>
+      <button className="admin-btn" type="submit" disabled={pending || !valid}>
+        {pending ? "מוסיף…" : "הוספת שירות"}
+      </button>
+      {error ? <p className="admin-error">{error}</p> : null}
+    </form>
   );
 }
 

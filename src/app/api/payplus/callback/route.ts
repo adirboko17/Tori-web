@@ -15,6 +15,8 @@ import {
   verifyPayplusHash,
 } from "@/lib/sms/payplus";
 import { loadMonthlyPriceIls } from "@/lib/admin/catalog";
+import { loadPayplusSubscription } from "@/lib/admin/payplus-subscriptions";
+import { notifyNewAppPayment } from "@/lib/sms/purchase-notify";
 import {
   parseSubscriptionMoreInfo,
   subscriptionChargeIls,
@@ -22,6 +24,41 @@ import {
 import { fulfillPaidSubscription } from "@/lib/subscription-orders";
 
 export const runtime = "nodejs";
+
+async function completeConfirmedSubscription(input: {
+  businessId: string;
+  amount: number;
+  payplusStatusCode: string;
+  recurringUid?: string | null;
+  terminalUid?: string | null;
+  customerUid?: string | null;
+  transactionUid?: string | null;
+}) {
+  if (!isSuccessfulPayplusStatus(input.payplusStatusCode)) {
+    return { ok: false as const, message: "התשלום לא אושר." };
+  }
+  let alreadyRecorded = true;
+  try {
+    alreadyRecorded = Boolean(await loadPayplusSubscription(input.businessId));
+  } catch (error) {
+    console.error("subscription lookup before sms failed", error);
+  }
+  const result = await fulfillPaidSubscription({
+    businessId: input.businessId,
+    amount: input.amount,
+    recurringUid: input.recurringUid,
+    terminalUid: input.terminalUid,
+    customerUid: input.customerUid,
+    transactionUid: input.transactionUid,
+  });
+  if (result.ok && !alreadyRecorded) {
+    await notifyNewAppPayment({
+      businessId: input.businessId,
+      payplusStatusCode: input.payplusStatusCode,
+    });
+  }
+  return result;
+}
 
 function firstHeader(request: Request, name: string) {
   return request.headers.get(name);
@@ -92,9 +129,10 @@ async function handleCallback(request: Request) {
         terminalUid = terminalUid || lookedUp?.terminalUid || "";
         customerUid = customerUid || lookedUp?.customerUid || "";
       }
-      const result = await fulfillPaidSubscription({
+      const result = await completeConfirmedSubscription({
         businessId: subscriptionId,
         amount: parsed.amount,
+        payplusStatusCode: parsed.statusCode,
         recurringUid,
         terminalUid,
         customerUid,
@@ -122,6 +160,7 @@ async function handleCallback(request: Request) {
     const result = await fulfillPaidOrder({
       orderId: order.id,
       transactionUid: parsed.uid,
+      payplusStatusCode: parsed.statusCode,
     });
     if (!result.ok) return jsonError(result.message, 502);
     return jsonOk({ ok: true, idempotent: result.idempotent ?? false });
@@ -158,9 +197,10 @@ async function handleCallback(request: Request) {
         subscriptionChargeIls(await loadMonthlyPriceIls()),
       )
     ) {
-      const result = await fulfillPaidSubscription({
+      const result = await completeConfirmedSubscription({
         businessId: paidSubscriptionId,
         amount: payment.amount,
+        payplusStatusCode: payment.statusCode,
         recurringUid: payment.recurringUid || parsed.recurringUid,
         terminalUid: payment.terminalUid || parsed.terminalUid,
         customerUid: payment.customerUid || parsed.customerUid,
@@ -175,6 +215,7 @@ async function handleCallback(request: Request) {
       const result = await fulfillPaidOrder({
         orderId: order.id,
         transactionUid: payment.uid,
+        payplusStatusCode: payment.statusCode,
       });
       if (!result.ok) return jsonError(result.message, 502);
       return jsonOk({ ok: true, via: "ipn" });
