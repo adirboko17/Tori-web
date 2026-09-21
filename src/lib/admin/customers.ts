@@ -53,8 +53,12 @@ async function loadLiveSmsTotals(businessIds: string[]) {
   const totals = new Map<string, number>();
   await Promise.all(
     businessIds.map(async (businessId) => {
-      const balance = await loadSmsBalance(businessId);
-      if (balance.ok) totals.set(businessId, balance.total);
+      try {
+        const balance = await loadSmsBalance(businessId);
+        if (balance.ok) totals.set(businessId, balance.total);
+      } catch {
+        // A live balance failure should not hide the customer list.
+      }
     }),
   );
   return totals;
@@ -66,7 +70,7 @@ export async function listCustomers(): Promise<AdminCustomer[]> {
     supabase
       .from("business_profile")
       .select(
-        "id, display_name, phone, pulseem_plan, pulseem_prepaid_sms_credits, pulseem_user_id, created_at",
+        "id, display_name, phone, pulseem_prepaid_sms_credits, pulseem_user_id, created_at",
       )
       .order("created_at", { ascending: false }),
     supabase
@@ -127,7 +131,7 @@ export async function listCustomers(): Promise<AdminCustomer[]> {
       id,
       name: String(record.display_name ?? "").trim() || "עסק",
       phone: String(record.phone ?? ""),
-      plan: String(record.pulseem_plan ?? ""),
+      plan: "",
       prepaidCredits,
       smsRemaining: resolveSmsRemaining(liveTotals.get(id) ?? null, prepaidCredits),
       createdAt: String(record.created_at ?? ""),

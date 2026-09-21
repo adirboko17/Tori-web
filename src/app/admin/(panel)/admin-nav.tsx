@@ -8,6 +8,7 @@ const LINKS = [
   { href: "/admin/packages", label: "חבילות הודעות" },
   { href: "/admin/pricing", label: "מחיר חודשי" },
   { href: "/admin/customers", label: "לקוחות" },
+  { href: "/admin/operational-messages", label: "הודעות תפעוליות" },
   { href: "/admin/purchases", label: "רכישות" },
   { href: "/admin/cancellations", label: "בקשות ביטול" },
 ];
