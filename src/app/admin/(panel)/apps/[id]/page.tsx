@@ -30,16 +30,26 @@ export default function AppDetailPage() {
   const [banner, setBanner] = useState<Banner>(null);
   const [copied, setCopied] = useState(false);
 
-  const load = useCallback(async () => {
-    const data = await adminJson<BusinessDetails & { ok: true }>(`/api/admin/apps/${businessId}`);
-    setDetails(data);
-  }, [businessId]);
+  const fetchDetails = useCallback(
+    () => adminJson<BusinessDetails & { ok: true }>(`/api/admin/apps/${businessId}`),
+    [businessId],
+  );
+
+  const load = useCallback(() => fetchDetails().then(setDetails), [fetchDetails]);
 
   useEffect(() => {
-    load().catch((err: unknown) => {
-      setError(err instanceof Error ? err.message : "טעינת העסק נכשלה");
-    });
-  }, [load]);
+    let cancelled = false;
+    fetchDetails()
+      .then((data) => {
+        if (!cancelled) setDetails(data);
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) setError(err instanceof Error ? err.message : "טעינת העסק נכשלה");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchDetails]);
 
   useEffect(() => {
     if (!banner) return;
@@ -50,7 +60,7 @@ export default function AppDetailPage() {
   const notify = useCallback(
     (text: string, kind: "success" | "error" = "success") => {
       setBanner({ kind, text });
-      void load();
+      load().catch(() => undefined);
     },
     [load],
   );
@@ -267,7 +277,7 @@ function SmsCard({
   const [balance, setBalance] = useState<number | null>(null);
   const [balanceError, setBalanceError] = useState("");
   const [refreshedAt, setRefreshedAt] = useState<Date | null>(null);
-  const [refreshing, setRefreshing] = useState(false);
+  const [refreshing, setRefreshing] = useState(true);
   const [busy, setBusy] = useState("");
   const [preset, setPreset] = useState<number | null>(500);
   const [custom, setCustom] = useState("");
@@ -282,38 +292,56 @@ function SmsCard({
 
   const hasAccount = Boolean(state?.hasApiKey || (state?.userId && state.hasPassword)) || pulseemReady;
 
-  const loadBalance = useCallback(async () => {
-    setRefreshing(true);
-    try {
-      const data = await adminJson<{ directSmsCredits?: string }>("/api/admin/pulseem/balance", {
-        method: "POST",
-        body: JSON.stringify({ businessId, subAccountName: displayName }),
-      });
-      const parsed = Number(data.directSmsCredits);
-      setBalance(Number.isFinite(parsed) ? parsed : null);
-      setBalanceError("");
-      setRefreshedAt(new Date());
-    } catch (err) {
-      setBalanceError(err instanceof Error ? err.message : "לא ניתן לטעון יתרה");
-    } finally {
-      setRefreshing(false);
-    }
+  const fetchBalance = useCallback(async () => {
+    const data = await adminJson<{ directSmsCredits?: string }>("/api/admin/pulseem/balance", {
+      method: "POST",
+      body: JSON.stringify({ businessId, subAccountName: displayName }),
+    });
+    const parsed = Number(data.directSmsCredits);
+    return Number.isFinite(parsed) ? parsed : null;
   }, [businessId, displayName]);
 
-  const loadState = useCallback(async () => {
-    const data = await adminJson<{ state: PulseemEditorState }>("/api/admin/pulseem/state", {
-      method: "POST",
-      body: JSON.stringify({ businessId }),
-    });
-    setState(data.state);
-    setUserId(data.state.userId);
-    setSender(data.state.fromNumber);
-  }, [businessId]);
+  const fetchState = useCallback(
+    () =>
+      adminJson<{ state: PulseemEditorState }>("/api/admin/pulseem/state", {
+        method: "POST",
+        body: JSON.stringify({ businessId }),
+      }).then((data) => data.state),
+    [businessId],
+  );
+
+  const applyState = useCallback((next: PulseemEditorState) => {
+    setState(next);
+    setUserId(next.userId);
+    setSender(next.fromNumber);
+  }, []);
+
+  const applyBalance = useCallback((promise: Promise<number | null>) => {
+    return promise
+      .then((value) => {
+        setBalance(value);
+        setBalanceError("");
+        setRefreshedAt(new Date());
+      })
+      .catch((err: unknown) => {
+        setBalanceError(err instanceof Error ? err.message : "לא ניתן לטעון יתרה");
+      })
+      .finally(() => setRefreshing(false));
+  }, []);
 
   useEffect(() => {
-    void loadState().catch(() => undefined);
-    void loadBalance();
-  }, [loadState, loadBalance]);
+    fetchState().then(applyState).catch(() => undefined);
+    void applyBalance(fetchBalance());
+  }, [fetchState, fetchBalance, applyState, applyBalance]);
+
+  function loadBalance() {
+    setRefreshing(true);
+    return applyBalance(fetchBalance());
+  }
+
+  function loadState() {
+    return fetchState().then(applyState);
+  }
 
   const amount = useMemo(() => {
     if (preset != null) return preset;
