@@ -776,7 +776,8 @@ export function initializeLanding(root) {
           managerName: name.value.trim(),
           phone: tel.value.trim(),
           businessNameHe: (biz && biz.value.trim()) || name.value.trim(),
-          plan: typeLabel || null,
+          businessType: typeLabel || null,
+          note: note ? note.value.trim() : "",
         },
         leadSavedId || undefined,
       );
@@ -785,6 +786,8 @@ export function initializeLanding(root) {
       if (tel) tel.value = "";
       if (biz) biz.value = "";
       if (note) note.value = "";
+      const radios = form.querySelectorAll('input[name="biz-type"]');
+      if (radios[0]) radios[0].checked = true;
       leadSavedId = "";
       say("הפרטים נשלחו בהצלחה. נחזור אליך תוך 72 שעות.", true);
     } catch (error) {

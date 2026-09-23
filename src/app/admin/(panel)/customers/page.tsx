@@ -7,7 +7,6 @@ type Customer = {
   id: string;
   name: string;
   phone: string;
-  plan: string;
   prepaidCredits: number;
   smsRemaining: number | null;
   createdAt: string;

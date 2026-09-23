@@ -5,6 +5,7 @@ import {
   mapServices,
   toAppNameEn,
   toEnglishName,
+  webhookAddress,
 } from "../src/lib/business-onboarding-map.ts";
 import {
   canFinishWithoutCards,
@@ -37,6 +38,9 @@ test("missing required fields fall back without inventing a new form", () => {
   assert.equal(mapped.brand_color, "#D4A574");
   assert.equal(mapped.manager_name, "דנה לוי");
   assert.equal(mapped.business_name_he, "סטודיו נועה");
+  assert.equal(mapped.plan, null);
+  assert.equal(mapped.business_type, null);
+  assert.equal(mapped.note, null);
   assert.match(mapped.app_name_en, /^[A-Za-z][A-Za-z0-9]*$/);
 });
 
@@ -52,6 +56,17 @@ test("demo save can finish without credit card details", () => {
     }),
     true,
   );
+});
+
+test("lead category and note are kept when the form has no address", () => {
+  const mapped = mapBusinessFields({
+    managerName: "דנה לוי",
+    phone: "050-000-0000",
+    businessNameHe: "סטודיו נועה",
+    businessType: "קוסמטיקה",
+    note: "שני עובדים",
+  });
+  assert.equal(webhookAddress(mapped), "תחום: קוסמטיקה · שני עובדים");
 });
 
 test("services skip empty rows and keep numeric price and duration", () => {

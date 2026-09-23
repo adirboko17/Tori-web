@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  serverExternalPackages: ["xlsx"],
   // the dev overlay badge defaults to bottom-left, on top of the chat FAB
   devIndicators: false,
   allowedDevOrigins: ["*.trycloudflare.com"],

@@ -15,7 +15,6 @@ export type AdminCustomer = {
   id: string;
   name: string;
   phone: string;
-  plan: string;
   prepaidCredits: number;
   smsRemaining: number | null;
   createdAt: string;
@@ -131,7 +130,6 @@ export async function listCustomers(): Promise<AdminCustomer[]> {
       id,
       name: String(record.display_name ?? "").trim() || "עסק",
       phone: String(record.phone ?? ""),
-      plan: "",
       prepaidCredits,
       smsRemaining: resolveSmsRemaining(liveTotals.get(id) ?? null, prepaidCredits),
       createdAt: String(record.created_at ?? ""),
