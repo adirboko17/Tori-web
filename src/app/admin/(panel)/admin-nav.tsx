@@ -11,6 +11,7 @@ const LINKS = [
   { href: "/admin/operational-messages", label: "הודעות תפעוליות" },
   { href: "/admin/purchases", label: "רכישות" },
   { href: "/admin/cancellations", label: "בקשות ביטול" },
+  { href: "/admin/account-deletions", label: "מחיקת חשבון" },
 ];
 
 export function AdminNav({
