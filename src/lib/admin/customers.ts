@@ -52,8 +52,12 @@ async function loadLiveSmsTotals(businessIds: string[]) {
   const totals = new Map<string, number>();
   await Promise.all(
     businessIds.map(async (businessId) => {
-      const balance = await loadSmsBalance(businessId);
-      if (balance.ok) totals.set(businessId, balance.total);
+      try {
+        const balance = await loadSmsBalance(businessId);
+        if (balance.ok) totals.set(businessId, balance.total);
+      } catch {
+        // A live balance failure should not hide the customer list.
+      }
     }),
   );
   return totals;
