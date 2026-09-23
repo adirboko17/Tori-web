@@ -156,6 +156,10 @@ a.admin-btn,
   font: var(--type-caption);
 }
 
+.admin-nav-email {
+  text-align: center;
+}
+
 .admin-nav-links {
   display: grid;
   gap: 6px;
