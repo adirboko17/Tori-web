@@ -1366,6 +1366,16 @@ a.ad-entity-title:hover {
   gap: 12px;
 }
 
+.ad-stats.is-six {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 760px) {
+  .ad-stats.is-six {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .ad-stat {
   display: grid;
   align-content: start;
@@ -1513,6 +1523,32 @@ a.ad-list-item:hover {
   color: var(--text-faint);
   font-size: 12px;
   white-space: nowrap;
+}
+
+.ad-list-amount {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--green-50);
+  color: var(--green-800);
+  font: var(--weight-semibold) 14px/1.2 var(--font-num);
+  font-feature-settings: var(--numeric-tabular);
+  white-space: nowrap;
+}
+
+.ad-list.is-feed .ad-list-item {
+  padding-block: 15px;
+}
+
+.ad-list.is-feed .ad-list-title {
+  font-weight: var(--weight-semibold);
+}
+
+.ad-list-end {
+  flex-shrink: 0;
+  display: grid;
+  justify-items: end;
+  gap: 5px;
 }
 
 .ad-list-item > .ad-icon:last-child {

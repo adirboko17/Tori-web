@@ -244,7 +244,7 @@ export default async function AppPrivacyPage() {
         </p>
         <p>
           אימייל:{" "}
-          <a href="mailto:we.toriapps@gmail.com">we.toriapps@gmail.com</a>
+          <a href="mailto:support@wetori.co.il">support@wetori.co.il</a>
         </p>
         <p>
           טלפון / WhatsApp:{" "}

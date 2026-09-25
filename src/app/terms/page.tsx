@@ -1,10 +1,10 @@
 import { LegalPage } from "@/components/legal-page";
 import ServiceAgreement from "@/components/service-agreement";
 
-export const metadata = { title: "הסכם שירות" };
+export const metadata = { title: "תנאי שימוש" };
 export default function Terms() {
   return (
-    <LegalPage title="הסכם שירות">
+    <LegalPage title="תנאי שימוש">
       <ServiceAgreement />
     </LegalPage>
   );

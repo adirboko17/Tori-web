@@ -13,6 +13,7 @@ import {
   SkeletonRows,
   StatCard,
 } from "../../_ui/parts";
+import { MainPulseemStat, useMainPulseemBalance } from "../../_ui/pulseem-main";
 import { useAdminData } from "../../_ui/use-admin-data";
 
 type Filter = "all" | "paid" | "pending" | "failed";
@@ -30,6 +31,7 @@ export default function PurchasesPage() {
   const [filter, setFilter] = useState<Filter>("all");
   const [query, setQuery] = useState("");
   const { data, error, loading, reload } = useAdminData<{ purchases: AdminPurchase[] }>("/api/admin/purchases");
+  const mainBalance = useMainPulseemBalance();
   const purchases = useMemo(() => data?.purchases ?? [], [data]);
 
   const month = useMemo(() => {
@@ -69,6 +71,7 @@ export default function PurchasesPage() {
     <>
       <section className="ad-stats" aria-label="סיכום רכישות">
         <StatCard highlight loading={loading} icon="banknote" label="הכנסות SMS החודש" value={formatIls(month.total)} hint={`${month.count} רכישות`} />
+        <MainPulseemStat balance={mainBalance} />
         <StatCard loading={loading} icon="message-square" label="הודעות שנמכרו החודש" value={formatNumber(month.credits)} />
         <StatCard
           loading={loading}

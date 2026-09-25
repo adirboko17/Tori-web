@@ -1,173 +1,189 @@
 import "./service-agreement.css";
 
-const cancelTimeline = [
-  { title: "בקשת ביטול", date: "14 לחודש" },
-  { title: "שירות פעיל עד", date: "10 לחודש הבא" },
-  { title: "ביטול סופי", date: "10 לחודש הבא" },
-];
-
 export default function ServiceAgreement() {
   return (
     <div className="tori-agreement" dir="rtl" lang="he">
       <section className="tori-agreement-section">
-        <h2 className="tori-agreement-h2">{"1. השירות שאנו מספקים"}</h2>
-        <h3 className="tori-agreement-h3">{"אפליקציה אישית וממותגת לחלוטין"}</h3>
+        <h2 className="tori-agreement-h2">{"1. מי מפעיל את השירות"}</h2>
         <p className="tori-agreement-p">
           {
-            "כל עסק מקבל אפליקציה עצמאית הנושאת את שמו, הלוגו שלו ועיצובו — ונפרסת בחנות האפליקציות תחת מותג העסק בלבד."
+            "תנאי שימוש אלה הם הסכם השירות. הם חלים על האתר wetori.co.il ועל מנוי Tori. גלישה באתר אינה יוצרת מנוי. המנוי נוצר רק אחרי אישור התנאים בעת ההצטרפות ותשלום ראשון."
           }
         </p>
         <p className="tori-agreement-p">
           {
-            "הפלטפורמה כוללת: ניהול תורים חכם, מערכת הזמנה עצמאית ללקוחות, תזכורות SMS אוטומטיות, ניהול עובדים ושירותים, וסטטיסטיקות עסקיות."
-          }
-        </p>
-      </section>
-
-      <section className="tori-agreement-section">
-        <h2 className="tori-agreement-h2">{"2. תשלום ומנוי"}</h2>
-        <p className="tori-agreement-p">
-          {
-            "דמי המנוי נגבים אוטומטית בכל ה-10 לחודש. אין דמי הקמה — התשלום הראשון הוא דמי המנוי החודשי בלבד."
-          }
-        </p>
-        <h3 className="tori-agreement-h3">{"מחזור החיוב"}</h3>
-        <p className="tori-agreement-p">
-          {
-            "החיוב מתבצע ב-10 לכל חודש עבור החודש הקרוב. לא יינתן החזר כספי עבור תקופה ששולמה."
-          }
-        </p>
-        <h3 className="tori-agreement-h3">{"כשל בתשלום – מה קורה?"}</h3>
-        <div className="tori-agreement-steps">
-          <p className="tori-agreement-p">
-            {
-              "1. התראה מיידית — במידה והתשלום לא עבר מכל סיבה שהיא, בעל האפליקציה יקבל התראה להסדרת התשלום."
-            }
-          </p>
-          <p className="tori-agreement-p">
-            {
-              "2. חלון זמן להסדרה – 7 ימי עסקים — לבעל העסק יש 7 ימי עסקים להסדיר את התשלום ממועד קבלת ההתראה."
-            }
-          </p>
-          <p className="tori-agreement-p">
-            {
-              "3. השהיית השירות — אם התשלום לא הוסדר תוך 7 ימי עסקים, האפליקציה תוסר מחנות האפליקציות וכל המידע שבתוכה יימחק לצמיתות."
-            }
-          </p>
-        </div>
-      </section>
-
-      <section className="tori-agreement-section">
-        <h2 className="tori-agreement-h2">{"3. ביטול"}</h2>
-        <h3 className="tori-agreement-h3">{"ללא התחייבות"}</h3>
-        <p className="tori-agreement-p">{"ניתן לבטל בכל עת, ללא דמי ביטול."}</p>
-        <h3 className="tori-agreement-h3">{"עם התחייבות"}</h3>
-        <p className="tori-agreement-p">
-          {"ביטול לפני תום התקופה יחייב תשלום יתרת החודשים שנותרו."}
-        </p>
-        <h3 className="tori-agreement-h3">{"מועד כניסת הביטול לתוקף"}</h3>
-        <p className="tori-agreement-p">
-          {
-            "הביטול נכנס לתוקף בתאריך ה-10 של החודש העוקב לאחר בקשת הביטול. השירות ימשיך לפעול עד לאותו מועד."
-          }
-        </p>
-        <div
-          className="tori-agreement-timeline"
-          role="list"
-          aria-label="דוגמה למועד כניסת הביטול לתוקף"
-        >
-          {cancelTimeline.map((step, index) => (
-            <div
-              className="tori-agreement-timeline-item"
-              role="listitem"
-              key={step.title}
-            >
-              <span className="tori-agreement-timeline-num">
-                {String(index + 1)}
-              </span>
-              <strong className="tori-agreement-timeline-title">
-                {step.title}
-              </strong>
-              <span className="tori-agreement-timeline-date">{step.date}</span>
-            </div>
-          ))}
-        </div>
-        <p className="tori-agreement-note">
-          <strong>{"חשוב לדעת: "}</strong>
-          {
-            "עם סיום המנוי, האפליקציה תוסר מחנות האפליקציות ולקוחות העסק לא יוכלו עוד להשתמש בה."
+            "השירות מופעל על ידי איתי בן יאיר, עוסק מורשה מספר 209198704, כתובת אורן 19, באר שבע."
           }
         </p>
       </section>
 
       <section className="tori-agreement-section">
-        <h2 className="tori-agreement-h2">{"4. התחייבויות תורי"}</h2>
-        <ul className="tori-agreement-ul">
-          <li>{"הפלטפורמה תועמד לשימוש רציף ותקין."}</li>
-          <li>{"הקמת האפליקציה תושלם תוך 72 שעות מקבלת כל החומרים."}</li>
-          <li>
-            {"תמיכה טכנית זמינה בימים א'–ה', בין השעות 09:00–17:00."}
-          </li>
-          <li>{"המידע שלכם ושל לקוחותיכם ישמר בסודיות מלאה."}</li>
-        </ul>
-        <h3 className="tori-agreement-h3">
-          {"הגבלת אחריות – חנות האפליקציות"}
-        </h3>
+        <h2 className="tori-agreement-h2">{"2. השירות"}</h2>
+        <p className="tori-agreement-p">
+          {
+            "Tori מקימה לעסק אפליקציית קביעת תורים במותג העסק, מגישה אותה ל-App Store ול-Google Play, ומפעילה ממשק ניהול, תזכורות וכלים נוספים כפי שמתוארים באתר בעת ההצטרפות."
+          }
+        </p>
+        <p className="tori-agreement-p">
+          {
+            "Apple ו-Google מאשרים, דוחים, מגבילים או מסירים אפליקציה לפי הכללים שלהן. אין לנו שליטה בהחלטות האלה."
+          }
+        </p>
         <p className="tori-agreement-callout">
           {
-            "תורי אינה אחראית לחסימה, הסרה או הגבלה של האפליקציה על ידי Apple או Google מכל סיבה שהיא. החלטות חנויות האפליקציות הן בסמכותן הבלעדית ואינן בשליטת תורי."
+            "יעד ההקמה הוא עד 72 שעות מהרגע שהתקבלו כל החומרים והתשלום הראשון. זה יעד תפעולי. עיכוב של חנות האפליקציות, של חומר חסר, או של תקלת ספק אינם הפרה של ההסכם."
           }
         </p>
       </section>
 
       <section className="tori-agreement-section">
-        <h2 className="tori-agreement-h2">{"5. התחייבויות המשתמש"}</h2>
+        <h2 className="tori-agreement-h2">{"3. מי יכול להצטרף"}</h2>
         <ul className="tori-agreement-ul">
+          <li>{"השירות מיועד לבעלי עסקים או למי שהוסמך מטעמם."}</li>
+          <li>{"חובה למסור פרטים נכונים, מלאים ומעודכנים."}</li>
           <li>
             {
-              "יש לספק את כל החומרים הנדרשים להקמה (לוגו, פרטי עסק, שירותים, תמונות)."
+              "אסור שימוש לרעה, ניסיון פריצה, העתקה של הקוד או של הממשק, או פגיעה בזכות של צד שלישי."
             }
           </li>
-          <li>{"אין להעביר את זכות השימוש לצד שלישי."}</li>
-          <li>{"יש לעשות שימוש הוגן ותקין בפלטפורמה."}</li>
-          <li>
-            {"האחריות על התוכן שמועלה לפלטפורמה חלה על המשתמש בלבד."}
-          </li>
+          <li>{"התוכן שהעסק מעלה לאפליקציה הוא באחריות העסק בלבד."}</li>
+          <li>{"אין להעביר את זכות השימוש לצד שלישי בלי אישור מראש."}</li>
         </ul>
       </section>
 
       <section className="tori-agreement-section">
-        <h2 className="tori-agreement-h2">
-          {"6. קניין רוחני, פרטיות וסודיות"}
-        </h2>
+        <h2 className="tori-agreement-h2">{"4. מחיר ותשלום"}</h2>
         <p className="tori-agreement-p">
           {
-            "הפלטפורמה, הטכנולוגיה והעיצוב הינם קניינה הבלעדי של תורי. המשתמש מקבל רישיון שימוש בלבד."
+            "המחיר הוא המחיר החודשי שמוצג במסך התשלום בעת ההצטרפות, בתוספת מע״מ כדין. אין דמי הקמה ואין עמלה על תורים."
           }
         </p>
         <p className="tori-agreement-p">
           {
-            "המידע לא יועבר לצד שלישי ללא הסכמתכם, בהתאם לחוק הגנת הפרטיות הישראלי."
+            "החיוב הוא הוראת קבע חודשית אצל ספק הסליקה. מועד החיוב החוזר הוא לפי תאריך התשלום הראשון. פרטי כרטיס האשראי אינם נשמרים אצלנו. חשבונית מונפקת כדין."
           }
         </p>
-        <h3 className="tori-agreement-h3">{"ממשק הניהול – סודיות מלאה"}</h3>
         <p className="tori-agreement-p">
           {
-            "ממשק הניהול של העסק הוא סודי ומיועד לבעל העסק בלבד. ללקוחות הקצה אין ולא תהיה גישה לממשק זה, לנתונים העסקיים או לכל מידע ניהולי אחר."
+            "מחיר של לקוח קיים לא ישתנה בלי הודעה מראש. מחיר חדש יחול על מצטרפים חדשים."
           }
         </p>
       </section>
 
       <section className="tori-agreement-section">
-        <h2 className="tori-agreement-h2">{"7. שונות"}</h2>
+        <h2 className="tori-agreement-h2">{"5. ביטול"}</h2>
         <p className="tori-agreement-p">
           {
-            "סמכות השיפוט הבלעדית תהיה לבתי המשפט המוסמכים במחוז תל אביב. תורי שומרת את הזכות לעדכן תנאים אלו בהודעה מוקדמת של 14 ימים."
+            "אין תקופת התחייבות ואין דמי ביטול. אפשר לבקש ביטול בכל עת בוואטסאפ, בטלפון או בדוא״ל."
           }
+        </p>
+        <p className="tori-agreement-p">
+          {
+            "מרגע שהביטול נרשם, מחזור החיוב הבא לא מחויב. התקופה שכבר שולמה ממשיכה עד מועד החיוב שהתבטל. אין החזר על תקופה ששולמה."
+          }
+        </p>
+        <p className="tori-agreement-note">
+          <strong>{"בתום התקופה ששולמה: "}</strong>
+          {
+            "האפליקציה יורדת מחנויות האפליקציות, ולקוחות העסק לא יוכלו עוד לקבוע בה תור."
+          }
+        </p>
+      </section>
+
+      <section className="tori-agreement-section">
+        <h2 className="tori-agreement-h2">{"6. אי־תשלום ומחיקת מידע"}</h2>
+        <p className="tori-agreement-p">
+          {
+            "אם חיוב נכשל, נשלחת התראה. יש 7 ימי עסקים ממועד ההתראה להסדיר את התשלום."
+          }
+        </p>
+        <p className="tori-agreement-note">
+          <strong>{"אין ייצוא נתונים מהאפליקציה. "}</strong>
+          {
+            "אם התשלום לא הוסדר בתוך 7 ימי העסקים, האפליקציה והמידע שבה נמחקים, לרבות תורים, לקוחות, שירותים ותוכן שהעסק העלה. אחרי המחיקה אי אפשר לשחזר את המידע."
+          }
+        </p>
+        <p className="tori-agreement-p">
+          {
+            "אנו רשאים להשעות את השירות מיד במקרה של שימוש בלתי חוקי או הפרה מהותית של תנאים אלה."
+          }
+        </p>
+      </section>
+
+      <section className="tori-agreement-section">
+        <h2 className="tori-agreement-h2">{"7. קניין רוחני"}</h2>
+        <p className="tori-agreement-p">
+          {
+            "הפלטפורמה, הקוד, עיצוב המערכת והמותג Tori הם שלנו או של מעניקי הרישיון. העסק מקבל רישיון שימוש לא בלעדי כל עוד המנוי פעיל."
+          }
+        </p>
+        <p className="tori-agreement-p">
+          {
+            "השם, הלוגו והתוכן של העסק נשארים של העסק. העסק נותן לנו רישיון להשתמש בהם כדי להקים ולהפעיל את האפליקציה."
+          }
+        </p>
+        <p className="tori-agreement-p">
+          {
+            "ממשק הניהול מיועד לבעל העסק ולמי שהוסמך מטעמו. לקוחות הקצה של העסק אינם מקבלים גישה אליו."
+          }
+        </p>
+      </section>
+
+      <section className="tori-agreement-section">
+        <h2 className="tori-agreement-h2">{"8. זמינות ואחריות"}</h2>
+        <p className="tori-agreement-p">
+          {
+            "אנו משקיעים מאמץ סביר לזמינות השירות ולתמיכה בימים א׳–ה׳, בין 09:00 ל־17:00. אין התחייבות לשירות רציף בלי תקלה, או לזמינות של ספק סליקה, מסרונים, אחסון או חנות אפליקציות."
+          }
+        </p>
+        <p className="tori-agreement-p">
+          {
+            "האחריות הכספית, ככל שתחול, מוגבלת לדמי המנוי ששולמו ב־12 החודשים שקדמו לאירוע. ההגבלה אינה חלה על זדון, הטעיה או נזק גוף."
+          }
+        </p>
+      </section>
+
+      <section className="tori-agreement-section">
+        <h2 className="tori-agreement-h2">{"9. פרטיות ועוגיות"}</h2>
+        <p className="tori-agreement-p">
+          {
+            "עיבוד מידע אישי כפוף למדיניות הפרטיות. באתר השיווקי פועלים, אחרי אישור המבקר, פיקסל של Meta וכלי מדידה של Google. פירוט העוגיות והבחירה מופיעים במדיניות העוגיות."
+          }
+        </p>
+      </section>
+
+      <section className="tori-agreement-section">
+        <h2 className="tori-agreement-h2">{"10. שינוי תנאים"}</h2>
+        <p className="tori-agreement-p">
+          {
+            "אנו רשאים לעדכן תנאים אלה. הגרסה המעודכנת תפורסם באתר. שינוי שפוגע בלקוח פעיל ייכנס לתוקף 14 יום אחרי שנשלחה לו הודעה. המשך שימוש אחרי מועד הכניסה לתוקף הוא הסכמה לתנאים המעודכנים."
+          }
+        </p>
+      </section>
+
+      <section className="tori-agreement-section">
+        <h2 className="tori-agreement-h2">{"11. דין וסמכות שיפוט"}</h2>
+        <p className="tori-agreement-p">
+          {
+            "על תנאים אלה חלים דיני מדינת ישראל. סמכות השיפוט המקומית היא לבתי המשפט המוסמכים בבאר שבע ובמחוז הדרום."
+          }
+        </p>
+      </section>
+
+      <section className="tori-agreement-section">
+        <h2 className="tori-agreement-h2">{"12. יצירת קשר"}</h2>
+        <p className="tori-agreement-p">
+          {"וואטסאפ וטלפון: 053-5575303"}
+          <br />
+          {"דוא״ל: support@wetori.co.il"}
+          <br />
+          {"כתובת: אורן 19, באר שבע"}
+          <br />
+          {"שעות מענה: א׳–ה׳, 09:00–17:00"}
         </p>
         <p className="tori-agreement-close">
           {
-            'בלחיצה על "אני מאשר/ת את תנאי ההסכם", הלקוח מאשר כי קרא את ההסכם, הבין את תנאיו ומסכים להם במלואם.'
+            "עודכן לאחרונה: 25 בספטמבר 2026. בלחיצה על אישור ההסכם הלקוח מאשר שקרא את התנאים, הבין אותם, ומסכים להם. בפרט ידוע לו שאין ייצוא נתונים, ושאי־הסדרת תשלום תוך 7 ימי עסקים מובילה למחיקת המידע."
           }
         </p>
       </section>

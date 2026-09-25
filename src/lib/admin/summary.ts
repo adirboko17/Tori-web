@@ -19,6 +19,7 @@ export type ActivityItem = {
   detail: string;
   at: string;
   href: string;
+  amountIls?: number;
 };
 
 export type WaitingChat = {
@@ -117,10 +118,11 @@ function buildActivity(
       .map((purchase) => ({
         id: `p-${purchase.id}`,
         kind: "purchase" as const,
-        title: `${purchase.businessName} רכשו ${purchase.smsCredits.toLocaleString("he-IL")} הודעות`,
-        detail: `₪${purchase.amountIls.toLocaleString("he-IL")}`,
+        title: purchase.businessName,
+        detail: `רכשו ${purchase.smsCredits.toLocaleString("he-IL")} הודעות SMS`,
         at: purchase.paidAt || purchase.createdAt,
         href: `/admin/businesses/${purchase.businessId}?tab=billing`,
+        amountIls: purchase.amountIls,
       })),
     ...cancellations.map((request) => ({
       id: `c-${request.id}`,
@@ -142,7 +144,7 @@ function buildActivity(
   return items
     .filter((item) => item.at)
     .sort((a, b) => b.at.localeCompare(a.at))
-    .slice(0, 8);
+    .slice(0, 12);
 }
 
 export async function loadAdminSummary(): Promise<AdminSummary> {

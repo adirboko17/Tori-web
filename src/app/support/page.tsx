@@ -5,7 +5,7 @@ export const metadata = { title: "תמיכה" };
 const PHONE_DISPLAY = "053-557-5303";
 const PHONE_TEL = "+972535575303";
 const WHATSAPP_URL = "https://wa.me/972535575303";
-const EMAIL = "we.toriapps@gmail.com";
+const EMAIL = "support@wetori.co.il";
 
 const topics = [
   "בעיה בהתחברות לאפליקציה",

@@ -1255,7 +1255,7 @@ export default function Onboarding() {
                       }}
                     >
                       {
-                        "299 ₪ לחודש + מע״מ, כהוראת קבע. התשלום מתבצע בדף מאובטח נפרד, בלי לשמור פרטי כרטיס אצלנו. אפשר להתנתק מתי שרוצים."
+                        "299 ₪ לחודש + מע״מ, כהוראת קבע. התשלום מתבצע בדף מאובטח נפרד, בלי לשמור פרטי כרטיס אצלנו. אפשר לבטל בכל עת, ומחזור החיוב הבא לא יחויב."
                       }
                     </p>
                   </div>
@@ -1768,7 +1768,7 @@ export default function Onboarding() {
         >
           <a href="/">{"דף הבית"}</a>
           <a href="https://wa.me/972535575303">{"תמיכה בוואטסאפ"}</a>
-          <a href="mailto:hello@tori.co.il">{"hello@tori.co.il"}</a>
+          <a href="mailto:support@wetori.co.il">{"support@wetori.co.il"}</a>
         </span>
       </footer>
     </div>

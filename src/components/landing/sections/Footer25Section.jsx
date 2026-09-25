@@ -1,3 +1,5 @@
+import { CookieSettingsButton } from "@/components/tracking/cookie-settings-button";
+
 export default function Footer25Section() {
   return (
     <footer
@@ -43,6 +45,10 @@ export default function Footer25Section() {
           <a className="ths13" href="/privacy" style={{ color: "var(--ink-600)" }}>
             {"מדיניות פרטיות"}
           </a>
+          <a href="/cookies" style={{ color: "var(--ink-600)" }}>
+            {"עוגיות"}
+          </a>
+          <CookieSettingsButton />
           <a
             className="ths14"
             href="/accessibility"

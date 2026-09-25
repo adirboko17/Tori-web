@@ -10,7 +10,8 @@ export type EdgeFunctionName =
   | 'pulseem-admin-credentials'
   | 'pulseem-provision-subaccount'
   | 'pulseem-credit-transfer'
-  | 'pulseem-delete-subaccount';
+  | 'pulseem-delete-subaccount'
+  | 'pulseem-main-balance';
 
 export interface EdgeResult<T> {
   data: T | null;
@@ -94,6 +95,26 @@ export async function fetchDirectSmsBalance(
     return { ok: true, directSmsCredits: data.directSmsCredits };
   }
   return { ok: false, message: data.message || 'לא ניתן לטעון יתרה' };
+}
+
+export interface MainBalanceResponse {
+  ok?: boolean;
+  smsCredits?: number | null;
+  errorMessage?: string;
+}
+
+/** SMS credits left on the company main Pulseem account — the pool transfers draw from. */
+export async function fetchMainPulseemBalance(): Promise<
+  { ok: true; smsCredits: number } | { ok: false; message: string }
+> {
+  const { data, status } = await invokeEdge<MainBalanceResponse>('pulseem-main-balance', {});
+  if (!data) {
+    return { ok: false, message: status === 401 ? MSG_PULSEEM_401 : MSG_PULSEEM_SERVER };
+  }
+  if (data.ok && typeof data.smsCredits === 'number') {
+    return { ok: true, smsCredits: data.smsCredits };
+  }
+  return { ok: false, message: data.errorMessage || 'לא ניתן לטעון את יתרת החשבון הראשי' };
 }
 
 export interface TestConnectionResponse {

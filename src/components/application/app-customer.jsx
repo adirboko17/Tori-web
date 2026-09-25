@@ -471,7 +471,7 @@ function HomeScreen({ onBook, onOpenAppt, onReschedule }) {
           />
         </Card>
       </HomeSheet>
-      {messageOpen && <Dialog title="יצירת קשר" description="אפשר ליצור קשר עם צוות תורי דרך hello@tori.co.il." onClose={() => setMessageOpen(false)} />}
+      {messageOpen && <Dialog title="יצירת קשר" description="אפשר ליצור קשר עם צוות תורי דרך support@wetori.co.il." onClose={() => setMessageOpen(false)} />}
     </div>
   );
 }
@@ -1034,7 +1034,7 @@ function ProfileScreen({ onSwitchRole, onAppointments }) {
                         ? "אמצעי תשלום יופעלו לאחר חיבור לספק סליקה. לא נשמרים פרטי כרטיס בהדגמה."
                         : i === 2
                           ? "נתוני ההדגמה נשמרים בדפדפן הזה בלבד. אפשר למחוק אותם בהגדרות הדפדפן."
-                          : "לתמיכה: hello@tori.co.il",
+                          : "לתמיכה: support@wetori.co.il",
                     )
               }
               style={{

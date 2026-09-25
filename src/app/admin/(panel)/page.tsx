@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import type { AdminSummary, ActivityItem } from "@/lib/admin/summary";
+import { INCLUDED_SMS } from "@/lib/superadmin/pulseem-plans";
 import { formatIls, formatNumber, formatRelative, LOW_SMS_BALANCE } from "../_ui/format";
 import { Icon, type IconName } from "../_ui/icon";
 import { EmptyState, ErrorState, PageHeader, SkeletonRows, StatCard } from "../_ui/parts";
+import { MainPulseemStat, useMainPulseemBalance } from "../_ui/pulseem-main";
 import { useAdminData } from "../_ui/use-admin-data";
 import { useSmsBalances } from "../_ui/use-sms-balances";
 
@@ -34,8 +36,20 @@ const todayFormat = new Intl.DateTimeFormat("he-IL", {
 function buildAttention(
   summary: AdminSummary,
   balances: ReturnType<typeof useSmsBalances>,
+  mainCredits: number | null,
 ): Attention[] {
   const items: Attention[] = [];
+  const monthlyRefill = summary.smsBusinesses.length * INCLUDED_SMS;
+  if (mainCredits != null && mainCredits < monthlyRefill) {
+    items.push({
+      id: "pulseem-main",
+      icon: "send",
+      tone: "danger",
+      title: "יתרה נמוכה בחשבון פולסים הראשי",
+      detail: `נשארו ${formatNumber(mainCredits)} הודעות · החידוש החודשי צריך עד ${formatNumber(monthlyRefill)}`,
+      href: "/admin/billing",
+    });
+  }
   for (const request of summary.openCancellations) {
     items.push({
       id: `c-${request.id}`,
@@ -103,7 +117,8 @@ export default function DashboardPage() {
   const smsIds = summary?.smsBusinesses.map((business) => business.id) ?? [];
   const balances = useSmsBalances(smsIds);
   const balancesPending = smsIds.some((id) => !balances[id]);
-  const attention = summary ? buildAttention(summary, balances) : [];
+  const mainBalance = useMainPulseemBalance();
+  const attention = summary ? buildAttention(summary, balances, mainBalance.credits) : [];
 
   return (
     <>
@@ -135,7 +150,7 @@ export default function DashboardPage() {
       ) : null}
 
       {!error || summary ? (
-        <section className="ad-stats" aria-label="מדדים">
+        <section className="ad-stats is-six" aria-label="מדדים">
           <StatCard
             highlight
             loading={loading}
@@ -148,6 +163,7 @@ export default function DashboardPage() {
                 : undefined
             }
           />
+          <MainPulseemStat balance={mainBalance} />
           <StatCard
             loading={loading}
             icon="store"
@@ -184,6 +200,47 @@ export default function DashboardPage() {
 
       {!error || summary ? (
         <div className="ad-grid-2">
+          <section className="ad-card" aria-labelledby="activity-title">
+            <div className="ad-card-head">
+              <div>
+                <h2 id="activity-title">
+                  <Icon name="activity" />
+                  פעילות אחרונה
+                </h2>
+                <p>רכישות, עסקים חדשים ובקשות מהעסקים</p>
+              </div>
+              <Link href="/admin/billing" className="ad-btn is-ghost is-sm">
+                כל הרכישות
+                <Icon name="chevron-left" size={16} />
+              </Link>
+            </div>
+            {loading ? (
+              <SkeletonRows rows={6} />
+            ) : summary?.activity.length ? (
+              <div className="ad-list is-feed">
+                {summary.activity.map((item) => (
+                  <Link key={item.id} href={item.href} className="ad-list-item">
+                    <span className={`ad-list-icon ${ACTIVITY_ICON[item.kind].tone}`}>
+                      <Icon name={ACTIVITY_ICON[item.kind].icon} size={17} />
+                    </span>
+                    <span className="ad-list-main">
+                      <span className="ad-list-title">{item.title}</span>
+                      <span className="ad-list-sub">{item.detail}</span>
+                    </span>
+                    <span className="ad-list-end">
+                      {item.amountIls != null ? (
+                        <span className="ad-list-amount">{formatIls(item.amountIls)}</span>
+                      ) : null}
+                      <span className="ad-list-meta">{formatRelative(item.at)}</span>
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <EmptyState icon="activity" title="אין פעילות עדיין" />
+            )}
+          </section>
+
           <section className="ad-card" aria-labelledby="attention-title">
             <div className="ad-card-head">
               <h2 id="attention-title">
@@ -219,35 +276,6 @@ export default function DashboardPage() {
                 בודקים יתרות SMS בפולסים…
               </div>
             ) : null}
-          </section>
-
-          <section className="ad-card" aria-labelledby="activity-title">
-            <div className="ad-card-head">
-              <h2 id="activity-title">
-                <Icon name="activity" />
-                פעילות אחרונה
-              </h2>
-            </div>
-            {loading ? (
-              <SkeletonRows rows={5} />
-            ) : summary?.activity.length ? (
-              <div className="ad-list">
-                {summary.activity.map((item) => (
-                  <Link key={item.id} href={item.href} className="ad-list-item">
-                    <span className={`ad-list-icon ${ACTIVITY_ICON[item.kind].tone}`}>
-                      <Icon name={ACTIVITY_ICON[item.kind].icon} size={17} />
-                    </span>
-                    <span className="ad-list-main">
-                      <span className="ad-list-title">{item.title}</span>
-                      <span className="ad-list-sub">{item.detail}</span>
-                    </span>
-                    <span className="ad-list-meta">{formatRelative(item.at)}</span>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <EmptyState icon="activity" title="אין פעילות עדיין" />
-            )}
           </section>
         </div>
       ) : null}

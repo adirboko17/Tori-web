@@ -72,7 +72,7 @@ export default function ToriA11ySection() {
             <span
               style={{ fontSize: "11.5px", color: "rgba(255,255,255,.72)" }}
             >
-              {"בהתאם לת״י 5568 ולתקנות שוויון זכויות"}
+              {"התאמות תצוגה באתר"}
             </span>
           </span>
           <button
@@ -370,7 +370,7 @@ export default function ToriA11ySection() {
               }}
             >
               {
-                "נתקלתם בבעיית נגישות? רכזת הנגישות שלנו זמינה בטלפון ‎053-557-5303 ובמייל hello@wetori.co.il ונטפל בפנייה תוך 14 ימים."
+                "נתקלתם בבעיית נגישות? רכז הנגישות שלנו זמין בטלפון ‎053-557-5303 ובמייל support@wetori.co.il, ונשיב לכל המאוחר בתוך 5 ימי עסקים."
               }
             </span>
           </div>
