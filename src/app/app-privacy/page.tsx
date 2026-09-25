@@ -1,6 +1,14 @@
 import { LegalPage } from "@/components/legal-page";
+import { listPrivacyPolicyApps } from "@/lib/admin/privacy-apps";
 
 export const metadata = { title: "מדיניות פרטיות – אפליקציות Tori" };
+export const dynamic = "force-dynamic";
+
+const FALLBACK_APPS = [
+  { id: "amitsenior", name: "Amit senior | עמית סניור", bundle_id: "com.amitsenior.app" },
+  { id: "linbitton", name: "Lin Bitton | לין ביטון", bundle_id: "com.linbitton.tori" },
+  { id: "shirlvay", name: "Shir Lvay | שיר לביא", bundle_id: "com.shirlvay.app" },
+];
 
 const listStyle = {
   margin: 0,
@@ -10,27 +18,30 @@ const listStyle = {
   gap: 6,
 } as const;
 
-export default function AppPrivacyPage() {
+export default async function AppPrivacyPage() {
+  let apps = FALLBACK_APPS;
+  try {
+    apps = await listPrivacyPolicyApps();
+  } catch {
+    apps = FALLBACK_APPS;
+  }
+
   return (
     <LegalPage title="מדיניות פרטיות – אפליקציות Tori">
       <section style={{ display: "grid", gap: 12 }}>
         <h2>אפליקציות שעליהן חלה מדיניות זו</h2>
         <p>
           מדיניות פרטיות זו חלה על אפליקציות קביעת התורים הממותגות המופעלות
-          באמצעות פלטפורמת Tori ומפורסמות ב-Google Play תחת חשבון המפתח itay
-          ben yair.
+          באמצעות פלטפורמת Tori ומפורסמות ב-App Store וב-Google Play תחת
+          חשבון המפתח itay ben yair.
         </p>
         <p>בין האפליקציות שעליהן חלה מדיניות זו:</p>
         <ul style={listStyle}>
-          <li>
-            Amit senior | עמית סניור — <span dir="ltr">com.amitsenior.app</span>
-          </li>
-          <li>
-            Lin Bitton | לין ביטון — <span dir="ltr">com.linbitton.tori</span>
-          </li>
-          <li>
-            Shir Lvay | שיר לביא — <span dir="ltr">com.shirlvay.app</span>
-          </li>
+          {apps.map((app) => (
+            <li key={app.id}>
+              {app.name} — <span dir="ltr">{app.bundle_id}</span>
+            </li>
+          ))}
         </ul>
         <p>
           מדיניות זו חלה גם על אפליקציות נוספות של Tori המפורסמות תחת אותו

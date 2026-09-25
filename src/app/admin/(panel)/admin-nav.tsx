@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const LINKS = [
   { href: "/admin", label: "לוח בקרה" },
   { href: "/admin/apps", label: "אפליקציות" },
+  { href: "/admin/privacy-apps", label: "מדיניות פרטיות" },
   { href: "/admin/videos", label: "סרטונים" },
   { href: "/admin/whatsapp", label: "הודעות וואטסאפ" },
   { href: "/admin/packages", label: "חבילות הודעות" },
