@@ -48,3 +48,13 @@ export async function listAccountDeletionRequests(): Promise<AccountDeletionRequ
   if (error) throw new Error("טעינת בקשות המחיקה נכשלה.");
   return (data ?? []).map((row) => toRequest(asRecord(row)));
 }
+
+export async function countRecentAccountDeletionRequests(days: number) {
+  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+  const { count, error } = await getServiceSupabase()
+    .from("account_deletion_requests")
+    .select("id", { count: "exact", head: true })
+    .gte("created_at", since);
+  if (error) throw new Error("טעינת בקשות המחיקה נכשלה.");
+  return count ?? 0;
+}

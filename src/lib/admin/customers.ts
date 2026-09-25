@@ -1,5 +1,6 @@
 import { loadSmsBalance } from "@/lib/sms/balance";
 import { getServiceSupabase } from "@/lib/sms/supabase-admin";
+import { loadSmsPackageRows } from "./catalog";
 import {
   loadOpenCancellationsByBusiness,
   type OpenCancellation,
@@ -30,9 +31,11 @@ export type AdminPurchase = {
   businessId: string;
   businessName: string;
   packageId: string;
+  packageLabel: string | null;
   smsCredits: number;
   amountIls: number;
   status: string;
+  errorMessage: string | null;
   createdAt: string;
   paidAt: string | null;
 };
@@ -143,12 +146,15 @@ export async function listCustomers(): Promise<AdminCustomer[]> {
 }
 
 export async function loadCustomer(id: string): Promise<AdminCustomerDetail | null> {
-  const customers = await listCustomers();
-  const customer = customers.find((item) => item.id === id);
-  if (!customer) return null;
-
   const supabase = getServiceSupabase();
-  const [admins, purchases] = await Promise.all([
+  const [profile, admins, purchases, labels] = await Promise.all([
+    supabase
+      .from("business_profile")
+      .select(
+        "id, display_name, phone, pulseem_prepaid_sms_credits, pulseem_user_id, created_at",
+      )
+      .eq("id", id)
+      .maybeSingle(),
     supabase
       .from("users")
       .select("id, name, phone, user_type, block")
@@ -156,40 +162,81 @@ export async function loadCustomer(id: string): Promise<AdminCustomerDetail | nu
       .eq("user_type", "admin"),
     supabase
       .from("sms_topup_orders")
-      .select(
-        "id, business_id, package_id, sms_credits, amount_ils, status, created_at, paid_at",
-      )
+      .select(ORDER_COLUMNS)
       .eq("business_id", id)
       .order("created_at", { ascending: false }),
+    loadPackageLabels(),
   ]);
 
+  if (profile.error) throw new Error("טעינת הלקוח נכשלה.");
+  if (!profile.data) return null;
+
+  const record = asRecord(profile.data);
+  const name = String(record.display_name ?? "").trim() || "עסק";
+  const prepaidCredits = Number(record.pulseem_prepaid_sms_credits ?? 0) || 0;
+  const hasLive = Boolean(String(record.pulseem_user_id ?? "").trim());
+  const [liveTotals, cancellations, subscriptions] = await Promise.all([
+    hasLive ? loadLiveSmsTotals([id]) : Promise.resolve(new Map<string, number>()),
+    loadOpenCancellationsByBusiness([id]),
+    loadPayplusSubscriptionsByBusiness([id]).then(enrichPayplusSubscriptionsWithLive),
+  ]);
+
+  const orders = (purchases.data ?? []).map((row) =>
+    toPurchase(asRecord(row), name, labels),
+  );
+  const paid = orders.filter((order) =>
+    ["paid", "fulfilled", "processing"].includes(order.status),
+  );
+  const activeAdmins = (admins.data ?? [])
+    .map((row) => asRecord(row))
+    .filter((row) => row.block !== true);
+
   return {
-    ...customer,
-    admins: (admins.data ?? [])
-      .map((row) => asRecord(row))
-      .filter((row) => row.block !== true)
-      .map((row) => ({
-        id: String(row.id ?? ""),
-        name: String(row.name ?? "").trim() || "מנהל",
-        phone: String(row.phone ?? ""),
-      })),
-    purchases: (purchases.data ?? []).map((row) =>
-      toPurchase(asRecord(row), customer.name),
-    ),
+    id,
+    name,
+    phone: String(record.phone ?? ""),
+    prepaidCredits,
+    smsRemaining: resolveSmsRemaining(liveTotals.get(id) ?? null, prepaidCredits),
+    createdAt: String(record.created_at ?? ""),
+    adminCount: activeAdmins.length,
+    purchaseCount: paid.length,
+    purchaseTotalIls: paid.reduce((sum, order) => sum + order.amountIls, 0),
+    openCancellation: cancellations.get(id) ?? null,
+    payplusSubscription: subscriptions.get(id) ?? null,
+    admins: activeAdmins.map((row) => ({
+      id: String(row.id ?? ""),
+      name: String(row.name ?? "").trim() || "מנהל",
+      phone: String(row.phone ?? ""),
+    })),
+    purchases: orders,
   };
+}
+
+const ORDER_COLUMNS =
+  "id, business_id, package_id, sms_credits, amount_ils, status, created_at, paid_at, error_message";
+
+async function loadPackageLabels() {
+  const labels = new Map<string, string>();
+  try {
+    for (const row of await loadSmsPackageRows()) {
+      labels.set(row.package_key, row.label);
+    }
+  } catch {
+    // Purchases still render with the raw package id.
+  }
+  return labels;
 }
 
 export async function listPurchases(): Promise<AdminPurchase[]> {
   const supabase = getServiceSupabase();
-  const [orders, profiles] = await Promise.all([
+  const [orders, profiles, labels] = await Promise.all([
     supabase
       .from("sms_topup_orders")
-      .select(
-        "id, business_id, package_id, sms_credits, amount_ils, status, created_at, paid_at",
-      )
+      .select(ORDER_COLUMNS)
       .order("created_at", { ascending: false })
       .limit(200),
     supabase.from("business_profile").select("id, display_name"),
+    loadPackageLabels(),
   ]);
 
   if (orders.error) throw new Error("טעינת הרכישות נכשלה.");
@@ -206,22 +253,26 @@ export async function listPurchases(): Promise<AdminPurchase[]> {
   return (orders.data ?? []).map((row) => {
     const record = asRecord(row);
     const businessId = String(record.business_id ?? "");
-    return toPurchase(record, names.get(businessId) || "עסק");
+    return toPurchase(record, names.get(businessId) || "עסק", labels);
   });
 }
 
 function toPurchase(
   record: Record<string, unknown>,
   businessName: string,
+  labels: Map<string, string>,
 ): AdminPurchase {
+  const packageId = String(record.package_id ?? "");
   return {
     id: String(record.id ?? ""),
     businessId: String(record.business_id ?? ""),
     businessName,
-    packageId: String(record.package_id ?? ""),
+    packageId,
+    packageLabel: labels.get(packageId) ?? null,
     smsCredits: Number(record.sms_credits ?? 0),
     amountIls: Number(record.amount_ils ?? 0),
     status: String(record.status ?? ""),
+    errorMessage: record.error_message ? String(record.error_message) : null,
     createdAt: String(record.created_at ?? ""),
     paidAt: record.paid_at ? String(record.paid_at) : null,
   };

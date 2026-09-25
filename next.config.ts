@@ -29,6 +29,21 @@ const nextConfig: NextConfig = {
         destination: "/demo",
         permanent: true,
       },
+      ...[
+        ["/admin/apps", "/admin/businesses"],
+        ["/admin/apps/new", "/admin/businesses/new"],
+        ["/admin/apps/:id", "/admin/businesses/:id"],
+        ["/admin/customers", "/admin/businesses"],
+        ["/admin/customers/:id", "/admin/businesses/:id?tab=billing"],
+        ["/admin/cancellations", "/admin/requests"],
+        ["/admin/account-deletions", "/admin/requests/deletions"],
+        ["/admin/purchases", "/admin/billing"],
+        ["/admin/pricing", "/admin/billing/pricing"],
+        ["/admin/packages", "/admin/billing/pricing"],
+        ["/admin/operational-messages", "/admin/content"],
+        ["/admin/videos", "/admin/content/videos"],
+        ["/admin/privacy-apps", "/admin/content/privacy"],
+      ].map(([source, destination]) => ({ source, destination, permanent: false })),
     ];
   },
 };
