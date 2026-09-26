@@ -67,6 +67,12 @@ async function verifyPayload<T>(
   }
 }
 
+/** `Authorization: Bearer <token>` → token. Anything else → null. */
+export function readBearerToken(header: string | null | undefined) {
+  const match = /^Bearer\s+(\S+)\s*$/i.exec(String(header ?? "").trim());
+  return match ? match[1] : null;
+}
+
 export async function signAdminSession(session: AdminSession, secret: string) {
   return signPayload(session, secret);
 }

@@ -83,3 +83,62 @@ export async function POST(request: Request, context: RouteContext) {
 
   return ok({ service: created });
 }
+
+export async function PATCH(request: Request, context: RouteContext) {
+  const auth = await guardAdmin();
+  if (!auth.ok) return auth.response;
+  const { id } = await context.params;
+  if (!UUID_RE.test(id)) return fail("מזהה עסק לא תקין");
+
+  const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
+  const serviceId = str(body.serviceId);
+  if (!serviceId) return fail("חסר מזהה שירות");
+
+  const patch: Record<string, unknown> = {};
+  if (body.name !== undefined) {
+    const name = str(body.name);
+    if (!name) return fail("יש להזין שם שירות");
+    if (name.length > NAME_MAX) return fail("שם השירות ארוך מדי");
+    patch.name = name;
+  }
+  if (body.price !== undefined) {
+    const price = Number(body.price);
+    if (!Number.isFinite(price) || price < 0 || price > PRICE_MAX) {
+      return fail("יש להזין מחיר בין 0 ל-100,000");
+    }
+    patch.price = price;
+  }
+  if (body.durationMinutes !== undefined) {
+    const duration = Number(body.durationMinutes);
+    if (!Number.isInteger(duration) || duration < 5 || duration > DURATION_MAX) {
+      return fail("משך השירות צריך להיות בין 5 דקות ליממה");
+    }
+    patch.duration_minutes = duration;
+  }
+  if (body.isActive !== undefined) {
+    if (typeof body.isActive !== "boolean") return fail("ערך הפעלה לא תקין");
+    patch.is_active = body.isActive;
+  }
+  if (body.orderIndex !== undefined) {
+    const orderIndex = Number(body.orderIndex);
+    if (!Number.isInteger(orderIndex) || orderIndex < 0 || orderIndex > 100_000) {
+      return fail("סדר השירות לא תקין");
+    }
+    patch.order_index = orderIndex;
+  }
+  if (Object.keys(patch).length === 0) return fail("אין שינויים לשמירה");
+
+  const { data: updated, error } = await getServiceSupabase()
+    .from("services")
+    .update(patch)
+    .eq("id", serviceId)
+    .eq("business_id", id)
+    .select("id, name, price, duration_minutes, is_active, order_index")
+    .maybeSingle();
+  if (error) {
+    console.error("[apps/services] update", error.message);
+    return fail("עדכון השירות נכשל", 500);
+  }
+  if (!updated) return fail("השירות לא נמצא", 404);
+  return ok({ service: updated });
+}

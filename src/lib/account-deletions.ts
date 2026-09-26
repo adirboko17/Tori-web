@@ -29,13 +29,18 @@ function toRequest(row: Record<string, unknown>): AccountDeletionRequest {
 
 export async function createAccountDeletionRequest(input: AccountDeletionInput) {
   const supabase = getServiceSupabase();
-  const { error } = await supabase.from("account_deletion_requests").insert({
-    full_name: input.fullName,
-    phone: input.phone,
-    app_name: input.appName,
-    note: input.note,
-  });
+  const { data, error } = await supabase
+    .from("account_deletion_requests")
+    .insert({
+      full_name: input.fullName,
+      phone: input.phone,
+      app_name: input.appName,
+      note: input.note,
+    })
+    .select("id")
+    .single();
   if (error) throw new Error("שמירת בקשת המחיקה נכשלה.");
+  return { id: String(data?.id ?? "") };
 }
 
 export async function listAccountDeletionRequests(): Promise<AccountDeletionRequest[]> {

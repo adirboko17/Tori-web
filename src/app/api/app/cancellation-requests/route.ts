@@ -2,6 +2,7 @@ import {
   createCancellationRequest,
   getOpenCancellationForAdmin,
 } from "@/lib/admin/cancellations";
+import { adminPushEvents, queueAdminPush } from "@/lib/admin/push";
 import {
   CONFIG_ERRORS,
   smsBackendConfigured,
@@ -51,6 +52,16 @@ export async function POST(request: Request) {
   try {
     const result = await createCancellationRequest(body);
     if (!result.ok) return withCors(jsonError(result.error, 400));
+    if (!result.existing) {
+      queueAdminPush(
+        adminPushEvents.cancellation({
+          requestId: result.request.id,
+          requestedAt: result.request.requestedAt,
+          businessName: result.request.businessName,
+          requestedByName: result.request.requestedByName,
+        }),
+      );
+    }
     return withCors(
       jsonOk({
         ok: true,

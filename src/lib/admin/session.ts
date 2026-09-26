@@ -1,6 +1,7 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { getSessionSecret, sessionSigningConfigured } from "@/lib/sms/env";
 import {
+  readBearerToken,
   signAdminOtpPending,
   signAdminSession,
   verifyAdminOtpPending,
@@ -27,8 +28,15 @@ function cookieOptions(maxAge: number) {
   };
 }
 
+/**
+ * The mobile admin app sends the signed session as `Authorization: Bearer`.
+ * When that header is present it is the only credential considered, so a
+ * stale Bearer token never silently falls back to a browser cookie.
+ */
 export async function readAdminSession(): Promise<AdminSession | null> {
   if (!sessionSigningConfigured()) return null;
+  const bearer = readBearerToken((await headers()).get("authorization"));
+  if (bearer) return await verifyAdminSession(bearer, getSessionSecret());
   const store = await cookies();
   const token = store.get(ADMIN_SESSION_COOKIE)?.value;
   if (!token) return null;
@@ -43,14 +51,11 @@ export async function writeAdminSession(input: AdminSessionInput) {
     ...input,
     exp: Date.now() + ADMIN_SESSION_TTL_SECONDS * 1000,
   };
+  const token = await signAdminSession(session, getSessionSecret());
   const store = await cookies();
-  store.set(
-    ADMIN_SESSION_COOKIE,
-    await signAdminSession(session, getSessionSecret()),
-    cookieOptions(ADMIN_SESSION_TTL_SECONDS),
-  );
+  store.set(ADMIN_SESSION_COOKIE, token, cookieOptions(ADMIN_SESSION_TTL_SECONDS));
   store.delete(ADMIN_OTP_COOKIE);
-  return session;
+  return { session, token };
 }
 
 export async function clearAdminSession() {
@@ -70,19 +75,19 @@ export async function writeAdminOtpPending(input: {
     ...input,
     exp: Date.now() + ADMIN_OTP_TTL_SECONDS * 1000,
   };
+  const token = await signAdminOtpPending(pending, getSessionSecret());
   const store = await cookies();
-  store.set(
-    ADMIN_OTP_COOKIE,
-    await signAdminOtpPending(pending, getSessionSecret()),
-    cookieOptions(ADMIN_OTP_TTL_SECONDS),
-  );
-  return pending;
+  store.set(ADMIN_OTP_COOKIE, token, cookieOptions(ADMIN_OTP_TTL_SECONDS));
+  return { pending, token };
 }
 
-export async function readAdminOtpPending(): Promise<AdminOtpPending | null> {
+/** Cookie first; `fallbackToken` is the signed value the mobile app echoes back. */
+export async function readAdminOtpPending(
+  fallbackToken?: string | null,
+): Promise<AdminOtpPending | null> {
   if (!sessionSigningConfigured()) return null;
   const store = await cookies();
-  const token = store.get(ADMIN_OTP_COOKIE)?.value;
+  const token = store.get(ADMIN_OTP_COOKIE)?.value || fallbackToken?.trim();
   if (!token) return null;
   return await verifyAdminOtpPending(token, getSessionSecret());
 }
