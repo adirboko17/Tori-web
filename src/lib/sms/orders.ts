@@ -1,3 +1,4 @@
+import { queueOrderPush } from "@/lib/admin/push";
 import { transferPrepaidCredits } from "./balance";
 import { fulfillmentAfterMissedLock } from "./fulfillment";
 import { notifySmsPurchase } from "./purchase-notify";
@@ -67,11 +68,13 @@ export async function attachPayplusLink(
 
 export async function markOrderFailed(orderId: string, message: string) {
   const supabase = getServiceSupabase();
-  await supabase
+  const { data } = await supabase
     .from("sms_topup_orders")
     .update({ status: "failed", error_message: message })
     .eq("id", orderId)
-    .in("status", ["pending", "processing"]);
+    .in("status", ["pending", "processing"])
+    .select("id");
+  if ((data ?? []).length > 0) queueOrderPush(orderId, "failed", message);
 }
 
 export async function loadOrder(orderId: string) {
@@ -144,6 +147,7 @@ export async function fulfillPaidOrder(input: {
         error_message: transfer.message,
       })
       .eq("id", order.id);
+    queueOrderPush(order.id, "failed", transfer.message);
     return { ok: false as const, message: transfer.message };
   }
 
@@ -155,6 +159,7 @@ export async function fulfillPaidOrder(input: {
       error_message: null,
     })
     .eq("id", order.id);
+  queueOrderPush(order.id, "paid");
 
   const saved = await loadOrder(order.id);
   if (saved && isSuccessfulPayplusStatus(input.payplusStatusCode)) {

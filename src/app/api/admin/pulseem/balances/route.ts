@@ -1,3 +1,4 @@
+import { queueLowBusinessBalances } from "@/lib/admin/push";
 import { getServiceSupabase } from "@/lib/sms/supabase-admin";
 import { hasPulseemCredentials } from "@/lib/superadmin/format";
 import { fail, guardAdmin, ok, UUID_RE } from "@/lib/superadmin/http";
@@ -59,6 +60,13 @@ export async function POST(request: Request) {
       }),
     );
 
+    queueLowBusinessBalances(
+      entries.map(([id, balance]) => ({
+        businessId: id,
+        businessName: byId.get(id)?.display_name?.trim() || "עסק",
+        credits: balance.credits,
+      })),
+    );
     return ok({ balances: Object.fromEntries(entries) });
   } catch (error) {
     const message = error instanceof Error ? error.message : "טעינת היתרות נכשלה";

@@ -17,10 +17,13 @@ export async function POST(request: Request) {
   try {
     const result = await sendSiteAdminOtp(String(body.phone ?? ""));
     if (!result.ok) return jsonError(result.error, 400);
-    await writeAdminOtpPending({
+    const { token } = await writeAdminOtpPending({
       phone: result.phone,
       businessId: result.businessId,
     });
+    if (body.client === "mobile") {
+      return jsonOk({ ok: true, phone: result.phone, otpToken: token });
+    }
     return jsonOk({ ok: true, phone: result.phone });
   } catch (error) {
     const message =

@@ -1,3 +1,4 @@
+import { adminPushEvents, queueAdminPush } from "@/lib/admin/push";
 import { CreateBusinessError, createBusiness } from "@/lib/superadmin/create-business";
 import { fail, guardAdmin, ok } from "@/lib/superadmin/http";
 import { isValidHexColor } from "@/lib/superadmin/format";
@@ -48,6 +49,12 @@ export async function POST(request: Request) {
       pulseemWsUserId: asString(body.pulseemWsUserId),
       pulseemWsPassword: asString(body.pulseemWsPassword),
     });
+    queueAdminPush(
+      adminPushEvents.newBusiness({
+        businessId: result.businessId,
+        businessName: asString(body.businessName).trim() || result.clientName,
+      }),
+    );
     return ok(result);
   } catch (error) {
     if (error instanceof CreateBusinessError) return fail(error.message);
