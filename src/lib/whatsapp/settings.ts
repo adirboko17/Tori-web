@@ -1,7 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
-import { getWhatsappSupabase } from "@/lib/whatsapp/client";
+import { getServiceSupabase } from "@/lib/sms/supabase-admin";
 
+// Site table only. The WhatsApp bot keeps its own app_settings and this dashboard must not write it.
+const SETTINGS_TABLE = "wa_app_settings";
 const SETTINGS_PATH = path.join(process.cwd(), "data", "whatsapp-app-settings.json");
 
 function missingTable(err: { code?: string; message?: string } | null) {
@@ -9,7 +11,7 @@ function missingTable(err: { code?: string; message?: string } | null) {
   const msg = String(err?.message || "");
   return (
     code === "PGRST205" ||
-    (msg.includes("wa_app_settings") &&
+    (msg.includes(SETTINGS_TABLE) &&
       (msg.includes("does not exist") ||
         msg.includes("schema cache") ||
         msg.includes("Could not find the table")))
@@ -32,8 +34,8 @@ function writeFileSettings(all: Record<string, unknown>) {
 
 export async function getAppSetting(key: string, defaultValue: unknown = null) {
   try {
-    const db = getWhatsappSupabase();
-    const { data, error } = await db.from("wa_app_settings").select("value").eq("key", key).maybeSingle();
+    const db = getServiceSupabase();
+    const { data, error } = await db.from(SETTINGS_TABLE).select("value").eq("key", key).maybeSingle();
     if (error) throw error;
     if (data) return data.value;
   } catch (err) {
@@ -53,8 +55,8 @@ export async function setAppSetting(key: string, value: unknown) {
   file[key] = value;
   writeFileSettings(file);
   try {
-    const db = getWhatsappSupabase();
-    const { error } = await db.from("wa_app_settings").upsert(
+    const db = getServiceSupabase();
+    const { error } = await db.from(SETTINGS_TABLE).upsert(
       { key, value, updated_at: new Date().toISOString() },
       { onConflict: "key" },
     );

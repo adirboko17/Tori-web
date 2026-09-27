@@ -83,7 +83,7 @@ export default function PainSection({ monthlyPrice = 299 }) {
                   margin: "0",
                 }}
               >
-                {"ובזמן שאת/ה עונה — הלקוח כבר פנה למתחרה."}
+                {"ובזמן שאת/ה עונה - הלקוח כבר פנה למתחרה."}
               </p>
             </div>
             <div style={{ position: "relative", minHeight: "170px" }}>
@@ -143,7 +143,7 @@ export default function PainSection({ monthlyPrice = 299 }) {
                   <path d="M18 6 7 17l-5-5"></path>
                   <path d="m22 10-7.5 7.5L13 16"></path>
                 </svg>
-                {"נקבע — אצל המתחרה"}
+                {"נקבע - אצל המתחרה"}
               </div>
             </div>
           </div>
@@ -420,7 +420,7 @@ export default function PainSection({ monthlyPrice = 299 }) {
                       textOverflow: "ellipsis",
                     }}
                   >
-                    {"תזכורת — ידנית, שוב"}
+                    {"תזכורת - ידנית, שוב"}
                   </div>
                   <div
                     style={{

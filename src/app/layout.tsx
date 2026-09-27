@@ -4,9 +4,9 @@ import "@/styles/design-system.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "תורי — העסק שלך. האפליקציה שלך.", template: "%s | tori" },
+  title: { default: "תורי - העסק שלך. האפליקציה שלך.", template: "%s | tori" },
   description:
-    "אפליקציית תורים ממותגת לעסק שלך. יומן חכם, ניהול לקוחות ותזכורות — בעיצוב ובצבעים שלך.",
+    "אפליקציית תורים ממותגת לעסק שלך. יומן חכם, ניהול לקוחות ותזכורות - בעיצוב ובצבעים שלך.",
   icons: {
     icon: "/assets/brand/tori-app-icon.png",
     apple: "/assets/brand/tori-app-icon.png",

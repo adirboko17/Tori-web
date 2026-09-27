@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { adminJson } from "@/lib/superadmin/browser";
 import {
+  LEAD_BUSINESS_TYPES,
   LEAD_STATUS_LABELS,
   LEAD_STATUSES,
   canSendFirstMessage,
@@ -19,6 +20,13 @@ import { Badge, EmptyState, ErrorState, Field, FilterChips, SearchField, Skeleto
 import { useAdminData } from "../../../_ui/use-admin-data";
 
 const DEFAULT_BUSINESS_TYPE = "סלון ציפורניים";
+
+function businessTypeChoices(current: string | null | undefined) {
+  const value = String(current || "").trim();
+  const options: string[] = [...LEAD_BUSINESS_TYPES];
+  if (value && !options.includes(value)) options.unshift(value);
+  return options;
+}
 
 const STATUS_TONES: Record<LeadStatus, Tone> = {
   no_contact: "neutral",
@@ -103,7 +111,13 @@ function NewLeadDrawer({ onClose, onSaved }: { onClose: () => void; onSaved: () 
         </Field>
       </div>
       <Field label="סוג העסק">
-        <input className="ad-input" value={businessType} onChange={(event) => setBusinessType(event.target.value)} />
+        <select className="ad-select" value={businessType} onChange={(event) => setBusinessType(event.target.value)}>
+          {businessTypeChoices(businessType).map((type) => (
+            <option key={type} value={type}>
+              {type}
+            </option>
+          ))}
+        </select>
       </Field>
       <Field label="הערות" hint="לא חובה">
         <textarea className="ad-textarea" rows={3} value={notes} onChange={(event) => setNotes(event.target.value)} />
@@ -177,8 +191,14 @@ function ImportDrawer({ onClose, onSaved }: { onClose: () => void; onSaved: () =
           <span>{file ? file.name : "לחצו לבחירת קובץ"}</span>
         </span>
       </label>
-      <Field label="סוג העסק" hint="יישמר לכל הלידים בקובץ">
-        <input className="ad-input" value={businessType} onChange={(event) => setBusinessType(event.target.value)} />
+      <Field label="סוג העסק" hint="יישמר לכל הלידים בקובץ, ויקבע את נוסח ההודעה הראשונה">
+        <select className="ad-select" value={businessType} onChange={(event) => setBusinessType(event.target.value)}>
+          {LEAD_BUSINESS_TYPES.map((type) => (
+            <option key={type} value={type}>
+              {type}
+            </option>
+          ))}
+        </select>
       </Field>
       <label className="ad-check">
         <input type="checkbox" checked={sendOpening} onChange={(event) => setSendOpening(event.target.checked)} />
@@ -192,9 +212,26 @@ function LeadDrawer({ lead, onClose, onSaved }: { lead: LeadRow; onClose: () => 
   const toast = useToast();
   const confirm = useConfirm();
   const [messageName, setMessageName] = useState(lead.message_name ?? "");
+  const savedBusinessType = (lead.business_type ?? "").trim() || DEFAULT_BUSINESS_TYPE;
+  const [businessType, setBusinessType] = useState(savedBusinessType);
   const [status, setStatus] = useState<LeadStatus>(statusOf(lead));
+  const [messageTouched, setMessageTouched] = useState(false);
+  const [message, setMessage] = useState(() => getFirstLeadMessage(lead.message_name ?? "", lead.business_type));
   const [pending, setPending] = useState(false);
-  const dirty = messageName.trim() !== (lead.message_name ?? "").trim() || status !== statusOf(lead);
+  const dirty =
+    messageName.trim() !== (lead.message_name ?? "").trim() ||
+    businessType.trim() !== savedBusinessType ||
+    status !== statusOf(lead);
+
+  function applyMessageName(value: string) {
+    setMessageName(value);
+    if (!messageTouched) setMessage(getFirstLeadMessage(value, businessType));
+  }
+
+  function applyBusinessType(value: string) {
+    setBusinessType(value);
+    if (!messageTouched) setMessage(getFirstLeadMessage(messageName, value));
+  }
   const canSend = canSendFirstMessage(lead.source);
 
   async function save() {
@@ -203,7 +240,7 @@ function LeadDrawer({ lead, onClose, onSaved }: { lead: LeadRow; onClose: () => 
     try {
       await adminJson(`/api/admin/whatsapp/leads/${encodeURIComponent(lead.id)}`, {
         method: "PATCH",
-        body: JSON.stringify({ message_name: messageName.trim(), status }),
+        body: JSON.stringify({ message_name: messageName.trim(), business_type: businessType.trim(), status }),
       });
       toast.success("הליד עודכן");
       onSaved();
@@ -217,14 +254,17 @@ function LeadDrawer({ lead, onClose, onSaved }: { lead: LeadRow; onClose: () => 
 
   async function sendFirst() {
     const ok = await confirm({
-      title: `לשלוח הודעה ראשונה ל${lead.message_name}?`,
-      body: getFirstLeadMessage(lead.message_name),
+      title: `לשלוח הודעה ראשונה ל${messageName.trim() || lead.message_name}?`,
+      body: message.trim(),
       confirmLabel: "שליחה",
     });
     if (!ok) return;
     setPending(true);
     try {
-      await adminJson(`/api/admin/whatsapp/leads/${encodeURIComponent(lead.id)}/send`, { method: "POST" });
+      await adminJson(`/api/admin/whatsapp/leads/${encodeURIComponent(lead.id)}/send`, {
+        method: "POST",
+        body: JSON.stringify({ message: message.trim() }),
+      });
       toast.success("ההודעה הראשונה נשלחה");
       onSaved();
       onClose();
@@ -288,8 +328,6 @@ function LeadDrawer({ lead, onClose, onSaved }: { lead: LeadRow; onClose: () => 
             {lead.phone}
           </a>
         </dd>
-        <dt>סוג העסק</dt>
-        <dd>{lead.business_type || "—"}</dd>
         {lead.notes ? (
           <>
             <dt>הערות</dt>
@@ -307,28 +345,55 @@ function LeadDrawer({ lead, onClose, onSaved }: { lead: LeadRow; onClose: () => 
           ))}
         </select>
       </Field>
+      <Field label="סוג העסק" hint="קובע את נוסח ההודעה הראשונה">
+        <select className="ad-select" value={businessType} onChange={(event) => applyBusinessType(event.target.value)}>
+          {businessTypeChoices(businessType).map((type) => (
+            <option key={type} value={type}>
+              {type}
+            </option>
+          ))}
+        </select>
+      </Field>
       <Field label="שם בהודעה" hint="הפנייה בהודעה הראשונה, למשל ״היי דנה״">
-        <input className="ad-input" value={messageName} onChange={(event) => setMessageName(event.target.value)} />
+        <input className="ad-input" value={messageName} onChange={(event) => applyMessageName(event.target.value)} />
       </Field>
 
       {canSend ? (
         <div className="ad-form-section">
-          <span className="ad-field-label">הודעה ראשונה</span>
-          <div className="wa-bubble out" style={{ maxWidth: "100%" }}>
-            {getFirstLeadMessage(messageName)}
-          </div>
+          <Field label="הודעה ראשונה" hint="מתעדכנת לפי סוג העסק. אפשר לשנות את הנוסח לפני השליחה.">
+            <textarea
+              className="wa-first-message"
+              rows={3}
+              value={message}
+              onChange={(event) => {
+                setMessageTouched(true);
+                setMessage(event.target.value);
+              }}
+            />
+          </Field>
           <div className="ad-row">
             <button
               type="button"
               className="ad-btn is-brand is-sm"
-              disabled={pending || dirty || !lead.message_name.trim()}
+              disabled={pending || dirty || !message.trim() || !messageName.trim()}
               onClick={() => void sendFirst()}
             >
               <Icon name="send" size={15} />
               שליחת ההודעה
             </button>
+            <button
+              type="button"
+              className="ad-btn is-ghost is-sm"
+              disabled={pending}
+              onClick={() => {
+                setMessageTouched(false);
+                setMessage(getFirstLeadMessage(messageName, businessType));
+              }}
+            >
+              לפי סוג העסק
+            </button>
             {dirty ? <span className="ad-small ad-muted">שמרו קודם את השינויים</span> : null}
-            {!dirty && !lead.message_name.trim() ? <span className="ad-small ad-muted">צריך שם בהודעה</span> : null}
+            {!dirty && !messageName.trim() ? <span className="ad-small ad-muted">צריך שם בהודעה</span> : null}
           </div>
         </div>
       ) : null}

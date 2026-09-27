@@ -281,9 +281,7 @@
     width: calc(100% - 20px) !important;
     margin-top: 8px !important;
     padding: 8px 8px 8px 14px !important;
-    background: rgba(255, 255, 255, 0.9) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(1.7);
-    backdrop-filter: blur(20px) saturate(1.7);
+    overflow: hidden;
   }
   .tori-lp .tori-nav-logo {
     margin-inline-end: auto;
@@ -318,6 +316,9 @@
     box-shadow: none !important;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
+  }
+  .tori-lp.menu-open .tori-nav-glass {
+    opacity: 0;
   }
   .tori-lp.menu-open .tori-nav-cta,
   .tori-lp.menu-open .tori-nav-mark {

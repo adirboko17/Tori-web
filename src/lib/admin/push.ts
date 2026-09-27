@@ -38,9 +38,9 @@ type ExpoTicket = {
 
 async function countWaitingChats() {
   const { count, error } = await getWhatsappSupabase()
-    .from("wa_conversations")
+    .from("conversations")
     .select("phone", { count: "exact", head: true })
-    .eq("status", "human");
+    .in("status", ["human", "needs_human"]);
   if (error) throw new Error(error.message);
   return count ?? 0;
 }

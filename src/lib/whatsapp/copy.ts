@@ -4,10 +4,37 @@ export function getOpeningMessage(name: string) {
   return `${greeting}, אני אליה מצוות טורי 🙂 ראיתי שהשארת פרטים והתעניינת באפליקציה. מאיזה תחום אתה מגיע?`;
 }
 
-export function getFirstLeadMessage(messageName: string) {
+export const LEAD_BUSINESS_TYPES = ["סלון ציפורניים", "ספר", "ספרית", "עיצוב גבות"] as const;
+
+const NAIL_ROLE = "את בונת ציפורניים";
+
+export function leadRoleClause(businessType: string | null | undefined) {
+  const type = String(businessType || "").trim().replace(/\s+/g, " ");
+  if (!type) return NAIL_ROLE;
+  const folded = type.toLowerCase();
+
+  if (/גבות|eyebrow|\bbrows?\b/.test(folded)) {
+    if (/מעצב(?!ת)/.test(type)) return "אתה מעצב גבות";
+    return "את מעצבת גבות";
+  }
+  if (/ספרית|מעצבת שיער/.test(type)) return "את ספרית";
+  if (/מעצב שיער|ברבר|\bbarber\b/.test(folded) || /(^|[\s/])ספר($|[\s/])/.test(type)) {
+    return "אתה ספר";
+  }
+  if (/מספרה|שיער|\bhair\b/.test(folded)) return "יש לך מספרה";
+  if (/ציפורנ|\bnails?\b|מניקור|פדיקור/.test(folded)) return NAIL_ROLE;
+  return `התחום שלך הוא ${type}`;
+}
+
+export function getFirstLeadMessage(messageName: string, businessType?: string | null) {
   const name = String(messageName || "").trim();
   const greeting = name ? `היי ${name}` : "היי";
-  return `${greeting} מה שלומך ?\nהבנתי שאת בונת ציפורניים , זה נכון ?`;
+  return `${greeting} מה שלומך ?\nהבנתי ש${leadRoleClause(businessType)} , זה נכון ?`;
+}
+
+export function isDefaultNailLeadMessage(text: string, messageName: string) {
+  const name = String(messageName || "").trim();
+  return text.trim() === getFirstLeadMessage(name, "סלון ציפורניים").trim();
 }
 
 export function firstLeadTemplateOptions() {

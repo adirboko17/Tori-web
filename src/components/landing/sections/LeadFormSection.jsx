@@ -45,7 +45,7 @@ export default function LeadFormSection({ monthlyPrice = 299 }) {
             }}
           >
             {
-              "משאירים פרטים, ואנחנו חוזרים אליכם תוך שעה לשיחת היכרות קצרה — בלי התחייבות."
+              "משאירים פרטים, ואנחנו חוזרים אליכם תוך שעה לשיחת היכרות קצרה - בלי התחייבות."
             }
           </p>
           <div style={{ display: "grid", gap: "14px", maxWidth: "34ch" }}>
@@ -404,7 +404,7 @@ export default function LeadFormSection({ monthlyPrice = 299 }) {
               <textarea
                 className="tori-textarea"
                 rows="3"
-                placeholder="ספרו לנו על העסק — כמה עובדים, איך מנהלים תורים היום"
+                placeholder="ספרו לנו על העסק - כמה עובדים, איך מנהלים תורים היום"
               ></textarea>
             </details>
             <button

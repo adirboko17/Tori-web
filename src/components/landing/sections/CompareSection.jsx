@@ -38,7 +38,7 @@ export default function CompareSection() {
             }}
           >
             {
-              "כל המערכות מנהלות יומן. רק אצלנו העסק מקבל אפליקציה ממותגת משלו בחנויות, וידג׳ט במסך הבית, סוכן AI ו-1,000 הודעות כל חודש — במחיר אחד קבוע."
+              "כל המערכות מנהלות יומן. רק אצלנו העסק מקבל אפליקציה ממותגת משלו בחנויות, וידג׳ט במסך הבית, סוכן AI ו-1,000 הודעות כל חודש - במחיר אחד קבוע."
             }
           </p>
         </div>
@@ -94,7 +94,7 @@ export default function CompareSection() {
                 </span>
                 <span className="tori-vs-text">
                   <span className="tori-vs-feat">
-                    {"מיתוג אישי מלא — לוגו, צבעים ותמונות"}
+                    {"מיתוג אישי מלא - לוגו, צבעים ותמונות"}
                   </span>
                   <span className="tori-vs-note">
                     {"הכל שלכם, גם אחרי ההשקה"}
@@ -188,7 +188,7 @@ export default function CompareSection() {
                 </span>
                 <span className="tori-vs-text">
                   <span className="tori-vs-feat">
-                    {"תורים זריזים — 10 התורים הקרובים"}
+                    {"תורים זריזים - 10 התורים הקרובים"}
                   </span>
                   <span className="tori-vs-note">
                     {"לחיצה אחת ומזמינים את הזמן הפנוי הבא"}
@@ -330,7 +330,7 @@ export default function CompareSection() {
                 </span>
                 <span className="tori-vs-text">
                   <span className="tori-vs-feat">
-                    {"מיתוג אישי מלא — לוגו, צבעים ותמונות"}
+                    {"מיתוג אישי מלא - לוגו, צבעים ותמונות"}
                   </span>
                   <span className="tori-vs-note">
                     {"מיתוג חלקי בתוך המערכת"}
@@ -412,7 +412,7 @@ export default function CompareSection() {
                 </span>
                 <span className="tori-vs-text">
                   <span className="tori-vs-feat">
-                    {"תורים זריזים — 10 התורים הקרובים"}
+                    {"תורים זריזים - 10 התורים הקרובים"}
                   </span>
                 </span>
               </div>
@@ -533,7 +533,7 @@ export default function CompareSection() {
           }}
         >
           {
-            "ההשוואה מתייחסת לאופן העבודה הנפוץ של מערכות תורים בשוק — עמוד עסקי או קישור להזמנת תור, לעומת אפליקציה ממותגת משלכם. פרטים מדויקים משתנים בין הספקים ולפי המסלול שנבחר."
+            "ההשוואה מתייחסת לאופן העבודה הנפוץ של מערכות תורים בשוק - עמוד עסקי או קישור להזמנת תור, לעומת אפליקציה ממותגת משלכם. פרטים מדויקים משתנים בין הספקים ולפי המסלול שנבחר."
           }
         </p>
       </div>

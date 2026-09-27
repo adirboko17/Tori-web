@@ -3,7 +3,16 @@ type TemplateOptions = {
   languageCode?: string;
   useNameVar?: boolean;
   name?: string;
+  extraBodyParams?: string[];
 };
+
+function templateParam(value: string) {
+  return String(value || "")
+    .replace(/[\r\n\t]+/g, " ")
+    .replace(/ {2,}/g, " ")
+    .trim()
+    .slice(0, 900);
+}
 
 function authHeaders() {
   const token = process.env.WHATSAPP_TOKEN?.trim();
@@ -38,7 +47,7 @@ async function postWhatsApp(payload: Record<string, unknown>) {
     if (fb?.code === 131047 || fb?.code === 63016) {
       throw new Error(`${detail} (חלון 24 השעות סגור, נדרש תבנית מאושרת)`);
     }
-    throw new Error(detail);
+    throw new Error(fb?.code ? `${detail} (${fb.code})` : detail);
   }
   return data;
 }
@@ -64,13 +73,14 @@ export async function sendProactiveMessage(to: string, name: string, options: Te
     language: { code: languageCode },
   };
   const displayName = String(options.name ?? name ?? "").trim();
-  if (useNameVar && displayName) {
-    template.components = [
-      {
-        type: "body",
-        parameters: [{ type: "text", text: displayName }],
-      },
-    ];
+  const parameters: { type: "text"; text: string }[] = [];
+  if (useNameVar && displayName) parameters.push({ type: "text", text: displayName });
+  for (const raw of options.extraBodyParams ?? []) {
+    const text = templateParam(raw);
+    if (text) parameters.push({ type: "text", text });
+  }
+  if (parameters.length) {
+    template.components = [{ type: "body", parameters }];
   }
   return postWhatsApp({
     messaging_product: "whatsapp",

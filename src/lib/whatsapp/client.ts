@@ -1,17 +1,21 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 let cached: SupabaseClient | null = null;
+let cachedUrl = "";
+let cachedKey = "";
 
 export function getWhatsappSupabase() {
-  const url = (process.env.SUPABASE_URL || process.env.WHATSAPP_SUPABASE_URL)?.trim();
-  const key = (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.WHATSAPP_SUPABASE_SERVICE_KEY)?.trim();
+  const url = (process.env.WHATSAPP_SUPABASE_URL || process.env.SUPABASE_URL)?.trim();
+  const key = (process.env.WHATSAPP_SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)?.trim();
   if (!url || !key) {
     throw new Error("חסר חיבור למסד של וואטסאפ.");
   }
-  if (!cached) {
+  if (!cached || cachedUrl !== url || cachedKey !== key) {
     cached = createClient(url, key, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
+    cachedUrl = url;
+    cachedKey = key;
   }
   return cached;
 }

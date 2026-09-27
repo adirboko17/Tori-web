@@ -517,49 +517,15 @@ export function initializeLanding(root) {
 
   /* ---------- chat ---------- */
   const CHAT = {
-    price: {
-      q: "כמה זה עולה?",
-      a: "‎299 ₪ לחודש (לא כולל מע״מ), וזהו. בלי דמי הקמה, בלי אחוזים על תורים ובלי התחייבות. אפשר לבטל בכל עת, ומחזור החיוב הבא לא יחויב.",
-      next: ["included", "time", "start"],
-    },
-    included: {
-      q: "מה כלול?",
-      a: "אפליקציה ממותגת בשם שלך בשתי החנויות, יומן תורים חכם, תזכורות אוטומטיות, תשלומים באפליקציה וניהול לקוחות — כולל עדכונים ותמיכה אנושית.",
-      next: ["time", "fit", "start"],
-    },
-    time: {
-      q: "כמה זמן עד שזה באוויר?",
-      a: "‎72 שעות מהרגע שקיבלנו לוגו ופרטי עסק. אנחנו עושים את הכל — עיצוב, הקמה והעלאה לחנויות.",
-      next: ["need", "price", "start"],
-    },
-    need: {
-      q: "מה צריך ממני?",
-      a: "לוגו (ואם אין — נעצב לך), שם העסק, רשימת שירותים ושעות פעילות. חמש דקות עבודה מצידך, לא יותר.",
-      next: ["start", "human"],
-    },
-    fit: {
-      q: "זה מתאים לעסק שלי?",
-      a: "אם יש לך תורים — כן. מספרות, ציפורניים, קוסמטיקה, קליניקות, סטודיו ומאמנים אישיים. גם עסק של אדם אחד.",
-      next: ["price", "time", "start"],
-    },
-    start: {
-      q: "רוצה להתחיל",
-      a: "יאללה. גללתי אותך לטופס — משאירים פרטים ואנחנו חוזרים תוך שעה לשיחה קצרה, בלי התחייבות.",
-      next: ["human", "more"],
-      act: "form",
-    },
-    human: {
-      q: "לדבר עם בן אדם",
-      a: "בכיף, גם אני מעדיף בן אדם לפעמים. וואטסאפ ‎053-557-5303, א׳–ה׳ בין 9:00 ל־17:00 — פותח לך את השיחה.",
-      next: ["price", "more"],
-      act: "wa",
-    },
-    more: {
-      q: "יש לי עוד שאלה",
-      a: "קדימה, אני כאן. אפשר גם פשוט לכתוב לי בשורה למטה.",
-      next: ["price", "included", "time", "fit"],
-    },
+    price: { q: "כמה זה עולה?" },
+    included: { q: "מה כלול?" },
+    time: { q: "כמה זמן עד שזה באוויר?" },
+    fit: { q: "זה מתאים לעסק שלי?" },
+    start: { q: "רוצה להתחיל", act: "form" },
+    human: { q: "לדבר עם בן אדם", act: "wa" },
   };
+  const CHAT_FALLBACK =
+    "לא הצלחתי לענות כרגע. אפשר לדבר איתנו בוואטסאפ 053-5575303, א׳–ה׳ בין 9:00 ל־17:00.";
   const MARK = "/assets/brand/tori-mark.png";
   const scrollEl = ref("chatScrollRef");
   const chipsEl = ref("chatChips");
@@ -567,22 +533,26 @@ export function initializeLanding(root) {
   let msgs = [
     {
       from: "bot",
-      text: "היי, אני תורי. איך אפשר לעזור? אפשר לשאול אותי הכל — מחיר, זמנים, מה כלול, ואם זה מתאים לעסק שלך.",
+      text: "היי, אני תורי. איך אפשר לעזור? אפשר לשאול אותי הכל - מחיר, זמנים, מה כלול, ואם זה מתאים לעסק שלך.",
     },
   ];
   let chips = ["price", "included", "time", "fit"];
-  let typing = false,
-    chatT = null;
+  let typing = false;
   const esc = (t) =>
     String(t)
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
+  const linkify = (safe) =>
+    safe.replace(
+      /(https?:\/\/[^\s<]+)/g,
+      '<a href="$1" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline">$1</a>',
+    );
   const botHTML = (t) =>
     '<div style="display:flex;align-items:flex-end;gap:8px;justify-content:flex-start;animation:tori-chat-in .32s cubic-bezier(.34,1.42,.64,1) both"><span style="flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#BFFF51,#0CFFBE);display:grid;place-items:center"><img src="' +
     MARK +
-    '" alt="" style="width:17px;height:17px"></span><div style="max-width:78%;background:var(--white);border:1px solid rgba(23,22,22,.08);border-radius:18px 18px 18px 6px;padding:11px 14px;font-size:14px;line-height:1.55;color:var(--ink-800);box-shadow:0 2px 8px rgba(23,22,22,.05)">' +
-    esc(t) +
+    '" alt="" style="width:17px;height:17px"></span><div style="max-width:78%;background:var(--white);border:1px solid rgba(23,22,22,.08);border-radius:18px 18px 18px 6px;padding:11px 14px;font-size:14px;line-height:1.55;color:var(--ink-800);box-shadow:0 2px 8px rgba(23,22,22,.05);white-space:pre-wrap">' +
+    linkify(esc(t)) +
     "</div></div>";
   const meHTML = (t) =>
     '<div style="display:flex;align-items:flex-end;gap:8px;justify-content:flex-end;animation:tori-chat-in .32s cubic-bezier(.34,1.42,.64,1) both"><div style="max-width:78%;background:linear-gradient(135deg,#BFFF51,#0CFFBE);border-radius:18px 18px 6px 18px;padding:11px 14px;font-size:14px;line-height:1.55;color:#171616;font-weight:500">' +
@@ -624,67 +594,77 @@ export function initializeLanding(root) {
     }
     scrollChat();
   }
-  function pushBot(key) {
-    const node = CHAT[key];
-    if (!node) return;
+  let chatBusy = false;
+  let chatAbort = null;
+  scope.cleanup(() => {
+    if (chatAbort) chatAbort.abort();
+  });
+  function setChatBusy(on) {
+    chatBusy = on;
+    if (inputEl) inputEl.disabled = on;
+    const send = $(".tori-chat-send", root);
+    if (send) send.disabled = on;
+  }
+  function followChips() {
+    return ["price", "included", "time", "human"];
+  }
+  async function replyFromModel(act) {
+    if (chatAbort) chatAbort.abort();
+    const controller = new AbortController();
+    chatAbort = controller;
     typing = true;
+    setChatBusy(true);
     renderChat();
-    clearTimeout(chatT);
-    chatT = setTimeout(() => {
-      typing = false;
-      msgs = msgs.concat({ from: "bot", text: node.a });
-      chips = node.next;
-      renderChat();
-      if (node.act === "form") {
-        const t = document.getElementById("lead-form");
-        if (t)
-          window.scrollTo({
-            top: t.getBoundingClientRect().top + window.scrollY - 70,
-            behavior: "smooth",
-          });
-      }
-      if (node.act === "wa")
-        window.open("https://wa.me/972535575303", "_blank");
-    }, 760);
+    let text = CHAT_FALLBACK;
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
+        body: JSON.stringify({
+          messages: msgs.slice(-10).map((m) => ({
+            role: m.from === "me" ? "user" : "assistant",
+            content: m.text,
+          })),
+        }),
+      });
+      const data = await response.json().catch(() => ({}));
+      text = (data && (data.reply || data.error)) || CHAT_FALLBACK;
+    } catch (error) {
+      if (error && error.name === "AbortError") return;
+    }
+    if (chatAbort !== controller) return;
+    typing = false;
+    setChatBusy(false);
+    msgs = msgs.concat({ from: "bot", text: String(text) });
+    chips = followChips();
+    renderChat();
+    if (act === "form") {
+      const t = document.getElementById("lead-form");
+      if (t)
+        window.scrollTo({
+          top: t.getBoundingClientRect().top + window.scrollY - 70,
+          behavior: "smooth",
+        });
+    }
+    if (act === "wa") window.open("https://wa.me/972535575303", "_blank");
   }
   function ask(key) {
+    if (chatBusy || !CHAT[key]) return;
     msgs = msgs.concat({ from: "me", text: CHAT[key].q });
     chips = [];
     renderChat();
-    pushBot(key);
+    replyFromModel(CHAT[key].act);
   }
   function sendChat() {
-    if (!inputEl) return;
+    if (!inputEl || chatBusy) return;
     const text = (inputEl.value || "").trim();
     if (!text) return;
     inputEl.value = "";
     msgs = msgs.concat({ from: "me", text: text });
     chips = [];
     renderChat();
-    let key = null;
-    if (/מחיר|עולה|כסף|תשלום|עלות/.test(text)) key = "price";
-    else if (/כלול|מקבל|יש באפליקציה|פיצ/.test(text)) key = "included";
-    else if (/זמן|מתי|כמה ימים|מהר/.test(text)) key = "time";
-    else if (/מתאים|עסק שלי|מספרה|קליניקה|סטודיו|קוסמטיק/.test(text))
-      key = "fit";
-    else if (/צריך ממני|לוגו|להתחיל|הרשמה/.test(text)) key = "need";
-    else if (/אנוש|נציג|טלפון|וואטסאפ|לדבר/.test(text)) key = "human";
-    if (key) {
-      pushBot(key);
-      return;
-    }
-    typing = true;
-    renderChat();
-    clearTimeout(chatT);
-    chatT = setTimeout(() => {
-      typing = false;
-      msgs = msgs.concat({
-        from: "bot",
-        text: "שאלה טובה, ודווקא עליה עדיף שיענה לך בן אדם — וואטסאפ ‎053-557-5303, עונים מהר. בינתיים אולי אחת מאלה?",
-      });
-      chips = ["price", "time", "human"];
-      renderChat();
-    }, 800);
+    replyFromModel();
   }
   on("toggleChat", () => {
     const open = !chatWrap.classList.contains("is-open");

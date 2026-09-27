@@ -12,8 +12,10 @@ export async function POST(_request: Request, context: RouteContext) {
   if (!auth.ok) return auth.response;
   const id = decodeURIComponent((await context.params).id);
   if (!id || id.includes("/") || id.includes("..")) return fail("חסר מזהה ליד");
+  const body = (await _request.json().catch(() => ({}))) as { message?: unknown };
+  const message = typeof body.message === "string" ? body.message : undefined;
   try {
-    const result = await sendFirstLeadMessage(id);
+    const result = await sendFirstLeadMessage(id, message);
     return ok(result);
   } catch (err) {
     const message = dbErrorMessage(err);

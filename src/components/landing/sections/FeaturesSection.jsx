@@ -48,7 +48,7 @@ export default function FeaturesSection() {
               }}
             >
               {
-                "ללקוח — אפליקציה שקובעים בה תור בעשר שניות. לכם — מערכת ניהול מלאה. אותה אפליקציה, שני מסכים."
+                "ללקוח - אפליקציה שקובעים בה תור בעשר שניות. לכם - מערכת ניהול מלאה. אותה אפליקציה, שני מסכים."
               }
             </p>
             <a
@@ -258,7 +258,7 @@ export default function FeaturesSection() {
                         color: "var(--ink-600)",
                       }}
                     >
-                      {"יום לפני ושעתיים לפני — פחות הברזות."}
+                      {"יום לפני ושעתיים לפני - פחות הברזות."}
                     </span>
                   </span>
                 </div>
@@ -367,7 +367,7 @@ export default function FeaturesSection() {
                         color: "var(--ink-900)",
                       }}
                     >
-                      {"היסתוריית תורים"}
+                      {"היסטוריית תורים"}
                     </span>
                     <span
                       style={{
@@ -478,7 +478,7 @@ export default function FeaturesSection() {
                         color: "rgba(255,255,255,.64)",
                       }}
                     >
-                      {"היסתוריה מלאה, מי קבוע ומי לא חזר."}
+                      {"היסטוריה מלאה, מי קבוע ומי לא חזר."}
                     </span>
                   </span>
                 </div>
@@ -624,8 +624,10 @@ export default function FeaturesSection() {
                       strokeLinejoin="round"
                       style={{ flex: "0 0 auto" }}
                     >
-                      <rect width="20" height="14" x="2" y="5" rx="2"></rect>
-                      <line x1="2" x2="22" y1="10" y2="10"></line>
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="9" cy="7" r="4"></circle>
+                      <line x1="19" x2="19" y1="8" y2="14"></line>
+                      <line x1="22" x2="16" y1="11" y2="11"></line>
                     </svg>
                   </span>
                   <span style={{ display: "grid", gap: "3px", minWidth: "0" }}>
@@ -636,7 +638,7 @@ export default function FeaturesSection() {
                         color: "var(--white)",
                       }}
                     >
-                      {"תשלום מראש"}
+                      {"ניהול עובדים"}
                     </span>
                     <span
                       style={{
@@ -645,7 +647,7 @@ export default function FeaturesSection() {
                         color: "rgba(255,255,255,.64)",
                       }}
                     >
-                      {"גובה על התור בעת ההזמנה."}
+                      {"יומן ושעות נפרדים לכל עובד, בלי הגבלה."}
                     </span>
                   </span>
                 </div>

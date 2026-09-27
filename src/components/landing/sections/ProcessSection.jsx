@@ -121,7 +121,7 @@ export default function ProcessSection() {
                 maxWidth: "30ch",
               }}
             >
-              {"צבעי מותג ולוגו — ואנחנו מתאימים את הכל."}
+              {"צבעי מותג ולוגו - ואנחנו מתאימים את הכל."}
             </p>
           </a>
           <a href="#lead-form" className="tori-step" data-reveal="3">
@@ -197,7 +197,7 @@ export default function ProcessSection() {
                 maxWidth: "30ch",
               }}
             >
-              {"האפליקציה אצלך בטלפון — מ־App Store ומ־Google Play."}
+              {"האפליקציה אצלך בטלפון - מ־App Store ומ־Google Play."}
             </p>
           </a>
           <a href="#lead-form" className="tori-step" data-reveal="2">
@@ -239,7 +239,7 @@ export default function ProcessSection() {
                 maxWidth: "30ch",
               }}
             >
-              {"שעות עבודה, שירותים ומחירון — הכל בניהול עצמי פשוט."}
+              {"שעות עבודה, שירותים ומחירון - הכל בניהול עצמי פשוט."}
             </p>
           </a>
           <a href="#lead-form" className="tori-step" data-reveal="3">
@@ -280,7 +280,7 @@ export default function ProcessSection() {
                 maxWidth: "30ch",
               }}
             >
-              {"שולחים קישור להורדה — והיומן מתחיל להתמלא לבד."}
+              {"שולחים קישור להורדה - והיומן מתחיל להתמלא לבד."}
             </p>
           </a>
         </div>

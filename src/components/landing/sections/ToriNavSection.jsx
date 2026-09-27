@@ -39,6 +39,13 @@ export default function ToriNavSection() {
         pointerEvents: "none",
       }}
     >
+      <svg className="tori-nav-filter" width="0" height="0" aria-hidden="true">
+        <filter id="glass-distortion" x="-20%" y="-20%" width="140%" height="140%" filterUnits="objectBoundingBox">
+          <feTurbulence type="fractalNoise" baseFrequency="0.008 0.014" numOctaves="2" seed="8" result="turbulence" />
+          <feGaussianBlur in="turbulence" stdDeviation="1.4" result="softMap" />
+          <feDisplacementMap in="SourceGraphic" in2="softMap" scale="120" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      </svg>
       <nav
         className="tori-nav-bar"
         style={{
@@ -49,6 +56,16 @@ export default function ToriNavSection() {
           boxSizing: "border-box",
         }}
       >
+        <div
+          className="tori-nav-glass tori-nav-glass-distort"
+          aria-hidden="true"
+          style={{
+            backdropFilter: "url(#glass-distortion) blur(3px) saturate(1.4)",
+            WebkitBackdropFilter: "url(#glass-distortion) blur(3px) saturate(1.4)",
+          }}
+        />
+        <div className="tori-nav-glass tori-nav-glass-tint" aria-hidden="true" />
+        <div className="tori-nav-glass tori-nav-glass-shine" aria-hidden="true" />
         <a
           href="#top"
           className="tori-nav-logo"

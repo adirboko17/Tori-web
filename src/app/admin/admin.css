@@ -2369,6 +2369,28 @@ a.ad-list-item:hover {
   background: var(--lime-100);
 }
 
+textarea.wa-first-message {
+  width: 100%;
+  min-height: 96px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  border-start-end-radius: 4px;
+  background: var(--lime-100);
+  color: var(--text-strong);
+  font: inherit;
+  font-size: 14px;
+  line-height: var(--leading-normal);
+  resize: vertical;
+}
+
+textarea.wa-first-message:hover,
+textarea.wa-first-message:focus {
+  border-color: var(--line-subtle);
+  outline: none;
+}
+
 .wa-bubble small {
   display: block;
   margin-top: 4px;

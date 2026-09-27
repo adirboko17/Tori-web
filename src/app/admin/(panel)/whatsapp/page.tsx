@@ -12,6 +12,10 @@ import { useAdminData } from "../../_ui/use-admin-data";
 
 const POLL_MS = 8000;
 
+function isWaitingStatus(status: string | undefined) {
+  return status === "human" || status === "needs_human";
+}
+
 function roleLabel(role: string) {
   if (role === "user") return "לקוח";
   if (role === "human_agent") return "נציג";
@@ -44,7 +48,7 @@ function Thread({
   const [busy, setBusy] = useState(false);
   const bubblesRef = useRef<HTMLDivElement>(null);
   const messages = useMemo(() => data?.messages ?? [], [data]);
-  const withAgent = conversation?.status === "human";
+  const withAgent = isWaitingStatus(conversation?.status);
   const name = conversation?.name || phone;
   usePolling(reload);
 
@@ -194,11 +198,11 @@ function ChatsContent() {
   usePolling(reload);
 
   const conversations = useMemo(() => data?.conversations ?? [], [data]);
-  const waiting = conversations.filter((item) => item.status === "human").length;
+  const waiting = conversations.filter((item) => isWaitingStatus(item.status)).length;
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return conversations.filter((item) => {
-      if (filter === "human" && item.status !== "human") return false;
+      if (filter === "human" && !isWaitingStatus(item.status)) return false;
       if (!needle) return true;
       return `${item.name} ${item.phone} ${item.last_user_message}`.toLowerCase().includes(needle);
     });
@@ -253,7 +257,7 @@ function ChatsContent() {
                   <span className="wa-item-time">{formatRelative(item.last_message_at)}</span>
                 </span>
                 <span className="wa-item-text">{item.last_user_message || item.last_message || "אין הודעות"}</span>
-                {item.status === "human" ? (
+                {isWaitingStatus(item.status) ? (
                   <span>
                     <Badge tone="warning" dot>
                       ממתין לנציג

@@ -1,4 +1,10 @@
-import { canSendFirstMessage, firstLeadTemplateOptions, getFirstLeadMessage, getOpeningMessage } from "@/lib/whatsapp/copy";
+import {
+  canSendFirstMessage,
+  firstLeadTemplateOptions,
+  getFirstLeadMessage,
+  getOpeningMessage,
+  isDefaultNailLeadMessage,
+} from "@/lib/whatsapp/copy";
 import {
   bulkInsertLeads,
   createLead,
@@ -63,7 +69,64 @@ export async function sendAsAgent(phone: string, message: string) {
   return { success: true, duplicate: false };
 }
 
-export async function sendFirstLeadMessage(id: string) {
+function errorText(error: unknown) {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function isClosedWindow(error: unknown) {
+  const message = errorText(error);
+  return message.includes("חלון 24") || message.includes("131047") || message.includes("63016");
+}
+
+function isTemplateParamError(error: unknown) {
+  return /132000|132012|132018|expected number of params|number of parameters/i.test(errorText(error));
+}
+
+function readOutgoingMessage(customMessage: string | undefined, messageName: string, businessType: string | null) {
+  if (customMessage == null) return getFirstLeadMessage(messageName, businessType);
+  const text = String(customMessage).trim();
+  if (!text) throw new Error("חסרה הודעה");
+  if (text.length > 1000) throw new Error("ההודעה ארוכה מדי");
+  return text;
+}
+
+function roleLine(text: string) {
+  const lines = text
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  return lines.length > 1 ? lines.slice(1).join(" ") : lines[0] || text;
+}
+
+async function deliverFirstLeadText(phone: string, name: string, text: string) {
+  try {
+    await sendMessage(phone, text);
+    return;
+  } catch (error) {
+    if (!isClosedWindow(error)) throw error;
+  }
+
+  const options = firstLeadTemplateOptions();
+  try {
+    await sendProactiveMessage(phone, name, {
+      ...options,
+      useNameVar: true,
+      extraBodyParams: [roleLine(text)],
+    });
+    return;
+  } catch (error) {
+    if (!isTemplateParamError(error)) throw error;
+  }
+
+  if (!isDefaultNailLeadMessage(text, name)) {
+    throw new Error(
+      "תבנית הוואטסאפ המאושרת עדיין בלי משתנה לתחום, אז ההודעה לא נשלחה. צריך תבנית עם {{1}} לשם ו-{{2}} למשפט התחום.",
+    );
+  }
+  await sendProactiveMessage(phone, name, options);
+}
+
+export async function sendFirstLeadMessage(id: string, customMessage?: string) {
   const lead = await getLeadById(id);
   if (!lead) throw new Error("ליד לא נמצא");
   if (!canSendFirstMessage(lead.source)) {
@@ -73,10 +136,10 @@ export async function sendFirstLeadMessage(id: string) {
   if (!messageName) throw new Error("חסר שם לשליחת הודעה");
   const phone = normalizePhone(lead.phone);
   if (!phone) throw new Error("מספר טלפון לא תקין");
-  const text = getFirstLeadMessage(messageName);
+  const text = readOutgoingMessage(customMessage, messageName, lead.business_type);
   await upsertConversation(phone, messageName);
   await markConversationProactive(phone);
-  await sendProactiveMessage(phone, messageName, firstLeadTemplateOptions());
+  await deliverFirstLeadText(phone, messageName, text);
   await saveMessage(phone, "bot", text);
   await updateLead(id, { status: "message_sent" });
   return { success: true, phone, message: text };

@@ -624,7 +624,7 @@ export function initializeOnboarding(root) {
       ) {
         st.contractRead = true;
         const h = ref("contractHint");
-        if (h) h.textContent = "קראתם עד הסוף — תודה.";
+        if (h) h.textContent = "קראתם עד הסוף - תודה.";
       }
     });
   const agree = ref("agree");

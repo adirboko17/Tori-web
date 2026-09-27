@@ -39,7 +39,7 @@ export default async function AppPrivacyPage() {
         <ul style={listStyle}>
           {apps.map((app) => (
             <li key={app.id}>
-              {app.name} — <span dir="ltr">{app.bundle_id}</span>
+              {app.name} - <span dir="ltr">{app.bundle_id}</span>
             </li>
           ))}
         </ul>

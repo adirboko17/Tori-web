@@ -21,8 +21,9 @@ export async function PATCH(request: Request, context: RouteContext) {
   const body = (await request.json().catch(() => ({}))) as {
     status?: string;
     message_name?: string;
+    business_type?: string;
   };
-  if (body.status === undefined && body.message_name === undefined) {
+  if (body.status === undefined && body.message_name === undefined && body.business_type === undefined) {
     return fail("חסר שדה לעדכון");
   }
   try {

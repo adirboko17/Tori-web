@@ -76,18 +76,18 @@ async function settle<T>(label: string, errors: string[], promise: Promise<T>, f
 
 export async function countWaitingChats() {
   const { count, error } = await getWhatsappSupabase()
-    .from("wa_conversations")
+    .from("conversations")
     .select("phone", { count: "exact", head: true })
-    .eq("status", "human");
+    .in("status", ["human", "needs_human"]);
   if (error) throw new Error(error.message);
   return count ?? 0;
 }
 
 async function loadWaitingChats(): Promise<WaitingChat[]> {
   const { data, error } = await getWhatsappSupabase()
-    .from("wa_conversations")
+    .from("conversations")
     .select("phone, name, last_message_at")
-    .eq("status", "human")
+    .in("status", ["human", "needs_human"])
     .order("last_message_at", { ascending: false })
     .limit(10);
   if (error) throw new Error(error.message);

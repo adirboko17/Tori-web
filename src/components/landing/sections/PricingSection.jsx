@@ -278,7 +278,7 @@ export default function PricingSection({ monthlyPrice = 299 }) {
                       color: "rgba(255,255,255,.6)",
                     }}
                   >
-                    {"שם, לוגו וצבעים שלכם — בשתי החנויות."}
+                    {"שם, לוגו וצבעים שלכם - בשתי החנויות."}
                   </span>
                 </span>
               </div>
@@ -449,7 +449,7 @@ export default function PricingSection({ monthlyPrice = 299 }) {
                       color: "rgba(255,255,255,.6)",
                     }}
                   >
-                    {"הכל מתעדכן אצלנו — אתם רק עובדים."}
+                    {"הכל מתעדכן אצלנו - אתם רק עובדים."}
                   </span>
                 </span>
               </div>
