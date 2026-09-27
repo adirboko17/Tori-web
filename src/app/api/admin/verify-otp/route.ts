@@ -1,4 +1,6 @@
+import { LOGIN_UNAVAILABLE } from "@/lib/admin/access-code";
 import { verifySiteAdminOtp } from "@/lib/admin/auth";
+import { verifyMobileAccessCode } from "@/lib/admin/mobile-login";
 import {
   readAdminOtpPending,
   writeAdminSession,
@@ -25,12 +27,14 @@ export async function POST(request: Request) {
   const code = String(body.code ?? "").replace(/\D/g, "");
   if (code.length !== 6) return jsonError("יש להזין קוד בן 6 ספרות.");
   try {
-    const result = await verifySiteAdminOtp({
-      phone: pending.phone,
-      businessId: pending.businessId,
-      code,
-    });
-    if (!result.ok) return jsonError(result.error, 400);
+    const result = mobile
+      ? await verifyMobileAccessCode({ phone: pending.phone, code })
+      : await verifySiteAdminOtp({
+          phone: pending.phone,
+          businessId: pending.businessId,
+          code,
+        });
+    if (!result.ok) return jsonError(result.error, "status" in result ? result.status : 400);
     const { session, token } = await writeAdminSession({
       userId: result.admin.id,
       phone: result.admin.phone,
@@ -46,6 +50,7 @@ export async function POST(request: Request) {
     }
     return jsonOk({ ok: true, phone: result.admin.phone });
   } catch (error) {
+    if (mobile) return jsonError(LOGIN_UNAVAILABLE, 500);
     const message =
       error instanceof Error ? error.message : "אימות הקוד נכשל.";
     return jsonError(message, 500);
