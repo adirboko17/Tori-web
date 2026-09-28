@@ -180,7 +180,9 @@ export default function ToriNavSection() {
         data-ref="menuRef"
         hidden
       >
-        <span className="tori-menu-glow" aria-hidden="true"></span>
+        <div className="tori-menu-glow-clip" aria-hidden="true">
+          <span className="tori-menu-glow"></span>
+        </div>
         <nav className="tori-menu-list" aria-label="תפריט ראשי">
           {NAV_ITEMS.map((item, i) => (
             <a

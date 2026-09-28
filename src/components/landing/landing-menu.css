@@ -81,6 +81,7 @@
   padding: calc(92px + env(safe-area-inset-top, 0px)) var(--m-gutter, 20px)
     calc(22px + env(safe-area-inset-bottom, 0px));
   background: var(--ink-950);
+  overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
   opacity: 0;
@@ -102,11 +103,18 @@
   visibility: visible;
   clip-path: circle(142% at calc(100% - 43px) 46px);
 }
+.tori-lp .tori-menu-glow-clip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
 .tori-lp .tori-menu-glow {
   position: absolute;
-  inset-inline-end: -28%;
-  top: -14%;
+  inset-inline-end: 0;
+  top: 0;
   width: 92%;
+  transform: translate(-28%, -14%);
   aspect-ratio: 1;
   border-radius: 50%;
   background: radial-gradient(

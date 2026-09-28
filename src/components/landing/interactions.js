@@ -350,6 +350,7 @@ export function initializeLanding(root) {
     nav.style.setProperty("top", top + "px", "important");
   }
   function onNavScroll() {
+    if (root.classList.contains("menu-open")) return;
     const y = window.scrollY;
     if (nav) nav.classList.toggle("is-scrolled", y > 40);
     placeNav();
@@ -363,6 +364,7 @@ export function initializeLanding(root) {
   const menu = ref("menuRef");
   const burger = $('[data-act="toggleMenu"]', root);
   const menuLinks = $$("[data-menu-link]", root);
+  let lockedScroll = 0;
   function setMenu(open) {
     root.classList.toggle("menu-open", open);
     if (burger) {
@@ -370,7 +372,24 @@ export function initializeLanding(root) {
       burger.setAttribute("aria-label", open ? "סגירת תפריט" : "פתיחת תפריט");
     }
     if (menu) menu.hidden = false;
-    document.body.style.overflow = open ? "hidden" : "";
+    const body = document.body;
+    if (open) {
+      lockedScroll = window.scrollY || 0;
+      body.style.position = "fixed";
+      body.style.top = "-" + lockedScroll + "px";
+      body.style.left = "0";
+      body.style.right = "0";
+      body.style.width = "100%";
+      body.style.overflow = "hidden";
+      return;
+    }
+    body.style.position = "";
+    body.style.top = "";
+    body.style.left = "";
+    body.style.right = "";
+    body.style.width = "";
+    body.style.overflow = "";
+    window.scrollTo(0, lockedScroll);
   }
   on("toggleMenu", () => setMenu(!root.classList.contains("menu-open")));
   on("closeMenu", () => setMenu(false));
@@ -382,7 +401,16 @@ export function initializeLanding(root) {
     if (window.innerWidth > 760 && root.classList.contains("menu-open"))
       setMenu(false);
   });
-  scope.cleanup(() => root.classList.remove("menu-open"));
+  scope.cleanup(() => {
+    root.classList.remove("menu-open");
+    const body = document.body;
+    body.style.position = "";
+    body.style.top = "";
+    body.style.left = "";
+    body.style.right = "";
+    body.style.width = "";
+    body.style.overflow = "";
+  });
 
   /* marks the section in view on both the bar links and the menu */
   if (menuLinks.length) {
