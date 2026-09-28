@@ -409,7 +409,8 @@
     opacity: 0;
   }
   .tori-lp.menu-open .tori-nav-cta,
-  .tori-lp.menu-open .tori-nav-mark {
+  .tori-lp.menu-open .tori-nav-mark,
+  .tori-lp.menu-open .tori-nav.is-scrolled .tori-nav-mark {
     opacity: 0 !important;
     pointer-events: none;
     transition: opacity 0.22s;
