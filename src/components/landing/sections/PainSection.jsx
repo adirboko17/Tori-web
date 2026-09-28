@@ -31,7 +31,7 @@ export default function PainSection({ monthlyPrice = 299 }) {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))",
+            gridTemplateColumns: "repeat(auto-fit,minmax(min(280px,100%),1fr))",
             gap: "18px",
           }}
         >
@@ -42,7 +42,7 @@ export default function PainSection({ monthlyPrice = 299 }) {
               background: "var(--ink-900)",
               color: "var(--white)",
               borderRadius: "24px",
-              padding: "26px 26px 0",
+              padding: "26px 26px 24px",
               minHeight: "340px",
               display: "grid",
               gridTemplateRows: "auto auto 1fr",
@@ -92,7 +92,7 @@ export default function PainSection({ monthlyPrice = 299 }) {
                 style={{
                   position: "absolute",
                   insetInlineEnd: "0",
-                  bottom: "70px",
+                  bottom: "84px",
                   transform: "rotate(-4deg)",
                   background: "var(--white)",
                   color: "var(--ink-900)",
@@ -113,7 +113,7 @@ export default function PainSection({ monthlyPrice = 299 }) {
                 style={{
                   position: "absolute",
                   insetInlineStart: "0",
-                  bottom: "12px",
+                  bottom: "22px",
                   transform: "rotate(3deg)",
                   background: "var(--gradient-brand)",
                   color: "var(--ink-900)",
@@ -154,7 +154,7 @@ export default function PainSection({ monthlyPrice = 299 }) {
               background: "var(--ink-50)",
               color: "var(--ink-900)",
               borderRadius: "24px",
-              padding: "26px 26px 0",
+              padding: "26px 26px 24px",
               minHeight: "340px",
               display: "grid",
               gridTemplateRows: "auto auto 1fr",
@@ -205,7 +205,7 @@ export default function PainSection({ monthlyPrice = 299 }) {
                   position: "absolute",
                   insetInlineStart: "0",
                   insetInlineEnd: "0",
-                  bottom: "-14px",
+                  bottom: "44px",
                   transform: "rotate(-3deg)",
                   background: "var(--white)",
                   borderRadius: "18px",
@@ -279,7 +279,7 @@ export default function PainSection({ monthlyPrice = 299 }) {
               background: "var(--lime-400)",
               color: "var(--ink-900)",
               borderRadius: "24px",
-              padding: "26px 26px 0",
+              padding: "26px 26px 24px",
               minHeight: "340px",
               display: "grid",
               gridTemplateRows: "auto auto 1fr",
@@ -330,7 +330,7 @@ export default function PainSection({ monthlyPrice = 299 }) {
                   position: "absolute",
                   insetInlineStart: "34px",
                   insetInlineEnd: "34px",
-                  bottom: "52px",
+                  bottom: "94px",
                   "--qr": "2deg",
                   transform: "rotate(2deg)",
                   background: "rgba(255,255,255,.55)",
@@ -345,7 +345,7 @@ export default function PainSection({ monthlyPrice = 299 }) {
                   position: "absolute",
                   insetInlineStart: "18px",
                   insetInlineEnd: "18px",
-                  bottom: "26px",
+                  bottom: "68px",
                   "--qr": "-1deg",
                   transform: "rotate(-1deg)",
                   background: "rgba(255,255,255,.8)",
@@ -360,7 +360,7 @@ export default function PainSection({ monthlyPrice = 299 }) {
                   position: "absolute",
                   insetInlineStart: "0",
                   insetInlineEnd: "0",
-                  bottom: "-8px",
+                  bottom: "30px",
                   background: "var(--white)",
                   borderRadius: "16px",
                   padding: "12px 14px",
@@ -448,6 +448,7 @@ export default function PainSection({ monthlyPrice = 299 }) {
           </div>
         </div>
         <div
+          className="tori-pain-sum"
           style={{
             marginTop: "18px",
             background: "var(--ink-50)",

@@ -281,19 +281,29 @@
   .tori-lp .tori-burger {
     display: grid;
   }
-  .tori-lp .tori-nav-bar {
-    gap: 10px !important;
-    padding: 12px var(--m-gutter) !important;
-  }
+  /* One geometry in both states, like an app bar: scrolling only slides it
+     over the promo strip and fades the frost in. Nothing inside moves. */
   .tori-lp .tori-nav {
     top: 40px !important;
+    transition: top 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  .tori-lp .tori-nav.is-scrolled {
+    top: 0 !important;
+  }
+  .tori-lp .tori-nav-bar,
+  .tori-lp .tori-nav.is-scrolled .tori-nav-bar {
+    width: calc(100% - 20px) !important;
+    max-width: none !important;
+    margin: 8px auto 0 !important;
+    gap: 8px !important;
+    padding: 6px 14px 6px 6px !important;
+    border-radius: 20px !important;
+    transition:
+      background 0.3s,
+      border-color 0.3s,
+      box-shadow 0.3s;
   }
   .tori-lp .tori-nav.is-scrolled .tori-nav-bar {
-    width: calc(100% - 48px) !important;
-    margin-top: 10px !important;
-    padding-block: 8px !important;
-    padding-inline-start: 18px !important;
-    padding-inline-end: 8px !important;
     overflow: hidden;
     background: rgba(255, 255, 255, 0.78);
     border-color: rgba(255, 255, 255, 0.7);
@@ -303,8 +313,11 @@
     -webkit-backdrop-filter: blur(18px) saturate(1.4);
     backdrop-filter: blur(18px) saturate(1.4);
   }
-  /* A transform on the logo makes iOS skip backdrop-filter behind it, so the
-     frost stops before the wordmark. */
+  /* The logo keeps one size and the mark stays visible, so the wordmark never
+     jumps. No transform either: iOS skips backdrop-filter behind one. */
+  .tori-lp .tori-nav-logo,
+  .tori-lp .tori-nav-word,
+  .tori-lp .tori-nav-mark,
   .tori-lp .tori-nav.is-scrolled .tori-nav-logo,
   .tori-lp .tori-nav.is-scrolled .tori-nav-word,
   .tori-lp .tori-nav.is-scrolled .tori-nav-mark {
@@ -312,24 +325,25 @@
     animation: none !important;
     background: transparent !important;
   }
-  /* The mark video is 100px wide and was spilling out of the rounded end,
-     so the wordmark got cut in half. Keep the icon inside its own box. */
+  /* The mark video is 100px wide; keep the icon inside its own box. */
+  .tori-lp .tori-nav-mark,
   .tori-lp .tori-nav.is-scrolled .tori-nav-mark {
     width: 28px !important;
     height: 28px !important;
     margin-inline-end: 6px !important;
+    opacity: 1 !important;
     overflow: hidden !important;
     border-radius: 8px;
     flex: 0 0 28px;
   }
-  .tori-lp .tori-nav.is-scrolled .tori-nav-mark video {
+  .tori-lp .tori-nav-mark video {
     width: 44px !important;
     height: 33px !important;
   }
-  .tori-lp .tori-nav.is-scrolled .tori-nav-word {
+  .tori-lp .tori-nav-word {
     height: 20px !important;
   }
-  .tori-lp .tori-nav.is-scrolled .tori-nav-glass {
+  .tori-lp .tori-nav-glass {
     display: none;
   }
   .tori-promo {
@@ -354,16 +368,22 @@
   .tori-lp .tori-nav-logo {
     margin-inline-end: auto;
   }
-  /* the bar CTA collapses to an icon; the worded CTA lives in the sheet */
+  /* the bar CTA says where it leads: a short label next to the arrow */
+  .tori-lp .tori-burger {
+    width: 44px;
+    height: 44px;
+  }
   .tori-lp .tori-nav-cta {
-    min-height: 46px !important;
-    width: 46px;
-    padding: 0 !important;
-    justify-content: center;
+    min-height: 44px !important;
+    gap: 8px !important;
+    padding: 0 14px 0 7px !important;
     border-radius: 14px !important;
   }
-  .tori-lp .tori-nav-cta > span:first-child {
+  .tori-lp .tori-nav-cta-label {
     display: none;
+  }
+  .tori-lp .tori-nav-cta-short {
+    display: inline !important;
   }
   .tori-lp .tori-nav-cta-arrow {
     width: 30px !important;
@@ -390,7 +410,7 @@
   }
   .tori-lp.menu-open .tori-nav-cta,
   .tori-lp.menu-open .tori-nav-mark {
-    opacity: 0;
+    opacity: 0 !important;
     pointer-events: none;
     transition: opacity 0.22s;
   }

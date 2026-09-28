@@ -99,7 +99,7 @@ export default function FeaturesSection() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))",
+              gridTemplateColumns: "repeat(auto-fit,minmax(min(320px,100%),1fr))",
               gap: "20px",
             }}
           >
@@ -115,7 +115,7 @@ export default function FeaturesSection() {
                 alignContent: "start",
               }}
             >
-              <div style={{ display: "grid", gap: "9px" }}>
+              <div className="tori-cap-head" style={{ display: "grid", gap: "9px" }}>
                 <span
                   style={{
                     display: "inline-flex",
@@ -393,7 +393,7 @@ export default function FeaturesSection() {
                 boxShadow: "0 26px 60px rgba(23,22,22,.18)",
               }}
             >
-              <div style={{ display: "grid", gap: "9px" }}>
+              <div className="tori-cap-head" style={{ display: "grid", gap: "9px" }}>
                 <span
                   style={{
                     display: "inline-flex",

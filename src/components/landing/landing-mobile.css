@@ -94,32 +94,39 @@
     letter-spacing: 0.06em !important;
   }
 
-  /* ---------- 3. the alignment spine ----------
-     Hebrew body copy centred is hard to scan. Everything hangs off
-     the same right-hand edge; only badges/eyebrows stay inline. */
-  .tori-lp section :is(h2, h3, p) {
-    text-align: start !important;
-  }
-  /* any wrapper that owns a section heading stops centring its children */
+  /* ---------- 3. the centre line ----------
+     On a phone the page reads like one app screen: every section opens on
+     the centre and cards centre their copy. Icon rows (lists, FAQ, form
+     fields) keep the start edge next to their icon. */
   .tori-lp section div:has(> h2) {
-    justify-items: start !important;
-    text-align: start !important;
+    justify-items: center !important;
+    align-items: center !important;
+    text-align: center !important;
     max-width: 100% !important;
-    margin-inline: 0 !important;
+    margin-inline: auto !important;
     margin-bottom: var(--m-block) !important;
     gap: 10px !important;
   }
+  .tori-lp section div:has(> h2) > :is(h2, p) {
+    text-align: center !important;
+    margin-inline: auto !important;
+  }
+  .tori-lp .tori-feat,
   .tori-lp .tori-feat-body,
   .tori-lp .tori-feat-title,
-  .tori-lp .tori-feat-text,
   .tori-lp .tori-step,
-  .tori-lp .tori-vs-head {
-    text-align: start !important;
-    align-items: start !important;
-    justify-items: start !important;
+  .tori-lp .tori-vs-head,
+  .tori-lp #pain .tori-lift > div:nth-child(2) {
+    text-align: center !important;
+    align-items: center !important;
+    justify-items: center !important;
   }
-  .tori-lp .tori-feat-title {
-    align-items: flex-start !important;
+  .tori-lp :is(.tori-feat-text, .tori-step p, .tori-step h3, .tori-vs-head p) {
+    text-align: center !important;
+    margin-inline: auto !important;
+  }
+  .tori-lp .tori-step-ico {
+    margin-inline: auto !important;
   }
   .tori-lp p {
     max-width: 100% !important;
@@ -163,7 +170,12 @@
   /* the stage carries 76/70px of padding for the desktop float; on a phone
      that reads as a dead band between the CTAs and the device */
   .tori-lp .tori-stage > div {
-    padding: 20px 0 0 !important;
+    padding: 14px 0 0 !important;
+  }
+  /* the two sparkle dots float in the desktop margin; on a phone they
+     read as stray pixels */
+  .tori-lp .tori-stage > div > span:nth-child(-n + 2) {
+    display: none;
   }
 
   /* ---------- 5. tap targets ---------- */
@@ -171,9 +183,6 @@
   .tori-lp button {
     -webkit-tap-highlight-color: rgba(191, 255, 81, 0.28);
   }
-  .tori-lp .tori-upload,
-  .tori-lp .tori-seg2 > *,
-  .tori-lp .tori-font,
   .tori-lp .tori-more {
     min-height: 44px !important;
   }
@@ -225,10 +234,24 @@
      dead band once the copy rewraps narrow */
   .tori-lp #pain .tori-lift {
     min-height: 0 !important;
-    padding: 20px 20px 0 !important;
+    padding: 20px !important;
   }
   .tori-lp #pain .tori-lift > div:last-child {
     min-height: 150px !important;
+  }
+  .tori-lp #pain .tori-lift > span:first-child {
+    justify-self: center !important;
+  }
+  /* the "20 hours" card stacks into one centred column */
+  .tori-lp .tori-pain-sum {
+    flex-direction: column;
+    text-align: center;
+    padding: 26px var(--m-card-pad) !important;
+    gap: 16px !important;
+  }
+  .tori-lp .tori-pain-sum > div {
+    flex: 0 0 auto !important;
+    align-items: center !important;
   }
 
   /* every section CTA becomes a full-width block */
@@ -273,8 +296,40 @@
     font-size: 17px !important;
     min-height: 58px !important;
   }
+  /* feature art spans the same width as every other card */
+  .tori-lp .tori-feats {
+    max-width: 100% !important;
+  }
   .tori-lp .tori-feat-media {
+    max-width: 100% !important;
     aspect-ratio: 4 / 3;
+  }
+
+  /* the section already owns the gutter; the grid adding its own doubled it */
+  .tori-lp .tori-lead-grid {
+    padding: 0 !important;
+  }
+  .tori-lp .tori-cap-head {
+    justify-items: center;
+    text-align: center;
+  }
+  .tori-lp .tori-cap-head > span:first-child {
+    justify-self: center !important;
+  }
+
+  /* footer: one centred column that ends clear of the two floating buttons */
+  .tori-lp footer {
+    padding: 32px var(--m-gutter) calc(92px + var(--m-safe-b)) !important;
+  }
+  .tori-lp footer > div {
+    flex-direction: column;
+    justify-content: center !important;
+    gap: 18px !important;
+    text-align: center;
+  }
+  .tori-lp footer > div > div:nth-child(2) {
+    justify-content: center;
+    gap: 12px 20px !important;
   }
 
   /* anchor jumps must clear the fixed bar */

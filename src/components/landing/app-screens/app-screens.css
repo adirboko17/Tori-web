@@ -1,0 +1,663 @@
+/* Hero phone: the real tori app home screen, fully animated.
+   One 12s story loop: the mosaic keeps drifting, the staff ring hops,
+   a finger taps "שלום איתי", the dynamic island blooms with the booking. */
+
+.tori-lp .ha-screen {
+  position: relative;
+  height: 540px;
+  border-radius: 34px;
+  overflow: hidden;
+  background: #fff;
+  font-family: "Rubik", system-ui, sans-serif;
+  text-align: center;
+  isolation: isolate;
+}
+
+/* ---------- photo mosaic ---------- */
+.tori-lp .ha-mosaic {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 300px;
+  overflow: hidden;
+  background: #fff;
+}
+.tori-lp .ha-mosaic::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(15, 14, 14, 0.42) 0%,
+    rgba(15, 14, 14, 0.08) 38%,
+    rgba(15, 14, 14, 0) 60%
+  );
+  pointer-events: none;
+}
+.tori-lp .ha-mosaic-grid {
+  position: absolute;
+  top: -60px;
+  left: -34px;
+  width: 318px;
+  display: flex;
+  gap: 6px;
+  transform: rotate(-7deg);
+}
+.tori-lp .ha-col {
+  flex: 1;
+  height: 460px;
+  overflow: hidden;
+}
+.tori-lp .ha-track {
+  animation: ha-drift calc(16s + var(--c) * 5s) linear infinite;
+}
+.tori-lp .ha-col:nth-child(2) .ha-track {
+  animation-direction: reverse;
+}
+.tori-lp .ha-tile {
+  display: block;
+  width: 100%;
+  height: 118px;
+  margin-bottom: 6px;
+  object-fit: cover;
+  border-radius: 9px;
+  box-shadow: 0 4px 12px rgba(15, 14, 14, 0.18);
+  animation: ha-tile-in 0.9s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+  animation-delay: calc(var(--c) * 0.12s + var(--t) * 0.07s);
+}
+.tori-lp .ha-tile:nth-child(3n + 2) {
+  height: 96px;
+}
+.tori-lp .ha-tile:nth-child(3n) {
+  height: 132px;
+}
+
+/* ---------- status bar, island, logo ---------- */
+.tori-lp .ha-status {
+  position: absolute;
+  z-index: 6;
+  inset: 0 0 auto;
+  height: 34px;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  font-feature-settings: "tnum" 1;
+}
+.tori-lp .ha-battery {
+  display: inline-block;
+  padding: 0 4px;
+  border-radius: 4px;
+  background: #34c759;
+  font-size: 8px;
+  line-height: 12px;
+}
+.tori-lp .ha-island {
+  position: absolute;
+  z-index: 7;
+  top: 8px;
+  left: 50%;
+  width: 72px;
+  height: 21px;
+  transform: translateX(-50%);
+  animation: ha-island 12s cubic-bezier(0.34, 1.3, 0.64, 1) infinite;
+}
+.tori-lp .ha-island-body {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: #000;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 7px;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(12, 255, 190, 0);
+  animation: ha-island-glow 12s ease-out infinite;
+}
+.tori-lp .ha-island-check,
+.tori-lp .ha-island-text {
+  opacity: 0;
+  animation: ha-island-content 12s ease-out infinite;
+}
+.tori-lp .ha-island-check {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--ha-a), var(--ha-b));
+  color: var(--ha-ink);
+  display: grid;
+  place-items: center;
+}
+.tori-lp .ha-island-text {
+  display: grid;
+  text-align: right;
+  color: #fff;
+  line-height: 1.25;
+}
+.tori-lp .ha-island-text b {
+  font-size: 10px;
+  font-weight: 700;
+}
+.tori-lp .ha-island-text small {
+  font-size: 8px;
+  color: rgba(255, 255, 255, 0.62);
+}
+.tori-lp .ha-spark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px;
+  border-radius: 50%;
+  background: var(--ha-a);
+  opacity: 0;
+  animation: ha-spark 12s ease-out infinite;
+}
+.tori-lp .ha-spark:nth-child(odd) {
+  background: var(--ha-b);
+}
+.tori-lp .ha-logo {
+  position: absolute;
+  z-index: 5;
+  top: 46px;
+}
+.tori-lp .ha-logo-img {
+  left: 50%;
+  height: 32px;
+  margin-left: -28px;
+  filter: brightness(0) invert(1) drop-shadow(0 2px 10px rgba(0, 0, 0, 0.25));
+  animation:
+    ha-logo-in 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both,
+    ha-logo-glow 4s ease-in-out 1.4s infinite;
+}
+.tori-lp .ha-logo-text {
+  top: 42px;
+  inset-inline: 0;
+  font-size: 27px;
+  line-height: 1.2;
+  color: #fff;
+  white-space: nowrap;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+  animation:
+    ha-logo-in 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both,
+    ha-text-glow 4s ease-in-out 1.4s infinite;
+}
+
+/* ---------- bottom sheet ---------- */
+.tori-lp .ha-sheet {
+  position: absolute;
+  z-index: 3;
+  inset: 280px 0 0;
+  padding-top: 16px;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -10px 30px rgba(15, 14, 14, 0.12);
+  animation: ha-sheet-in 1s cubic-bezier(0.2, 1.25, 0.3, 1) 0.55s both;
+}
+.tori-lp .ha-handle {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  width: 26px;
+  height: 3px;
+  margin-left: -13px;
+  border-radius: 3px;
+  background: #dcdcdc;
+}
+.tori-lp .ha-greet-wrap {
+  margin: 0 15px;
+  display: grid;
+  justify-items: center;
+}
+.tori-lp .ha-greet {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 50px;
+  box-sizing: border-box;
+  padding: 0 15px 0 8px;
+  border-radius: 25px;
+  background: linear-gradient(270deg, var(--ha-b) 0%, var(--ha-a) 100%);
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--ha-b) 38%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  animation: ha-press 12s ease-out infinite;
+}
+.tori-lp .ha-greet-text {
+  display: grid;
+  text-align: right;
+  line-height: 1.3;
+  color: var(--ha-ink);
+}
+.tori-lp .ha-greet-text b {
+  font-size: 13px;
+  font-weight: 700;
+}
+.tori-lp .ha-greet-text small {
+  font-size: 7.5px;
+  color: color-mix(in srgb, var(--ha-ink) 66%, transparent);
+}
+.tori-lp .ha-greet-plus {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  color: var(--ha-ink);
+  display: grid;
+  place-items: center;
+}
+.tori-lp .ha-ripple {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  animation: ha-ripple 2s ease-out infinite;
+}
+.tori-lp .ha-greet-shine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -45%;
+  width: 40%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.55),
+    rgba(255, 255, 255, 0)
+  );
+  transform: skewX(-18deg);
+  animation: ha-shine 4s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+}
+.tori-lp .ha-tap {
+  position: absolute;
+  top: 13px;
+  right: 58px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  border: 2px solid #fff;
+  box-shadow: 0 4px 14px rgba(15, 14, 14, 0.25);
+  opacity: 0;
+  animation: ha-tap 12s ease-out infinite;
+}
+.tori-lp .ha-soon {
+  margin-top: -1px;
+  padding: 5px 12px;
+  border-radius: 0 0 10px 10px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--ha-deep) 86%, #fff),
+    var(--ha-deep)
+  );
+  color: #fff;
+  font-size: 8px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ---------- staff availability ---------- */
+.tori-lp .ha-staff {
+  margin: 12px 15px 0;
+  padding: 10px 0;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow:
+    0 0 0 1px rgba(23, 22, 22, 0.04),
+    0 6px 22px rgba(23, 22, 22, 0.08);
+}
+.tori-lp .ha-staff > b {
+  display: block;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #1b1b1b;
+}
+.tori-lp .ha-staff > small {
+  display: block;
+  font-size: 7px;
+  color: #8a8a8a;
+}
+.tori-lp .ha-avatars {
+  position: relative;
+  display: flex;
+  gap: 7px;
+  padding: 9px 12px 0;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(270deg, #000 80%, transparent);
+  mask-image: linear-gradient(270deg, #000 80%, transparent);
+}
+.tori-lp .ha-avatar {
+  flex: 0 0 32px;
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  font-size: 7px;
+  color: #555;
+}
+.tori-lp .ha-avatar-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(
+    135deg,
+    hsl(calc(10 + var(--i) * 38) 70% 78%),
+    hsl(calc(var(--i) * 38) 45% 52%)
+  );
+}
+.tori-lp .ha-avatar-ring {
+  position: absolute;
+  top: 7px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 2px solid var(--ha-deep);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ha-deep) 15%, transparent);
+  animation: ha-ring 12s cubic-bezier(0.34, 1.4, 0.64, 1) infinite;
+}
+
+/* ---------- days + tab bar ---------- */
+.tori-lp .ha-days {
+  position: absolute;
+  z-index: 1;
+  inset: auto 0 6px;
+  display: flex;
+  font-size: 7px;
+  color: #b5b5b5;
+}
+.tori-lp .ha-days span {
+  position: relative;
+  flex: 1;
+}
+.tori-lp .ha-days .is-on {
+  color: var(--ha-deep);
+  font-weight: 700;
+}
+.tori-lp .ha-days .is-on::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  bottom: -4px;
+  width: 28px;
+  height: 30px;
+  margin-left: -14px;
+  border-radius: 8px;
+  background: var(--ha-a);
+}
+/* bottom menu: one white pill, brand-colored rim, six icons */
+.tori-lp .ha-tabbar {
+  position: absolute;
+  z-index: 4;
+  inset: auto 0 16px;
+  display: flex;
+  justify-content: center;
+  animation: ha-sheet-in 1s cubic-bezier(0.2, 1.25, 0.3, 1) 0.75s both;
+}
+.tori-lp .ha-tabs {
+  position: relative;
+  display: flex;
+  gap: 1px;
+  padding: 3px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1.5px solid var(--ha-a);
+  box-shadow:
+    0 8px 22px rgba(23, 22, 22, 0.12),
+    0 0 14px color-mix(in srgb, var(--ha-a) 35%, transparent);
+}
+.tori-lp .ha-tab {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  color: #3a3a3a;
+}
+.tori-lp .ha-tab-dot {
+  position: absolute;
+  top: 3px;
+  right: calc(3px + var(--active) * 27px);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--ha-a);
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--ha-b) 50%, transparent);
+}
+.tori-lp .ha-tab-dot.is-travel {
+  animation: ha-dot 12s cubic-bezier(0.34, 1.4, 0.64, 1) infinite;
+}
+.tori-lp .ha-avatar:nth-child(2) {
+  color: var(--ha-deep);
+  font-weight: 700;
+}
+.tori-lp .ha-status.is-dark {
+  color: #111;
+}
+
+/* story beats: each phone can run the loop offset from the others */
+.tori-lp .ha-island,
+.tori-lp .ha-island-body,
+.tori-lp .ha-island-check,
+.tori-lp .ha-island-text,
+.tori-lp .ha-spark,
+.tori-lp .ha-greet,
+.tori-lp .ha-tap,
+.tori-lp .ha-avatar-ring,
+.tori-lp .ha-tab-dot.is-travel {
+  animation-delay: var(--ha-delay, 0s);
+}
+
+/* ---------- keyframes ---------- */
+@keyframes ha-drift {
+  to {
+    transform: translateY(-50%);
+  }
+}
+@keyframes ha-tile-in {
+  from {
+    opacity: 0;
+    transform: scale(0.55) rotate(10deg);
+  }
+}
+@keyframes ha-logo-in {
+  from {
+    opacity: 0;
+    transform: scale(2.2) translateY(-8px);
+  }
+}
+@keyframes ha-logo-glow {
+  0%,
+  100% {
+    filter: brightness(0) invert(1) drop-shadow(0 2px 10px rgba(0, 0, 0, 0.25));
+  }
+  50% {
+    filter: brightness(0) invert(1) drop-shadow(0 0 14px rgba(12, 255, 190, 0.9));
+  }
+}
+@keyframes ha-text-glow {
+  0%,
+  100% {
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+  }
+  50% {
+    text-shadow:
+      0 0 16px color-mix(in srgb, var(--ha-a) 90%, transparent),
+      0 2px 12px rgba(0, 0, 0, 0.35);
+  }
+}
+@keyframes ha-sheet-in {
+  from {
+    transform: translateY(110%);
+  }
+}
+@keyframes ha-ripple {
+  from {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+}
+@keyframes ha-shine {
+  0% {
+    transform: translateX(0) skewX(-18deg);
+  }
+  45%,
+  100% {
+    transform: translateX(380%) skewX(-18deg);
+  }
+}
+@keyframes ha-ring {
+  0%,
+  14% {
+    transform: none;
+  }
+  18%,
+  30% {
+    transform: translateX(-39px);
+  }
+  34%,
+  46% {
+    transform: translateX(-78px);
+  }
+  50%,
+  88% {
+    transform: none;
+  }
+  92%,
+  100% {
+    transform: none;
+  }
+}
+@keyframes ha-tap {
+  0%,
+  44% {
+    opacity: 0;
+    transform: scale(1.8);
+  }
+  47% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(0.75);
+  }
+  55%,
+  100% {
+    opacity: 0;
+    transform: scale(2.4);
+  }
+}
+@keyframes ha-press {
+  0%,
+  48% {
+    transform: none;
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  54%,
+  100% {
+    transform: none;
+  }
+}
+@keyframes ha-island {
+  0%,
+  52% {
+    width: 72px;
+    height: 21px;
+    top: 8px;
+  }
+  57%,
+  78% {
+    width: 196px;
+    height: 40px;
+    top: 7px;
+  }
+  83%,
+  100% {
+    width: 72px;
+    height: 21px;
+    top: 8px;
+  }
+}
+@keyframes ha-island-glow {
+  0%,
+  54% {
+    box-shadow: 0 8px 24px rgba(12, 255, 190, 0);
+  }
+  58% {
+    box-shadow: 0 8px 28px color-mix(in srgb, var(--ha-b) 75%, transparent);
+  }
+  78%,
+  100% {
+    box-shadow: 0 8px 24px rgba(12, 255, 190, 0);
+  }
+}
+@keyframes ha-island-content {
+  0%,
+  57% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  61%,
+  75% {
+    opacity: 1;
+    transform: none;
+  }
+  79%,
+  100% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+@keyframes ha-spark {
+  0%,
+  56% {
+    opacity: 0;
+    transform: rotate(var(--a)) translateX(0) scale(0.4);
+  }
+  58% {
+    opacity: 1;
+  }
+  66%,
+  100% {
+    opacity: 0;
+    transform: rotate(var(--a)) translateX(92px) scale(1.2);
+  }
+}
+@keyframes ha-dot {
+  0%,
+  56% {
+    transform: none;
+  }
+  60%,
+  78% {
+    transform: translateX(-27px);
+  }
+  83%,
+  100% {
+    transform: none;
+  }
+}

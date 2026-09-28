@@ -334,26 +334,15 @@ export function initializeLanding(root) {
   }
 
   /* ---------- nav state + chat reveal ---------- */
-  const nav = $(".tori-nav", root);
+  /* looked up on every call: the nav can be re-rendered under us */
+  const getNav = () => $(".tori-nav", root);
   const chatWrap = $(".tori-chat", root);
-  const promo = $(".tori-promo", root);
-  function placeNav() {
-    if (!nav) return;
-    const mobile =
-      window.matchMedia && window.matchMedia("(max-width: 760px)").matches;
-    const y = window.scrollY || 0;
-    if (!mobile || !promo) {
-      nav.style.removeProperty("top");
-      return;
-    }
-    const top = Math.max(0, promo.offsetHeight - y);
-    nav.style.setProperty("top", top + "px", "important");
-  }
+  /* one class flip; CSS slides the bar over the promo strip (mobile) */
   function onNavScroll() {
     if (root.classList.contains("menu-open")) return;
     const y = window.scrollY;
-    if (nav) nav.classList.toggle("is-scrolled", y > 40);
-    placeNav();
+    const nav = getNav();
+    if (nav) nav.classList.toggle("is-scrolled", y > 12);
     if (chatWrap && y > 320) chatWrap.classList.add("is-visible");
   }
   listen(window, "scroll", onNavScroll, { passive: true });
@@ -434,129 +423,6 @@ export function initializeLanding(root) {
       if (section) spy.observe(section);
     });
   }
-
-  /* ---------- live brand demo ---------- */
-  const PALETTES = [
-    { c1: "#0CFFBE", c2: "#BFFF51", fg: "#171616" },
-    { c1: "#FF2E93", c2: "#FF8ACF", fg: "#FFFFFF" },
-    { c1: "#7C3AED", c2: "#A855F7", fg: "#FFFFFF" },
-    { c1: "#F5433C", c2: "#FF8A6B", fg: "#FFFFFF" },
-    { c1: "#0EA5E9", c2: "#67D5FF", fg: "#FFFFFF" },
-    { c1: "#F59E0B", c2: "#FCD34D", fg: "#171616" },
-  ];
-  const FONTS = [
-    { css: "var(--font-tenant-round)", boost: 1 },
-    { css: "var(--font-tenant-heavy)", boost: 1 },
-    { css: "var(--font-tenant-bold)", boost: 0.95 },
-    { css: "var(--font-tenant-script)", boost: 1.4 },
-  ];
-  const demo = { pal: 0, font: 0, size: 100, logoMode: "text", logoUrl: null };
-  const phone = ref("phoneRef");
-  const branch = (k) => $('[data-branch="' + k + '"]', root);
-  function applyLive() {
-    if (phone) {
-      const p = PALETTES[demo.pal],
-        f = FONTS[demo.font];
-      phone.style.setProperty("--c1", p.c1);
-      phone.style.setProperty("--c2", p.c2);
-      phone.style.setProperty("--fg", p.fg);
-      phone.style.setProperty("--logo-font", f.css);
-      phone.style.setProperty(
-        "--logo-scale",
-        String((demo.size / 100) * (demo.logoMode === "text" ? f.boost : 1)),
-      );
-    }
-    PALETTES.forEach((_, i) => {
-      const b = $('[data-act="pick' + i + '"]', root);
-      if (b) b.setAttribute("data-on", String(demo.pal === i));
-    });
-    FONTS.forEach((_, i) => {
-      const b = $('[data-act="font' + i + '"]', root);
-      if (b) b.setAttribute("data-on", String(demo.font === i));
-    });
-    const up = demo.logoMode === "upload";
-    const bu = $('[data-act="pickUpload"]', root),
-      bt = $('[data-act="pickText"]', root);
-    if (bu) bu.setAttribute("data-on", String(up));
-    if (bt) bt.setAttribute("data-on", String(!up));
-    const showImg = up && !!demo.logoUrl;
-    [
-      ["modeUpload", up],
-      ["modeText", !up],
-      ["hasLogo", up && !!demo.logoUrl],
-      ["showLogoImg", showImg],
-      ["showLogoText", !showImg],
-    ].forEach((pair) => {
-      const el = branch(pair[0]);
-      if (el) el.classList.toggle("is-off", !pair[1]);
-    });
-    const img = ref("logoImg");
-    if (img && demo.logoUrl) img.src = demo.logoUrl;
-    const lbl = $('[data-act="onLogo"]', root);
-    if (lbl && lbl.parentElement) {
-      const span = lbl.parentElement.querySelector("span");
-      if (span) span.textContent = demo.logoUrl ? "החלפת הלוגו" : "בחירת קובץ";
-    }
-  }
-  PALETTES.forEach((_, i) =>
-    on("pick" + i, () => {
-      demo.pal = i;
-      applyLive();
-    }),
-  );
-  FONTS.forEach((_, i) =>
-    on("font" + i, () => {
-      demo.font = i;
-      demo.logoMode = "text";
-      applyLive();
-    }),
-  );
-  on("pickUpload", () => {
-    demo.logoMode = "upload";
-    applyLive();
-  });
-  on("pickText", () => {
-    demo.logoMode = "text";
-    applyLive();
-  });
-  on(
-    "onSize",
-    (e) => {
-      demo.size = Number(e.target.value);
-      const sizeLbl = ref("sizeLabel");
-      if (sizeLbl) sizeLbl.textContent = demo.size + "%";
-      applyLive();
-    },
-    "input",
-  );
-  on(
-    "onName",
-    (e) => {
-      const t = ref("logoText");
-      if (t) t.textContent = e.target.value || "שם העסק";
-      demo.logoMode = "text";
-      applyLive();
-    },
-    "input",
-  );
-  on("clearLogo", () => {
-    if (demo.logoUrl) URL.revokeObjectURL(demo.logoUrl);
-    demo.logoUrl = null;
-    applyLive();
-  });
-  on(
-    "onLogo",
-    (e) => {
-      const f = e.target.files && e.target.files[0];
-      if (!f) return;
-      if (demo.logoUrl) URL.revokeObjectURL(demo.logoUrl);
-      demo.logoUrl = URL.createObjectURL(f);
-      demo.logoMode = "upload";
-      applyLive();
-    },
-    "change",
-  );
-  applyLive();
 
   /* ---------- chat ---------- */
   const CHAT = {

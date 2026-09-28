@@ -1,3 +1,5 @@
+import { Fragment, useEffect, useRef } from "react";
+
 const NAV_ITEMS = [
   { id: "pain", label: "למה תורי", hint: "הכאב שאנחנו פותרים" },
   { id: "brand", label: "מיתוג", hint: "האפליקציה בצבעים שלכם" },
@@ -6,6 +8,26 @@ const NAV_ITEMS = [
   { id: "compare", label: "השוואה", hint: "תורי מול הדרך הישנה" },
   { id: "pricing", label: "מחיר", hint: "מחיר אחד, הכל כלול" },
   { id: "faq", label: "שאלות", hint: "כל מה ששאלתם" },
+];
+
+/** Refraction map for the liquid-glass bar: red bends x, green bends y.
+    A gentle slope across the middle magnifies; steep ramps at the rim bend
+    the page like the edge of a lens. */
+const LENS_MAP =
+  "data:image/svg+xml," +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" viewBox="0 0 200 60" preserveAspectRatio="none">' +
+      '<linearGradient id="x"><stop offset="0" stop-color="#f00"/><stop offset=".1" stop-color="#8e0000"/><stop offset=".9" stop-color="#710000"/><stop offset="1" stop-color="#000"/></linearGradient>' +
+      '<linearGradient id="y" x2="0" y2="1"><stop offset="0" stop-color="#0a0"/><stop offset=".35" stop-color="#008600"/><stop offset=".65" stop-color="#007900"/><stop offset="1" stop-color="#050"/></linearGradient>' +
+      '<rect width="200" height="60" fill="url(#x)"/>' +
+      '<rect width="200" height="60" fill="url(#y)" style="mix-blend-mode:screen"/>' +
+      "</svg>",
+  );
+/** Each color channel bends a little differently: a thin rainbow at the rim. */
+const LENS_CHANNELS = [
+  [74, "1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"],
+  [68, "0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0"],
+  [62, "0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0"],
 ];
 
 function ArrowIcon({ size = 15 }) {
@@ -27,7 +49,25 @@ function ArrowIcon({ size = 15 }) {
   );
 }
 
+/** Keeps the lens map the exact pixel size of the glass it sits behind. */
+function useLensSize() {
+  const glassRef = useRef(null);
+  const lensRef = useRef(null);
+  useEffect(() => {
+    const glass = glassRef.current;
+    const lens = lensRef.current;
+    const observer = new ResizeObserver(() => {
+      lens.setAttribute("width", String(glass.offsetWidth));
+      lens.setAttribute("height", String(glass.offsetHeight));
+    });
+    observer.observe(glass);
+    return () => observer.disconnect();
+  }, []);
+  return { glassRef, lensRef };
+}
+
 export default function ToriNavSection() {
+  const { glassRef, lensRef } = useLensSize();
   return (
     <header
       className="tori-nav"
@@ -40,12 +80,47 @@ export default function ToriNavSection() {
       }}
     >
       <svg className="tori-nav-filter" width="0" height="0" aria-hidden="true">
-        <filter id="glass-distortion" x="-20%" y="-20%" width="140%" height="140%" filterUnits="objectBoundingBox">
-          <feTurbulence type="fractalNoise" baseFrequency="0.008 0.014" numOctaves="2" seed="8" result="turbulence" />
-          <feGaussianBlur in="turbulence" stdDeviation="1.4" result="softMap" />
-          <feDisplacementMap in="SourceGraphic" in2="softMap" scale="120" xChannelSelector="R" yChannelSelector="G" />
+        <filter
+          id="glass-distortion"
+          x="0"
+          y="0"
+          width="100%"
+          height="100%"
+          colorInterpolationFilters="sRGB"
+        >
+          <feImage
+            ref={lensRef}
+            href={LENS_MAP}
+            x="0"
+            y="0"
+            width="1000"
+            height="60"
+            preserveAspectRatio="none"
+            result="lens"
+          />
+          {LENS_CHANNELS.map(([scale, matrix], i) => (
+            <Fragment key={i}>
+              <feDisplacementMap
+                in="SourceGraphic"
+                in2="lens"
+                scale={scale}
+                xChannelSelector="R"
+                yChannelSelector="G"
+                result={"shift" + i}
+              />
+              <feColorMatrix
+                in={"shift" + i}
+                type="matrix"
+                values={matrix}
+                result={"ch" + i}
+              />
+            </Fragment>
+          ))}
+          <feBlend in="ch0" in2="ch1" mode="screen" result="rg" />
+          <feBlend in="rg" in2="ch2" mode="screen" />
         </filter>
       </svg>
+
       <nav
         className="tori-nav-bar"
         style={{
@@ -57,11 +132,12 @@ export default function ToriNavSection() {
         }}
       >
         <div
+          ref={glassRef}
           className="tori-nav-glass tori-nav-glass-distort"
           aria-hidden="true"
           style={{
-            backdropFilter: "url(#glass-distortion) blur(3px) saturate(1.4)",
-            WebkitBackdropFilter: "url(#glass-distortion) blur(3px) saturate(1.4)",
+            backdropFilter: "url(#glass-distortion) blur(4px) saturate(1.8) brightness(1.08)",
+            WebkitBackdropFilter: "url(#glass-distortion) blur(4px) saturate(1.8) brightness(1.08)",
           }}
         />
         <div className="tori-nav-glass tori-nav-glass-tint" aria-hidden="true" />
@@ -140,8 +216,17 @@ export default function ToriNavSection() {
             isolation: "isolate",
           }}
         >
-          <span style={{ position: "relative", fontSize: "15px" }}>
+          <span
+            className="tori-nav-cta-label"
+            style={{ position: "relative", fontSize: "15px" }}
+          >
             {"התחילו עכשיו"}
+          </span>
+          <span
+            className="tori-nav-cta-short"
+            style={{ display: "none", position: "relative", fontSize: "15px" }}
+          >
+            {"לפרטים"}
           </span>
           <span
             className="tori-nav-cta-arrow"

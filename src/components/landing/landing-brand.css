@@ -1,0 +1,412 @@
+/* "נראה כמו שלך": three businesses, three real screens, bento of what gets branded. */
+
+.tori-lp .tori-brand {
+  position: relative;
+  padding: 90px 24px;
+  background: var(--surface-page);
+  border-block: 1px solid var(--line-subtle);
+  overflow: hidden;
+}
+.tori-lp .tori-brand-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+.tori-lp .tori-brand-head {
+  max-width: 50ch;
+  margin: 0 auto 20px;
+  text-align: center;
+}
+.tori-lp .tori-brand-head h2 {
+  margin: 0 0 16px;
+  font-size: clamp(30px, 4vw, 50px);
+  line-height: 1.1;
+  color: var(--ink-900);
+}
+.tori-lp .tori-brand-head p {
+  margin: 0 auto;
+  max-width: 48ch;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--ink-600);
+}
+
+/* ---------- the three phones ---------- */
+.tori-lp .tori-brand-row {
+  display: flex;
+  justify-content: center;
+  gap: clamp(24px, 4vw, 64px);
+  padding: 60px 0 40px;
+}
+.tori-lp .tori-brand-item {
+  position: relative;
+}
+.tori-lp .tori-brand-item::before {
+  content: "";
+  position: absolute;
+  inset: 12% -18%;
+  border-radius: 50%;
+  background: var(--glow);
+  opacity: 0.32;
+  filter: blur(60px);
+  animation: tori-brand-glow 6s ease-in-out infinite alternate;
+}
+.tori-lp .tori-brand-item:nth-child(2) {
+  margin-top: -36px;
+}
+.tori-lp .tori-brand-device {
+  --r: var(--tilt);
+  position: relative;
+  width: 268px;
+  box-sizing: border-box;
+  padding: 9px;
+  border-radius: 42px;
+  background: var(--ink-900);
+  box-shadow:
+    0 30px 70px rgba(23, 22, 22, 0.24),
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+}
+.tori-lp .tori-brand-item:nth-child(2) .tori-brand-device {
+  animation-delay: -2.6s;
+}
+.tori-lp .tori-brand-item:nth-child(3) .tori-brand-device {
+  animation-delay: -5.2s;
+}
+
+/* ---------- bento: what gets branded ---------- */
+.tori-lp .tori-bento-grid {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 14px;
+}
+/* the card mirrors the "איך זה עובד" step cards, hover included */
+.tori-lp .tori-bento {
+  grid-column: span 2;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 270px;
+  padding: 26px 24px 28px;
+  box-sizing: border-box;
+  border: 1px solid var(--ink-200);
+  border-radius: 18px;
+  background: var(--white);
+  color: var(--ink-900);
+  text-align: center;
+  transition:
+    transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1),
+    border-color 0.35s,
+    box-shadow 0.35s;
+}
+.tori-lp .tori-bento.is-wide {
+  grid-column: span 3;
+}
+.tori-lp .tori-bento::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset-inline: 0;
+  top: 0;
+  height: 1.5px;
+  background: var(--gradient-brand);
+  transform: scaleX(0);
+  transform-origin: 100% 0;
+  transition: transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.tori-lp .tori-bento::after {
+  content: "";
+  position: absolute;
+  inset-inline-end: -30%;
+  top: -60%;
+  width: 70%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(12, 255, 190, 0.22),
+    rgba(12, 255, 190, 0) 70%
+  );
+  opacity: 0;
+  transition: opacity 0.45s;
+  pointer-events: none;
+}
+.tori-lp .tori-bento:hover {
+  transform: translateY(-6px);
+  border-color: var(--green-400);
+  box-shadow:
+    0 0 0 1px var(--green-400),
+    0 20px 46px rgba(12, 255, 190, 0.22);
+}
+.tori-lp .tori-bento:hover::before {
+  transform: scaleX(1);
+}
+.tori-lp .tori-bento:hover::after {
+  opacity: 1;
+}
+.tori-lp .tori-bento > b {
+  font-size: 20px;
+  font-weight: 700;
+}
+.tori-lp .tori-bento > small {
+  max-width: 34ch;
+  min-height: 3.1em;
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-600);
+}
+.tori-lp .tori-bento-art {
+  flex: 1;
+  width: 100%;
+  min-height: 130px;
+  margin-bottom: 18px;
+  display: grid;
+  place-items: center;
+}
+
+/* names flip through business fonts */
+.tori-lp .tori-bento-names span {
+  grid-area: 1 / 1;
+  font-size: 40px;
+  line-height: 1.2;
+  white-space: nowrap;
+  opacity: 0;
+  animation: tori-bento-flip 9s cubic-bezier(0.34, 1.3, 0.64, 1) infinite;
+  animation-delay: calc(var(--k) * 3s);
+}
+
+/* one button repainted in every brand color */
+.tori-lp .tori-bento-colors {
+  gap: 16px;
+  align-content: center;
+}
+.tori-lp .tori-bento-btn {
+  padding: 13px 34px;
+  border-radius: 999px;
+  font-size: 17px;
+  font-weight: 700;
+  color: #171616;
+  animation: tori-bento-paint 10s steps(1) infinite;
+  box-shadow: 0 10px 26px rgba(23, 22, 22, 0.18);
+}
+.tori-lp .tori-bento-swatches {
+  display: flex;
+  gap: 8px;
+}
+.tori-lp .tori-bento-swatches i {
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--ink-200);
+}
+
+/* endless photo strip */
+.tori-lp .tori-bento-strip {
+  place-items: stretch;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+}
+.tori-lp .tori-bento-strip > span {
+  display: flex;
+  gap: 8px;
+  width: max-content;
+  align-items: center;
+  animation: tori-bento-strip 18s linear infinite;
+}
+.tori-lp .tori-bento-strip img {
+  width: 86px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 14px;
+  transform: rotate(-4deg);
+}
+.tori-lp .tori-bento-strip img:nth-child(even) {
+  transform: rotate(4deg) translateY(8px);
+}
+
+/* team avatars with a hopping ring */
+.tori-lp .tori-bento-team {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.tori-lp .tori-bento-team span {
+  width: 54px;
+  height: 54px;
+  margin-inline-start: -12px;
+  border-radius: 50%;
+  border: 3px solid var(--white);
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  font-weight: 700;
+  background: linear-gradient(
+    135deg,
+    hsl(calc(10 + var(--i) * 45) 70% 75%),
+    hsl(calc(var(--i) * 45) 50% 48%)
+  );
+  animation: tori-bento-hop 7.5s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 1.5s);
+}
+
+/* the app icon changes owner */
+.tori-lp .tori-bento-store {
+  gap: 12px;
+}
+.tori-lp .tori-bento-icon {
+  display: grid;
+  width: 76px;
+  height: 76px;
+}
+.tori-lp .tori-bento-icon span {
+  grid-area: 1 / 1;
+  border-radius: 30%;
+  display: grid;
+  place-items: center;
+  font-size: 36px;
+  font-weight: 700;
+  color: #fff;
+  box-shadow: 0 12px 26px rgba(23, 22, 22, 0.2);
+  opacity: 0;
+  animation: tori-bento-icon 9s cubic-bezier(0.34, 1.4, 0.64, 1) infinite;
+  animation-delay: calc(var(--k) * 3s);
+}
+.tori-lp .tori-bento-stores {
+  display: flex;
+  gap: 8px;
+}
+.tori-lp .tori-bento-stores small {
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--ink-300);
+  font-size: 11px;
+  color: var(--ink-700);
+}
+
+@keyframes tori-brand-glow {
+  to {
+    transform: scale(1.15);
+    opacity: 0.45;
+  }
+}
+@keyframes tori-bento-flip {
+  0% {
+    opacity: 0;
+    transform: translateY(40%) rotateX(70deg);
+  }
+  4%,
+  33% {
+    opacity: 1;
+    transform: none;
+  }
+  38%,
+  100% {
+    opacity: 0;
+    transform: translateY(-40%) rotateX(-70deg);
+  }
+}
+@keyframes tori-bento-paint {
+  0% {
+    background: #ff4fa3;
+  }
+  20% {
+    background: #8b5cf6;
+    color: #fff;
+  }
+  40% {
+    background: #ff9f1a;
+  }
+  60% {
+    background: #0cffbe;
+  }
+  80% {
+    background: #0ea5e9;
+    color: #fff;
+  }
+}
+@keyframes tori-bento-strip {
+  to {
+    transform: translateX(50%);
+  }
+}
+@keyframes tori-bento-hop {
+  0%,
+  16%,
+  100% {
+    transform: none;
+    box-shadow: none;
+  }
+  6% {
+    transform: translateY(-14px) scale(1.12);
+    box-shadow: 0 0 0 3px var(--green-400);
+  }
+}
+@keyframes tori-bento-icon {
+  0% {
+    opacity: 0;
+    transform: scale(0.4) rotate(-20deg);
+  }
+  4%,
+  33% {
+    opacity: 1;
+    transform: none;
+  }
+  38%,
+  100% {
+    opacity: 0;
+    transform: scale(0.4) rotate(20deg);
+  }
+}
+
+@media (max-width: 1020px) {
+  .tori-lp .tori-brand-row {
+    justify-content: flex-start;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    margin-inline: -24px;
+    padding-inline: 40px;
+    scrollbar-width: none;
+  }
+  .tori-lp .tori-brand-item {
+    flex: 0 0 auto;
+    scroll-snap-align: center;
+  }
+  .tori-lp .tori-brand-item:nth-child(2) {
+    margin-top: 0;
+  }
+  .tori-lp .tori-bento,
+  .tori-lp .tori-bento.is-wide {
+    grid-column: span 3;
+  }
+}
+@media (max-width: 640px) {
+  /* a swipeable row where every phone snaps to the centre of the screen */
+  .tori-lp .tori-brand-row {
+    margin-inline: calc(-1 * var(--m-gutter, 24px));
+    padding: 40px calc(50% - 134px) 56px;
+    gap: 28px;
+  }
+  .tori-lp .tori-brand-device {
+    box-shadow:
+      0 16px 34px rgba(23, 22, 22, 0.2),
+      0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+  }
+  /* the swipe row clips its overflow, so the halo stays well inside it */
+  .tori-lp .tori-brand-item::before {
+    inset: 24% 6%;
+    filter: blur(36px);
+  }
+  .tori-lp .tori-bento,
+  .tori-lp .tori-bento.is-wide {
+    grid-column: 1 / -1;
+    min-height: 220px;
+  }
+  .tori-lp .tori-bento-names span {
+    font-size: 32px;
+  }
+}

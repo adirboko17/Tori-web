@@ -2,6 +2,10 @@ import { loadMonthlyPriceIls } from "@/lib/admin/catalog";
 import Landing from "@/components/landing/Landing";
 import "@/components/landing/landing.css";
 import "@/components/landing/landing-mobile.css";
+import "@/components/landing/app-screens/app-screens.css";
+import "@/components/landing/app-screens/profile.css";
+import "@/components/landing/app-screens/calendar.css";
+import "@/components/landing/landing-brand.css";
 import "@/components/landing/landing-loader.css";
 import "@/components/landing/landing-menu.css";
 

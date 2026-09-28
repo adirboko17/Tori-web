@@ -15,7 +15,7 @@ export default function LeadFormSection({ monthlyPrice = 299 }) {
           maxWidth: "1180px",
           margin: "0 auto",
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit,minmax(400px,1fr))",
+          gridTemplateColumns: "repeat(auto-fit,minmax(min(400px,100%),1fr))",
           alignItems: "center",
           gap: "clamp(40px,6vw,96px)",
           padding: "clamp(60px,7vw,92px) 24px",

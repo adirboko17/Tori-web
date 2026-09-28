@@ -499,7 +499,7 @@
 }
 .tori-lp .tori-nav-glass-tint {
   z-index: 1;
-  background: rgba(255, 255, 255, 0.16);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.58) 14%, rgba(255, 255, 255, 0.58) 86%, rgba(255, 255, 255, 0.22));
 }
 .tori-lp .tori-nav-glass-shine {
   z-index: 2;
@@ -733,86 +733,6 @@
     transform: none;
   }
 }
-@keyframes tori-push-in {
-  0% {
-    opacity: 0;
-    transform: translateY(-130%) scale(0.94);
-  }
-  5%,
-  27% {
-    opacity: 1;
-    transform: none;
-  }
-  33%,
-  100% {
-    opacity: 0;
-    transform: translateY(-130%) scale(0.94);
-  }
-}
-@keyframes tori-slot-pick {
-  0%,
-  2% {
-    background: var(--ink-50);
-    color: var(--ink-700);
-    transform: none;
-    box-shadow: none;
-  }
-  8%,
-  26% {
-    background: linear-gradient(135deg, #bfff51, #6bff85, #0cffbe);
-    color: var(--ink-900);
-    transform: scale(1.07);
-    box-shadow: 0 6px 16px rgba(0, 177, 131, 0.32);
-  }
-  34%,
-  100% {
-    background: var(--ink-50);
-    color: var(--ink-700);
-    transform: none;
-    box-shadow: none;
-  }
-}
-@keyframes tori-confirm-pulse {
-  0%,
-  4% {
-    transform: none;
-    box-shadow: 0 0 0 0 rgba(12, 255, 190, 0);
-  }
-  10% {
-    transform: scale(1.03);
-    box-shadow: 0 0 0 7px rgba(12, 255, 190, 0.28);
-  }
-  18%,
-  100% {
-    transform: none;
-    box-shadow: 0 0 0 0 rgba(12, 255, 190, 0);
-  }
-}
-@keyframes tori-shine {
-  0% {
-    transform: translateX(-160%) skewX(-16deg);
-  }
-  55%,
-  100% {
-    transform: translateX(320%) skewX(-16deg);
-  }
-}
-@keyframes tori-badge {
-  0%,
-  60% {
-    opacity: 0;
-    transform: scale(0.4);
-  }
-  68%,
-  92% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(0.4);
-  }
-}
 @keyframes tori-load {
   to {
     transform: scaleX(1);
@@ -888,52 +808,30 @@
   animation: tori-wipe-sheen 1.25s cubic-bezier(0.76, 0, 0.24, 1) forwards;
 }
 @keyframes tori-bub1 {
-  0% {
-    opacity: 0;
-    transform: translateY(20px) rotate(-4deg) scale(0.95);
-  }
-  9%,
-  50% {
-    opacity: 1;
-    transform: translateY(0) rotate(-4deg) scale(1);
-  }
-  62%,
+  0%,
   100% {
-    opacity: 0;
-    transform: translateY(-12px) rotate(-4deg) scale(0.98);
+    transform: translateY(0) rotate(-4deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(-2deg);
   }
 }
 @keyframes tori-bub2 {
   0%,
-  20% {
-    opacity: 0;
-    transform: translateY(22px) rotate(3deg) scale(0.93);
-  }
-  30%,
-  60% {
-    opacity: 1;
+  100% {
     transform: translateY(0) rotate(3deg) scale(1);
   }
-  72%,
-  100% {
-    opacity: 0;
-    transform: translateY(-10px) rotate(3deg) scale(0.98);
+  45% {
+    transform: translateY(-8px) rotate(1deg) scale(1.04);
   }
 }
 @keyframes tori-cancel {
-  0% {
-    opacity: 0;
-    transform: translateY(28px) rotate(-3deg);
-  }
-  11%,
-  84% {
-    opacity: 1;
+  0%,
+  100% {
     transform: translateY(0) rotate(-3deg);
   }
-  95%,
-  100% {
-    opacity: 0;
-    transform: translateY(-14px) rotate(-3deg);
+  50% {
+    transform: translateY(-10px) rotate(-1deg);
   }
 }
 @keyframes tori-strike {
@@ -952,39 +850,27 @@
 }
 @keyframes tori-loss {
   0%,
-  36% {
-    opacity: 0;
-    transform: scale(0.55);
+  30%,
+  100% {
+    transform: scale(1) rotate(0);
+  }
+  38% {
+    transform: scale(1.2) rotate(-6deg);
   }
   44% {
-    opacity: 1;
-    transform: scale(1.14);
+    transform: scale(1.12) rotate(5deg);
   }
-  50%,
-  86% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  94%,
-  100% {
-    opacity: 0;
-    transform: scale(0.9);
+  50% {
+    transform: scale(1) rotate(0);
   }
 }
 @keyframes tori-queue {
-  0% {
-    opacity: 0;
-    transform: translateY(28px) rotate(var(--qr, 0deg)) scale(0.97);
-  }
-  14%,
-  74% {
-    opacity: 1;
-    transform: translateY(0) rotate(var(--qr, 0deg)) scale(1);
-  }
-  90%,
+  0%,
   100% {
-    opacity: 0;
-    transform: translateY(-16px) rotate(var(--qr, 0deg)) scale(0.98);
+    transform: translateY(0) rotate(var(--qr, 0deg));
+  }
+  50% {
+    transform: translateY(-9px) rotate(var(--qr, 0deg));
   }
 }
 @keyframes tori-ring {
@@ -1010,13 +896,13 @@
   }
 }
 .tori-lp .tori-bub1 {
-  animation: tori-bub1 7s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+  animation: tori-bub1 4.2s ease-in-out infinite;
 }
 .tori-lp .tori-bub2 {
-  animation: tori-bub2 7s cubic-bezier(0.34, 1.42, 0.64, 1) infinite;
+  animation: tori-bub2 3.6s ease-in-out -1.2s infinite;
 }
 .tori-lp .tori-cancel {
-  animation: tori-cancel 7s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+  animation: tori-cancel 4.6s ease-in-out infinite;
 }
 .tori-lp .tori-strike {
   position: relative;
@@ -1031,13 +917,13 @@
   background: var(--ink-400);
   transform: scaleX(1);
   transform-origin: 100% 50%;
-  animation: tori-strike 7s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+  animation: tori-strike 3.5s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
 }
 .tori-lp .tori-loss {
-  animation: tori-loss 7s cubic-bezier(0.34, 1.42, 0.64, 1) infinite;
+  animation: tori-loss 3.5s cubic-bezier(0.34, 1.42, 0.64, 1) infinite;
 }
 .tori-lp .tori-q {
-  animation: tori-queue 7s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+  animation: tori-queue 3.8s ease-in-out infinite;
 }
 .tori-lp .tori-ring {
   animation: tori-ring 7s ease-in-out infinite;
@@ -1048,104 +934,9 @@
   --r: 0deg;
   transform-style: preserve-3d;
 }
-.tori-lp .tori-push-stack {
-  position: absolute;
-  z-index: 4;
-  inset-inline: 9px;
-  top: 32px;
-  display: grid;
-}
-.tori-lp .tori-push {
-  grid-area: 1/1;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 9px 10px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow:
-    0 0 0 1px rgba(23, 22, 22, 0.05),
-    0 12px 26px rgba(23, 22, 22, 0.16);
-  animation: tori-push-in 12s cubic-bezier(0.34, 1.42, 0.64, 1) infinite;
-  opacity: 0;
-}
-.tori-lp .tori-push-tile {
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 9px;
-  flex: 0 0 auto;
-}
-.tori-lp .tori-slot {
-  padding: 8px 0;
-  border-radius: 9px;
-  background: var(--ink-50);
-  color: var(--ink-700);
-  text-align: center;
-  font-size: 11px;
-  font-weight: 500;
-  font-feature-settings: "tnum" 1;
-  animation: tori-slot-pick 12s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
-}
-.tori-lp .tori-slot--off {
-  background: var(--ink-100);
-  color: var(--ink-400);
-  text-decoration: line-through;
-  animation: none;
-}
-.tori-lp .tori-confirm {
-  min-height: 42px;
-  border-radius: 13px;
-  background: var(--ink-900);
-  color: var(--white);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  font-size: 13px;
-  font-weight: 600;
-  margin-top: 3px;
-  animation: tori-confirm-pulse 12s ease-out infinite;
-}
-.tori-lp .tori-shine {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 34%;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0),
-    rgba(255, 255, 255, 0.5),
-    rgba(255, 255, 255, 0)
-  );
-  animation: tori-shine 7s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
-  pointer-events: none;
-}
-.tori-lp .tori-badge {
-  position: absolute;
-  top: -2px;
-  inset-inline-end: -2px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--red-500);
-  border: 1.5px solid var(--white);
-  animation: tori-badge 12s ease-out infinite;
-}
 @media (prefers-reduced-motion: reduce) {
-  .tori-lp .tori-push,
-  .tori-lp .tori-slot,
-  .tori-lp .tori-confirm,
-  .tori-lp .tori-shine,
-  .tori-lp .tori-badge,
   .tori-lp .tori-device {
     animation: none !important;
-  }
-  .tori-lp .tori-push:first-child {
-    opacity: 1;
   }
 }
 @keyframes tori-pulse {
@@ -1545,168 +1336,6 @@ body {
   border-color: var(--green-400);
   box-shadow: 0 0 0 4px rgba(12, 255, 190, 0.18);
 }
-.tori-lp .tori-pal {
-  all: unset;
-  cursor: pointer;
-  display: inline-grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 13px;
-  border: 1px solid var(--ink-200);
-  background: var(--white);
-  transition:
-    transform 0.2s cubic-bezier(0.34, 1.42, 0.64, 1),
-    box-shadow 0.2s,
-    border-color 0.2s;
-}
-.tori-lp .tori-pal span {
-  display: block;
-  width: 26px;
-  height: 26px;
-  border-radius: 8px;
-}
-.tori-lp .tori-pal:hover {
-  transform: translateY(-2px);
-  border-color: var(--ink-400);
-}
-.tori-lp .tori-pal[data-on="true"] {
-  border-color: var(--ink-900);
-  box-shadow:
-    0 0 0 2px var(--ink-900),
-    0 6px 16px rgba(23, 22, 22, 0.16);
-}
-.tori-lp .tori-upload {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  min-height: 44px;
-  padding: 0 16px;
-  border-radius: 12px;
-  border: 1px dashed var(--line-strong);
-  background: var(--white);
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--ink-800);
-  transition:
-    border-color 0.2s,
-    color 0.2s,
-    box-shadow 0.2s;
-}
-.tori-lp .tori-upload:hover {
-  border-color: var(--green-500);
-  color: var(--green-800);
-  box-shadow: 0 0 0 3px rgba(12, 255, 190, 0.14);
-}
-.tori-lp .tori-upload input {
-  position: absolute;
-  width: 0;
-  height: 0;
-  opacity: 0;
-}
-.tori-lp .tori-live-phone {
-  transition: filter 0.3s;
-}
-.tori-lp .tori-seg2 {
-  display: flex;
-  background: var(--ink-100);
-  border-radius: 12px;
-  padding: 3px;
-  gap: 2px;
-}
-.tori-lp .tori-seg2 button {
-  all: unset;
-  cursor: pointer;
-  flex: 1;
-  text-align: center;
-  min-height: 36px;
-  line-height: 36px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--ink-600);
-  transition:
-    background 0.15s,
-    color 0.15s,
-    box-shadow 0.15s;
-}
-.tori-lp .tori-seg2 button:hover {
-  color: var(--ink-900);
-}
-.tori-lp .tori-seg2 button[data-on="true"] {
-  background: var(--white);
-  color: var(--ink-900);
-  box-shadow: 0 1px 3px rgba(23, 22, 22, 0.14);
-}
-.tori-lp .tori-font {
-  all: unset;
-  cursor: pointer;
-  box-sizing: border-box;
-  flex: 1;
-  min-width: 0;
-  min-height: 46px;
-  padding: 0 8px;
-  border-radius: 11px;
-  border: 1px solid var(--ink-200);
-  background: var(--white);
-  color: var(--ink-800);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  white-space: nowrap;
-  transition:
-    transform 0.15s,
-    border-color 0.15s,
-    box-shadow 0.15s;
-}
-.tori-lp .tori-font:hover {
-  transform: translateY(-2px);
-  border-color: var(--ink-400);
-}
-.tori-lp .tori-font[data-on="true"] {
-  border-color: var(--ink-900);
-  box-shadow:
-    0 0 0 2px var(--ink-900),
-    0 6px 16px rgba(23, 22, 22, 0.14);
-}
-.tori-lp .tori-range {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 6px;
-  border-radius: 99px;
-  background: linear-gradient(90deg, var(--lime-400), var(--green-400));
-  outline: none;
-  cursor: pointer;
-}
-.tori-lp .tori-range::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--white);
-  border: 1.5px solid var(--ink-900);
-  box-shadow: 0 2px 8px rgba(23, 22, 22, 0.22);
-  cursor: grab;
-  transition: transform 0.15s;
-}
-.tori-lp .tori-range::-webkit-slider-thumb:hover {
-  transform: scale(1.12);
-}
-.tori-lp .tori-range::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--white);
-  border: 1.5px solid var(--ink-900);
-  box-shadow: 0 2px 8px rgba(23, 22, 22, 0.22);
-  cursor: grab;
-}
-.tori-lp .tori-range:focus-visible {
-  box-shadow: 0 0 0 4px rgba(12, 255, 190, 0.25);
-}
 .tori-lp .tori-feats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1737,12 +1366,13 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform: scale(1.13);
+  transform: scale(0.84);
+  clip-path: inset(7.5% round 6%);
   filter: brightness(1.085) saturate(1.05);
   transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 .tori-lp .tori-feat:hover .tori-feat-media video {
-  transform: scale(1.18);
+  transform: scale(0.88);
 }
 .tori-lp .tori-feat-body {
   display: grid;
@@ -1983,27 +1613,10 @@ body {
   .tori-lp .tori-hero-phone {
     transform: scale(1) rotate(-3deg) !important;
   }
-  .tori-lp .tori-brand-phone {
-    width: 290px !important;
-  }
 }
 @media (max-width: 560px) {
   .tori-lp .tori-stage {
     display: grid !important;
-  }
-  .tori-lp .tori-hero-phone {
-    transform: scale(0.9) rotate(-3deg) !important;
-  }
-  .tori-lp .tori-brand-phone {
-    width: min(100%, 270px) !important;
-  }
-}
-@media (max-width: 430px) {
-  .tori-lp .tori-hero-phone {
-    transform: scale(0.8) rotate(-3deg) !important;
-  }
-  .tori-lp .tori-brand-phone {
-    width: min(100%, 250px) !important;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -2017,12 +1630,6 @@ body {
   }
 }
 
-.tori-lp .tori-branch.is-off {
-  display: none !important;
-}
-.tori-lp .ths1:hover {
-  color: var(--red-500);
-}
 .tori-lp .ths2:hover {
   background: var(--ink-700);
 }
