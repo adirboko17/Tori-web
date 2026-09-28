@@ -1210,9 +1210,11 @@ body {
   transform: translateY(-3px) scale(1.06);
 }
 /* ---------- lead form: the onboarding form's field language ---------- */
+/* a white veil keeps the pattern quiet behind the form */
 .tori-lp .tori-lead {
-  background: #f2fbf7 url("/assets/media/tori-pattern.png") center / 1200px auto
-    repeat;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)),
+    url("/assets/media/tori-pattern.png") center / 1200px auto repeat #f2fbf7;
 }
 .tori-lp .tori-lead-perks {
   display: grid;
