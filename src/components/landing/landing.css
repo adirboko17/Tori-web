@@ -453,6 +453,9 @@
     height: 33px;
   }
 }
+.tori-promo {
+  display: none;
+}
 .tori-lp .tori-nav-bar {
   position: relative;
   max-width: 1180px;

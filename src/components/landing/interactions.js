@@ -336,12 +336,27 @@ export function initializeLanding(root) {
   /* ---------- nav state + chat reveal ---------- */
   const nav = $(".tori-nav", root);
   const chatWrap = $(".tori-chat", root);
+  const promo = $(".tori-promo", root);
+  function placeNav() {
+    if (!nav) return;
+    const mobile =
+      window.matchMedia && window.matchMedia("(max-width: 760px)").matches;
+    const y = window.scrollY || 0;
+    if (!mobile || !promo) {
+      nav.style.removeProperty("top");
+      return;
+    }
+    const top = Math.max(0, promo.offsetHeight - y);
+    nav.style.setProperty("top", top + "px", "important");
+  }
   function onNavScroll() {
     const y = window.scrollY;
     if (nav) nav.classList.toggle("is-scrolled", y > 40);
+    placeNav();
     if (chatWrap && y > 320) chatWrap.classList.add("is-visible");
   }
   listen(window, "scroll", onNavScroll, { passive: true });
+  listen(window, "resize", onNavScroll);
   onNavScroll();
 
   /* ---------- mobile menu ---------- */

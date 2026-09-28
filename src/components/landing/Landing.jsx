@@ -33,6 +33,7 @@ export default function Landing({ monthlyPrice = 299 }) {
       ref={rootRef}
     >
       <ToriLoaderSection />
+      <div className="tori-promo">ללא דמי הקמה - ללא התחייבות</div>
       <ToriNavSection />
       <TopSection />
       <CapabilitiesSection />
