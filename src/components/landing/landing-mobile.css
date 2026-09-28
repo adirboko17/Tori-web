@@ -292,13 +292,8 @@
     font-size: 17px !important;
     min-height: 58px !important;
   }
-  /* feature art spans the same width as every other card */
   .tori-lp .tori-feats {
     max-width: 100% !important;
-  }
-  .tori-lp .tori-feat-media {
-    max-width: 100% !important;
-    aspect-ratio: 4 / 3;
   }
 
   /* the section already owns the gutter; the grid adding its own doubled it */

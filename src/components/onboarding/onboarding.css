@@ -79,7 +79,8 @@
   border-radius: 12px;
   padding: 0 14px;
   font: inherit;
-  font-size: 15px;
+  /* under 16px, iOS zooms the whole page when the field is focused */
+  font-size: 16px;
   color: #171616;
   background: #fff;
   outline: none;
