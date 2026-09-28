@@ -450,9 +450,10 @@ export default function Onboarding() {
                       <input
                         className="ob-input "
                         type="password"
+                        inputMode="numeric"
                         data-act="on.adminPassword"
                         data-ev="change"
-                        placeholder="לפחות 8 תווים"
+                        placeholder="6 ספרות"
                         autoComplete="new-password"
                         dir="ltr"
                         style={{ textAlign: "right" }}
@@ -496,6 +497,77 @@ export default function Onboarding() {
                         style={{ textAlign: "right" }}
                       />
                     </label>
+                  </div>
+                  <div style={{ display: "grid", gap: "12px" }}>
+                    <label
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "10px",
+                        width: "fit-content",
+                        cursor: "pointer",
+                        fontSize: "13.5px",
+                        fontWeight: "600",
+                        color: "#3D3B3A",
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        className="ob-check"
+                        data-act="onReceiptOther"
+                        data-ev="change"
+                        style={{ margin: "0" }}
+                      />
+                      {"פרטים שונים על הקבלה?"}
+                    </label>
+                    <div
+                      className="ob-two ob-branch is-off"
+                      data-branch="receiptOther"
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns:
+                          "repeat(auto-fit,minmax(205px,1fr))",
+                        gap: "10px 16px",
+                      }}
+                    >
+                      <label style={{ display: "grid", gap: "5px" }}>
+                        <span
+                          style={{
+                            fontSize: "13px",
+                            fontWeight: "600",
+                            color: "#3D3B3A",
+                          }}
+                        >
+                          {"שם על הקבלה"}
+                        </span>
+                        <input
+                          className="ob-input "
+                          data-act="on.receiptName"
+                          data-ev="change"
+                          placeholder="סטודיו נועה בע״מ"
+                        />
+                      </label>
+                      <label style={{ display: "grid", gap: "5px" }}>
+                        <span
+                          style={{
+                            fontSize: "13px",
+                            fontWeight: "600",
+                            color: "#3D3B3A",
+                          }}
+                        >
+                          {"מספר ח.פ"}
+                        </span>
+                        <input
+                          className="ob-input "
+                          inputMode="numeric"
+                          data-act="on.receiptVat"
+                          data-ev="change"
+                          placeholder="9 ספרות"
+                          dir="ltr"
+                          style={{ textAlign: "right" }}
+                        />
+                      </label>
+                    </div>
                   </div>
                   <div style={{ display: "grid", gap: "7px" }}>
                     <span
@@ -879,10 +951,10 @@ export default function Onboarding() {
                           color: "#171616",
                         }}
                       >
-                        {"תמונות ווידאו"}
+                        {"תמונה ראשית למסך הבית"}
                       </span>
                       <span style={{ fontSize: "12.5px", color: "#7A7876" }}>
-                        {"עד 10 תמונות, או וידאו של 15 שניות"}
+                        {"תמונה אחת או וידאו עד 15 שניות"}
                       </span>
                     </div>
                     <label
@@ -910,11 +982,10 @@ export default function Onboarding() {
                         <circle cx="9" cy="10" r="1.6"></circle>
                         <path d="m21 15-4.5-4.5L8 19"></path>
                       </svg>
-                      <span>{"גררו לכאן תמונות או וידאו, או לחצו לבחירה"}</span>
+                      <span>{"גררו לכאן תמונה או וידאו, או לחצו לבחירה"}</span>
                       <input
                         type="file"
                         accept="image/*,video/mp4,video/quicktime"
-                        multiple={true}
                         data-act="onMediaFiles"
                         data-ev="change"
                       />
@@ -925,13 +996,8 @@ export default function Onboarding() {
                       style={{ display: "contents" }}
                     >
                       <div
-                        data-ref="mediaGrid"
-                        style={{
-                          display: "grid",
-                          gridTemplateColumns:
-                            "repeat(auto-fill,minmax(64px,1fr))",
-                          gap: "8px",
-                        }}
+                        data-ref="mediaPreview"
+                        style={{ width: "100%", maxWidth: "240px" }}
                       ></div>
                     </div>
                   </div>

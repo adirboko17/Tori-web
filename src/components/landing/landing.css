@@ -596,6 +596,22 @@
   transform: translate(-50%, -50%);
   pointer-events: none;
   filter: contrast(1.12);
+  opacity: 0;
+}
+.tori-lp .tori-nav-mark video.is-playing {
+  opacity: 1;
+}
+.tori-lp .tori-nav-mark:has(video.is-playing) .tori-nav-mark-still {
+  opacity: 0;
+}
+/* the static mark shows until the video really plays */
+.tori-lp .tori-nav-mark-still {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
 }
 .tori-lp .tori-nav-logo img {
   transition: filter 0.3s;
@@ -1193,44 +1209,110 @@ body {
   filter: drop-shadow(0 0 10px rgba(12, 255, 190, 0.8));
   transform: translateY(-3px) scale(1.06);
 }
+/* ---------- lead form: the onboarding form's field language ---------- */
+.tori-lp .tori-lead {
+  background: #f2fbf7 url("/assets/media/tori-pattern.png") center / 1200px auto
+    repeat;
+}
+.tori-lp .tori-lead-perks {
+  display: grid;
+  gap: 14px;
+  max-width: 34ch;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: start;
+}
+.tori-lp .tori-lead-perks li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.tori-lp .tori-lead-perks strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-900);
+}
+.tori-lp .tori-lead-perks li > span > span {
+  display: block;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-600);
+}
+.tori-lp .tori-lead-dot {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  margin-top: 1px;
+  border-radius: 50%;
+  background: var(--ink-900);
+  color: var(--tori-lime);
+}
+.tori-lp .tori-lead-wa {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 26px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--green-700);
+  transition: color 0.2s;
+}
+.tori-lp .tori-lead-wa:hover {
+  color: var(--ink-900);
+}
+.tori-lp .tori-lead-form-col {
+  min-width: 0;
+  padding: clamp(22px, 3vw, 36px);
+  border-radius: 30px;
+  background: var(--white);
+  box-shadow: 0 40px 100px rgba(23, 22, 22, 0.16);
+}
+.tori-lp .tori-lead-title {
+  margin: 0 0 4px;
+  font-size: clamp(23px, 2.5vw, 31px);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  color: var(--ink-900);
+}
+.tori-lp .tori-lead-sub {
+  margin: 0 0 20px;
+  font-size: 14.5px;
+  color: #7a7876;
+}
+.tori-lp .tori-lead-two {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+}
 .tori-lp .tori-field {
   display: grid;
-  gap: 7px;
+  gap: 5px;
 }
 .tori-lp .tori-field-label {
   font-size: 13px;
   font-weight: 600;
-  color: var(--ink-900);
+  color: #3d3b3a;
 }
-.tori-lp .tori-field-hint {
-  font-size: 12px;
-  color: var(--ink-400);
+.tori-lp .tori-field-label small {
+  font-size: inherit;
+  font-weight: 400;
+  color: #7a7876;
 }
-.tori-lp .tori-field-wrap {
-  position: relative;
-  display: block;
-}
-.tori-lp .tori-field-ico {
-  position: absolute;
-  inset-inline-start: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--ink-400);
-  transition:
-    color 0.2s,
-    filter 0.2s;
-  pointer-events: none;
-}
-.tori-lp .tori-field-wrap input {
+.tori-lp .tori-input {
   width: 100%;
   box-sizing: border-box;
-  min-height: 48px;
-  padding: 0 42px 0 14px;
-  border-radius: 14px;
-  border: 1px solid var(--ink-200);
-  background: var(--ink-50);
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid #e3e3e0;
+  border-radius: 12px;
+  background: var(--white);
   font:
-    400 16px/1 "Google Sans",
+    400 16px/1.4 "Google Sans",
     "Open Sans",
     system-ui,
     sans-serif;
@@ -1238,103 +1320,111 @@ body {
   outline: none;
   transition:
     border-color 0.2s,
-    background 0.2s,
     box-shadow 0.2s;
 }
-.tori-lp .tori-field-wrap input::placeholder {
-  color: var(--ink-400);
+.tori-lp textarea.tori-input {
+  padding: 11px 14px;
+  resize: none;
 }
-.tori-lp .tori-field-wrap input:hover {
-  border-color: var(--ink-300);
+.tori-lp .tori-input::placeholder {
+  color: #a9a7a4;
 }
-.tori-lp .tori-field-wrap input:focus {
-  background: var(--white);
-  border-color: var(--green-400);
-  box-shadow: 0 0 0 4px rgba(12, 255, 190, 0.18);
+.tori-lp .tori-input:focus {
+  border-color: #0cffbe;
+  box-shadow: 0 0 0 3px rgba(12, 255, 190, 0.22);
 }
-.tori-lp .tori-field-wrap:focus-within .tori-field-ico {
-  color: var(--green-600);
-  filter: drop-shadow(0 0 7px rgba(12, 255, 190, 0.6));
-}
-.tori-lp .tori-chip {
+.tori-lp .tori-lead-type {
   position: relative;
   cursor: pointer;
 }
-.tori-lp .tori-chip input {
+.tori-lp .tori-lead-type input {
   position: absolute;
   opacity: 0;
   width: 0;
   height: 0;
 }
-.tori-lp .tori-chip span {
+.tori-lp .tori-lead-type span {
   display: inline-flex;
   align-items: center;
-  min-height: 38px;
-  padding: 0 13px;
-  border-radius: 10px;
-  border: 1px solid var(--ink-200);
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid #e3e3e0;
+  border-radius: 999px;
   background: var(--white);
   font-size: 14px;
   font-weight: 500;
-  color: var(--ink-700);
-  transition: all 0.2s cubic-bezier(0.22, 0.61, 0.36, 1);
+  color: #3d3b3a;
+  white-space: nowrap;
+  transition:
+    background 0.18s,
+    color 0.18s,
+    border-color 0.18s,
+    transform 0.14s;
 }
-.tori-lp .tori-chip:hover span {
-  border-color: var(--green-400);
-  color: var(--ink-900);
+.tori-lp .tori-lead-type:hover span {
+  border-color: var(--ink-900);
 }
-.tori-lp .tori-chip input:checked + span {
-  border-color: var(--green-500);
-  background: var(--green-50);
-  color: var(--green-900);
-  box-shadow:
-    0 0 0 1px var(--green-500),
-    0 6px 18px rgba(12, 255, 190, 0.22);
+.tori-lp .tori-lead-type:active span {
+  transform: scale(0.96);
 }
-.tori-lp .tori-chip input:focus-visible + span {
-  box-shadow: 0 0 0 4px rgba(12, 255, 190, 0.25);
+.tori-lp .tori-lead-type input:checked + span {
+  border-color: var(--ink-900);
+  background: var(--ink-900);
+  color: var(--white);
 }
-.tori-lp .tori-more summary {
+.tori-lp .tori-lead-type input:focus-visible + span {
+  box-shadow: 0 0 0 3px rgba(12, 255, 190, 0.35);
+}
+.tori-lp .tori-lead-cta {
   display: flex;
   align-items: center;
-  gap: 7px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--green-700);
-  padding: 2px 0;
-}
-.tori-lp .tori-more .tori-more-ico {
-  display: inline-flex;
-  transition: transform 0.25s cubic-bezier(0.22, 0.61, 0.36, 1);
-}
-.tori-lp .tori-more[open] .tori-more-ico {
-  transform: rotate(180deg);
-}
-.tori-lp .tori-more textarea {
+  justify-content: center;
+  gap: 12px;
   width: 100%;
-  box-sizing: border-box;
-  margin-top: 10px;
-  padding: 14px 16px;
+  min-height: 54px;
+  margin-top: 4px;
+  padding: 0 22px;
+  border: 0;
   border-radius: 14px;
-  border: 1px solid var(--ink-200);
-  background: var(--ink-50);
+  background: var(--ink-900);
+  color: var(--white);
   font:
-    400 15px/1.55 "Google Sans",
+    600 17px/1 "Google Sans",
     "Open Sans",
     system-ui,
     sans-serif;
-  color: var(--ink-900);
-  outline: none;
-  resize: vertical;
+  cursor: pointer;
   transition:
-    border-color 0.2s,
-    background 0.2s,
-    box-shadow 0.2s;
+    transform 0.16s cubic-bezier(0.34, 1.42, 0.64, 1),
+    box-shadow 0.2s,
+    opacity 0.2s;
 }
-.tori-lp .tori-more textarea:focus {
-  background: var(--white);
-  border-color: var(--green-400);
-  box-shadow: 0 0 0 4px rgba(12, 255, 190, 0.18);
+.tori-lp .tori-lead-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(23, 22, 22, 0.22);
+}
+.tori-lp .tori-lead-cta:active {
+  transform: scale(0.97);
+}
+.tori-lp .tori-lead-cta:disabled {
+  opacity: 0.45;
+  cursor: wait;
+  transform: none;
+  box-shadow: none;
+}
+.tori-lp .tori-lead-cta-ico {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--tori-lime);
+  color: var(--ink-900);
+}
+.tori-lp .tori-lead-note {
+  font-size: 12px;
+  color: var(--ink-400);
+  text-align: center;
 }
 .tori-lp .tori-feats {
   display: grid;
@@ -1650,21 +1740,6 @@ body {
 }
 .tori-lp .ths8:hover {
   box-shadow: var(--shadow-md);
-}
-.tori-lp .ths9:hover {
-  color: var(--green-800);
-}
-.tori-lp .ths10:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-brand-lg);
-}
-.tori-lp .ths10:disabled {
-  opacity: 0.7;
-  cursor: wait;
-  transform: none;
-}
-.tori-lp .ths11:active {
-  transform: scale(0.98);
 }
 .tori-lp .ths12:hover {
   color: var(--ink-900);

@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useRef } from "react";
+import { watchMarkVideo } from "@/lib/mark-video";
 
 const NAV_ITEMS = [
   { id: "pain", label: "למה תורי", hint: "הכאב שאנחנו פותרים" },
@@ -68,6 +69,9 @@ function useLensSize() {
 
 export default function ToriNavSection() {
   const { glassRef, lensRef } = useLensSize();
+  const markVideoRef = useRef(null);
+  // the animated mark shows only where its transparency really renders
+  useEffect(() => watchMarkVideo(markVideoRef.current), []);
   return (
     <header
       className="tori-nav"
@@ -153,7 +157,9 @@ export default function ToriNavSection() {
           }}
         >
           <span className="tori-nav-mark">
+            <img className="tori-nav-mark-still" src="/assets/brand/tori-mark.png" alt="" />
             <video
+              ref={markVideoRef}
               muted={true}
               loop={true}
               playsInline={true}

@@ -2,6 +2,7 @@ import { createDomScope } from "@/lib/dom-scope";
 import { phoneSchema, priceSummary, serviceSchema } from "@/lib/booking";
 import { submitBusinessOnboarding } from "@/lib/business-onboarding";
 import { missingPaymentFields } from "@/lib/onboarding-payment";
+import { watchMarkVideo } from "@/lib/mark-video";
 export function initializeOnboarding(root) {
   const scope = createDomScope();
   const setTimeout = scope.timeout;
@@ -21,6 +22,9 @@ export function initializeOnboarding(root) {
     acts(name).forEach((el) =>
       listen(el, el.getAttribute("data-ev") || "click", fn),
     );
+
+  // the animated mark shows only where its transparency really renders
+  scope.cleanup(watchMarkVideo(ref("markVideoRef")));
 
   const FREE_SMS = 1000;
   const LAST_STEP = 5;
@@ -56,6 +60,8 @@ export function initializeOnboarding(root) {
     adminPassword: "סיסמת מנהל",
     address: "כתובת",
     idNumber: "תעודת זהות",
+    receiptName: "שם על הקבלה",
+    receiptVat: "מספר ח.פ",
     cardName: "שם בעל הכרטיס",
     cardNumber: "מספר כרטיס",
     cardExp: "תוקף",
@@ -73,7 +79,8 @@ export function initializeOnboarding(root) {
     savedId: "",
     submitting: false,
     pal: 0,
-    media: [],
+    media: null,
+    receiptOther: false,
     services: [
       { name: "", duration: "", price: "" },
       { name: "", duration: "", price: "" },
@@ -92,6 +99,7 @@ export function initializeOnboarding(root) {
         if (
           k !== "adminPassword" &&
           k !== "idNumber" &&
+          k !== "receiptVat" &&
           k.slice(0, 4) !== "card"
         )
           safe[k] = st.f[k];
@@ -106,6 +114,7 @@ export function initializeOnboarding(root) {
           lang: st.lang,
           logoMode: st.logoMode,
           customColor: st.customColor,
+          receiptOther: st.receiptOther,
           savedId: st.savedId || "",
         }),
       );
@@ -131,6 +140,7 @@ export function initializeOnboarding(root) {
         ? saved.customColor
         : "";
       st.savedId = typeof saved.savedId === "string" ? saved.savedId : "";
+      st.receiptOther = saved.receiptOther === true;
       const savedStep = Math.min(6, Math.max(1, saved.step || 1));
       st.step =
         "pkg" in saved && savedStep >= 5
@@ -158,7 +168,9 @@ export function initializeOnboarding(root) {
         .slice(0, 26);
     if (k === "appNameEn")
       return v.replace(/[^A-Za-z0-9 .'-]/g, "").slice(0, 28);
-    if (k === "idNumber") return v.replace(/\D/g, "").slice(0, 9);
+    if (k === "idNumber" || k === "receiptVat")
+      return v.replace(/\D/g, "").slice(0, 9);
+    if (k === "adminPassword") return v.replace(/\D/g, "").slice(0, 6);
     return v;
   }
   Object.keys(LABELS)
@@ -222,7 +234,10 @@ export function initializeOnboarding(root) {
     );
   }
   function validate() {
-    const need = REQUIRED[st.step];
+    const need =
+      st.step === 1 && st.receiptOther
+        ? REQUIRED[1].concat(["receiptName", "receiptVat"])
+        : REQUIRED[st.step];
     if (need) {
       const missing = need.filter((k) => !(st.f[k] || "").trim());
       missing.forEach((k) =>
@@ -244,8 +259,12 @@ export function initializeOnboarding(root) {
       showError("צריך להזין מספר נייד ישראלי תקין.");
       return false;
     }
-    if (st.step === 1 && (st.f.adminPassword || "").length < 8) {
-      showError("הסיסמה צריכה לכלול לפחות 8 תווים.");
+    if (st.step === 1 && !/^\d{6}$/.test(st.f.adminPassword || "")) {
+      showError("הסיסמה צריכה להיות 6 ספרות.");
+      return false;
+    }
+    if (st.step === 1 && st.receiptOther && st.f.receiptVat.length !== 9) {
+      showError("מספר ח.פ צריך להכיל 9 ספרות.");
       return false;
     }
     if (st.step === 3) {
@@ -377,10 +396,10 @@ export function initializeOnboarding(root) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           businessId: result.id,
-          customerName: st.f.fullName,
+          customerName: st.receiptOther ? st.f.receiptName : st.f.fullName,
           phone: st.f.phone,
           email: st.f.email,
-          vatNumber: st.f.idNumber,
+          vatNumber: st.receiptOther ? st.f.receiptVat : st.f.idNumber,
         }),
       });
       const data = await checkout.json().catch(() => ({}));
@@ -504,47 +523,78 @@ export function initializeOnboarding(root) {
     persist();
   });
 
-  /* ---------- media ---------- */
-  function paintMedia() {
-    const wrap = $('[data-branch="hasMedia"]', root);
-    const grid = ref("mediaGrid");
-    if (wrap) wrap.classList.toggle("is-off", st.media.length === 0);
-    if (!grid) return;
-    grid.innerHTML = st.media
-      .map(
-        (m, i) =>
-          '<div style="position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:#EEEEEB">' +
-          (m.type === "image"
-            ? '<img src="' +
-              m.url +
-              '" alt="" style="width:100%;height:100%;object-fit:cover;display:block">'
-            : '<video src="' +
-              m.url +
-              '" muted style="width:100%;height:100%;object-fit:cover;display:block"></video>') +
-          '<button type="button" data-rm="' +
-          i +
-          '" aria-label="הסרה" style="position:absolute;top:4px;inset-inline-start:4px;width:22px;height:22px;border-radius:50%;border:0;background:rgba(23,22,22,.75);color:#fff;display:grid;place-items:center;cursor:pointer"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button></div>',
-      )
-      .join("");
-    $$("[data-rm]", grid).forEach((b) =>
-      listen(b, "click", () => {
-        const i = Number(b.getAttribute("data-rm"));
-        URL.revokeObjectURL(st.media[i].url);
-        st.media.splice(i, 1);
-        paintMedia();
-      }),
+  /* ---------- receipt in another name ---------- */
+  function paintReceipt() {
+    acts("onReceiptOther").forEach((box) => (box.checked = st.receiptOther));
+    $('[data-branch="receiptOther"]', root).classList.toggle(
+      "is-off",
+      !st.receiptOther,
     );
   }
-  on("onMediaFiles", (e) => {
-    const files = Array.prototype.slice.call(e.target.files || []);
-    files.forEach((f) => {
-      if (st.media.length >= 10) return;
-      st.media.push({
-        url: URL.createObjectURL(f),
-        type: f.type.indexOf("video") === 0 ? "video" : "image",
-      });
-    });
+  on("onReceiptOther", (e) => {
+    st.receiptOther = e.target.checked;
+    paintReceipt();
+    persist();
+  });
+
+  /* ---------- media: one home-screen image, or a video up to 15s ---------- */
+  const MAX_VIDEO_SECONDS = 15;
+  function paintMedia() {
+    const wrap = $('[data-branch="hasMedia"]', root);
+    const box = ref("mediaPreview");
+    if (wrap) wrap.classList.toggle("is-off", !st.media);
+    if (!box) return;
+    const m = st.media;
+    box.innerHTML = !m
+      ? ""
+      : '<div style="position:relative;aspect-ratio:16/10;border-radius:12px;overflow:hidden;background:#EEEEEB">' +
+        (m.type === "image"
+          ? '<img src="' +
+            m.url +
+            '" alt="" style="width:100%;height:100%;object-fit:cover;display:block">'
+          : '<video src="' +
+            m.url +
+            '" muted autoplay loop playsinline style="width:100%;height:100%;object-fit:cover;display:block"></video>') +
+        '<button type="button" data-rm aria-label="הסרה" style="position:absolute;top:6px;inset-inline-start:6px;width:24px;height:24px;border-radius:50%;border:0;background:rgba(23,22,22,.75);color:#fff;display:grid;place-items:center;cursor:pointer"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button></div>';
+    const rm = $("[data-rm]", box);
+    if (rm) listen(rm, "click", () => setMedia(null));
+  }
+  function setMedia(item) {
+    if (st.media) URL.revokeObjectURL(st.media.url);
+    st.media = item;
     paintMedia();
+  }
+  /** Resolves a video's length in seconds, or NaN when it can't be read. */
+  function videoSeconds(url) {
+    return new Promise((resolve) => {
+      const v = document.createElement("video");
+      v.preload = "metadata";
+      v.onloadedmetadata = () => resolve(v.duration);
+      v.onerror = () => resolve(NaN);
+      v.src = url;
+    });
+  }
+  on("onMediaFiles", async (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const isVideo = file.type.indexOf("video") === 0;
+    if (isVideo) {
+      const seconds = await videoSeconds(url);
+      const error = Number.isNaN(seconds)
+        ? "לא הצלחנו לקרוא את הווידאו. נסו קובץ MP4."
+        : Math.round(seconds) > MAX_VIDEO_SECONDS
+          ? "הווידאו ארוך מ־15 שניות. בחרו סרטון קצר יותר."
+          : "";
+      if (error) {
+        URL.revokeObjectURL(url);
+        showError(error);
+        return;
+      }
+    }
+    showError("");
+    setMedia({ url, type: isVideo ? "video" : "image" });
   });
 
   /* ---------- services ---------- */
@@ -664,13 +714,14 @@ export function initializeOnboarding(root) {
   paintServices();
   paintLogo();
   paintMedia();
+  paintReceipt();
   paintSteps();
   const colorInput = acts("onCustomColor")[0];
   if (colorInput && st.customColor) colorInput.value = st.customColor;
   ref("errorLine")?.setAttribute("role", "alert");
   scope.cleanup(() => {
     if (st.logoUrl) URL.revokeObjectURL(st.logoUrl);
-    st.media.forEach((item) => URL.revokeObjectURL(item.url));
+    if (st.media) URL.revokeObjectURL(st.media.url);
   });
   return () => scope.dispose();
 }

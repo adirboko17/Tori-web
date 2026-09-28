@@ -86,7 +86,6 @@
     line-height: 1.6 !important;
   }
   .tori-lp .tori-badge,
-  .tori-lp .tori-chip,
   .tori-lp .tori-feat-num,
   .tori-lp .tori-step-num,
   .tori-lp .tori-vs-badge {
@@ -182,9 +181,6 @@
   .tori-lp a,
   .tori-lp button {
     -webkit-tap-highlight-color: rgba(191, 255, 81, 0.28);
-  }
-  .tori-lp .tori-more {
-    min-height: 44px !important;
   }
   .tori-lp .tori-q {
     min-height: 56px !important;
@@ -308,6 +304,9 @@
   /* the section already owns the gutter; the grid adding its own doubled it */
   .tori-lp .tori-lead-grid {
     padding: 0 !important;
+  }
+  .tori-lp .tori-lead-perks {
+    margin-inline: auto !important;
   }
   .tori-lp .tori-cap-head {
     justify-items: center;
