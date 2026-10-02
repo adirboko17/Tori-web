@@ -18,11 +18,10 @@ export default async function SubscribeSuccessPage() {
       />
       <h1>הוראת הקבע נקלטה</h1>
       <p>
-        {`החיוב החודשי של ${monthlyPrice} ₪ + מע״מ נקלט. נחזור אליכם תוך 72 שעות להשלמת`}
-        ההקמה. אפשר להתנתק מתי שרוצים.
+        {`החיוב החודשי של ${monthlyPrice} ₪ + מע״מ נקלט. באזור האישי מתחברים עם הנייד שאיתו שילמתם, ומקבלים קוד ב-SMS.`}
       </p>
-      <Link className="tori-btn tori-btn--secondary" href="/dashboard">
-        לממשק הניהול
+      <Link className="tori-btn tori-btn--secondary" href="/account">
+        לאזור האישי
       </Link>
       <Link className="tori-btn tori-btn--ghost" href="/">
         לדף הבית

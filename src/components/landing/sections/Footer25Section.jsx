@@ -39,6 +39,9 @@ export default function Footer25Section() {
             fontSize: "14px",
           }}
         >
+          <a href="/account" style={{ color: "var(--ink-600)" }}>
+            {"אזור אישי"}
+          </a>
           <a className="ths12" href="/terms" style={{ color: "var(--ink-600)" }}>
             {"תנאי שימוש"}
           </a>

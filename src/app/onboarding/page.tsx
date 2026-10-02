@@ -1,8 +1,5 @@
-import type { Metadata } from "next";
-import Onboarding from "@/components/onboarding/Onboarding";
-import "@/components/onboarding/onboarding.css";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "הרשמה והקמת האפליקציה" };
 export default function OnboardingPage() {
-  return <Onboarding />;
+  redirect("/account");
 }

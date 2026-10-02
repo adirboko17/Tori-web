@@ -1,3 +1,4 @@
+import { markAccountPaid } from "@/lib/account/store";
 import { loadMonthlyPriceIls } from "@/lib/admin/catalog";
 import { savePayplusSubscription } from "@/lib/admin/payplus-subscriptions";
 import { priceSummary } from "@/lib/booking";
@@ -60,6 +61,7 @@ export async function fulfillPaidSubscription(input: {
   if (!amountsMatch(input.amount, subscriptionChargeIls(await loadMonthlyPriceIls()))) {
     return { ok: false as const, message: "סכום התשלום אינו תואם למנוי." };
   }
+  await markAccountPaid(input.businessId);
   if (input.recurringUid) {
     try {
       await savePayplusSubscription({

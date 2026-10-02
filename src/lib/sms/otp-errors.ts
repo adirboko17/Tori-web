@@ -1,5 +1,6 @@
 export const OTP_ERROR_MESSAGES: Record<string, string> = {
   phone_not_registered: "המספר לא רשום במערכת.",
+  phone_registered: "המספר כבר רשום.",
   invalid_phone: "מספר הטלפון אינו תקין.",
   rate_limit_sends: "נשלחו יותר מדי קודים. נסו שוב בעוד כמה דקות.",
   sms_send_failed: "שליחת ה-SMS נכשלה. נסו שוב.",

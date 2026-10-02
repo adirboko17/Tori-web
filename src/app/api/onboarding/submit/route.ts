@@ -1,3 +1,4 @@
+import { upsertSignupAccount } from "@/lib/account/store";
 import { getSupabaseUrl } from "@/lib/sms/env";
 import { jsonError, jsonOk, readJsonBody } from "@/lib/sms/http";
 
@@ -125,6 +126,22 @@ export async function POST(request: Request) {
   if (!response.ok || !data?.ok) {
     console.error("onboarding-webhook failed", response.status, data?.error || "unknown");
     return jsonError("לא הצלחנו לשלוח את הפרטים. נסו שוב.", 502);
+  }
+
+  const savedBusinessId = data.businessId || id;
+  try {
+    await upsertSignupAccount({
+      businessId: savedBusinessId,
+      fullName: managerName,
+      phone,
+      businessName: businessNameHe,
+      email: optionalText(business.email, 200),
+      appNameEn,
+      address: text(business.address, 800),
+      brandColor: text(business.brand_color, 20),
+    });
+  } catch (error) {
+    console.error("customer account save failed", error);
   }
 
   return jsonOk({

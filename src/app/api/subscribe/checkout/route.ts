@@ -1,3 +1,4 @@
+import { rememberCheckoutDetails } from "@/lib/account/store";
 import { phoneSchema } from "@/lib/booking";
 import {
   CONFIG_ERRORS,
@@ -41,7 +42,7 @@ export async function POST(request: Request) {
   }
 
   const email = trimField(body.email).toLowerCase();
-  if (!EMAIL_RE.test(email)) {
+  if (email && !EMAIL_RE.test(email)) {
     return jsonError("צריך להזין אימייל תקין.");
   }
 
@@ -52,6 +53,17 @@ export async function POST(request: Request) {
       await markSubscriptionCheckoutStarted(businessId);
     } catch (error) {
       console.error("subscription status update skipped", error);
+    }
+    try {
+      await rememberCheckoutDetails({
+        businessId,
+        fullName: customerName,
+        phone: phoneParsed.data,
+        email,
+        idNumber: vatNumber,
+      });
+    } catch (error) {
+      console.error("checkout account update skipped", error);
     }
 
     const link = await generatePayplusSubscriptionLink({
