@@ -74,7 +74,11 @@ function Island({ staff }) {
 function Logo({ logo }) {
   if (logo.text) {
     return (
-      <span className="ha-logo ha-logo-text" style={{ fontFamily: logo.font }}>
+      <span
+        className="ha-logo ha-logo-text"
+        dir="ltr"
+        style={{ fontFamily: logo.font, fontWeight: logo.weight }}
+      >
         {logo.text}
       </span>
     );

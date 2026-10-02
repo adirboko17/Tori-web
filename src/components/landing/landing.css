@@ -569,25 +569,6 @@
 .tori-lp .tori-nav.is-scrolled .tori-nav-word {
   animation: tori-logo-bump 0.62s cubic-bezier(0.34, 1.42, 0.64, 1) both;
 }
-.tori-lp .tori-hero-mark {
-  position: relative;
-  display: inline-block;
-  overflow: visible;
-  width: 0.92em;
-  height: 0.92em;
-  vertical-align: -0.14em;
-  margin: 0 0.06em;
-}
-.tori-lp .tori-hero-mark img {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 1.14em;
-  height: 1.14em;
-  max-width: none;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
 .tori-lp .tori-nav-mark video {
   position: absolute;
   left: 50%;
@@ -1754,4 +1735,107 @@ body {
 }
 .tori-lp .ths17:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+
+/* store names carry their real marks wherever they're mentioned */
+.tori-lp .tori-store {
+  white-space: nowrap;
+}
+.tori-lp .tori-store svg {
+  display: inline-block;
+  width: 1.05em;
+  height: 1.05em;
+  margin-inline-end: 0.26em;
+  vertical-align: -0.14em;
+}
+
+/* ---------- hero: Tori in 3D ---------- */
+.tori-lp .tori-hero3d {
+  flex: 1.15 1 420px;
+  min-width: 0;
+  display: grid;
+  justify-items: center;
+}
+.tori-lp .tori-hero3d-box {
+  position: relative;
+  width: min(100%, 620px);
+  aspect-ratio: 1;
+  margin: -56px 0 -64px;
+  animation: tori-hero3d-in 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+.tori-lp .tori-hero3d-glow {
+  position: absolute;
+  inset: 18%;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgba(12, 255, 190, 0.5),
+    rgba(191, 255, 81, 0.32) 60%,
+    rgba(191, 255, 81, 0) 100%
+  );
+  filter: blur(50px);
+  pointer-events: none;
+}
+@keyframes tori-hero3d-in {
+  from {
+    opacity: 0;
+  }
+}
+/* on a phone Tori stands alone, above the headline */
+@media (max-width: 560px) {
+  .tori-lp .tori-hero3d {
+    order: -1;
+  }
+  .tori-lp .tori-hero3d-box {
+    width: min(64vw, 250px);
+    margin: -14px auto -22px;
+  }
+  .tori-lp .tori-hero3d-glow {
+    inset: 8%;
+  }
+}
+
+/* ---------- chat launcher: Tori in 3D with a typing bubble ---------- */
+.tori-lp .tori-chat-fab.is-3d {
+  width: 88px;
+  height: 88px;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  animation: none;
+  transition:
+    transform 0.3s cubic-bezier(0.34, 1.42, 0.64, 1),
+    background 0.2s;
+}
+.tori-lp .tori-chat-fab.is-3d::before {
+  inset: 30% 14% 4%;
+  background: radial-gradient(
+    closest-side,
+    rgba(12, 255, 190, 0.6),
+    rgba(191, 255, 81, 0.28) 62%,
+    rgba(191, 255, 81, 0) 100%
+  );
+  filter: blur(6px);
+}
+.tori-lp .tori-chat-3d {
+  inset: -6px;
+  pointer-events: none;
+  transition:
+    opacity 0.2s,
+    transform 0.35s cubic-bezier(0.34, 1.42, 0.64, 1);
+}
+.tori-lp .tori-chat.is-open .tori-chat-fab.is-3d {
+  border: 1.5px solid rgba(23, 22, 22, 0.55);
+  background: linear-gradient(135deg, #bfff51, #6bff85, #0cffbe);
+  transform: scale(0.74);
+}
+.tori-lp .tori-chat.is-open .tori-chat-3d {
+  opacity: 0;
+  transform: scale(0.4) rotate(40deg);
+}
+@media (max-width: 560px) {
+  .tori-lp .tori-chat-fab.is-3d {
+    width: 74px !important;
+    height: 74px !important;
+  }
 }

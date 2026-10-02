@@ -1,0 +1,42 @@
+.tori3d {
+  position: absolute;
+  inset: 0;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: pan-y;
+}
+/* the box takes the clicks; the canvas never does, so where it bleeds over
+   text and buttons, those stay clickable */
+.tori3d-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none;
+}
+.tori3d-fallback {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(34%, 190px);
+  transform: translate(-50%, -50%);
+  animation: tori3d-float 5s ease-in-out infinite;
+}
+@keyframes tori3d-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -10px;
+  }
+}
+
+/* the hero canvas bleeds past its box, so a feature that swells on hover or
+   drifts outward is never cut by an edge */
+@media (min-width: 561px) {
+  .tori3d.is-features .tori3d-canvas {
+    inset: -16%;
+    width: 132% !important;
+    height: 132% !important;
+  }
+}

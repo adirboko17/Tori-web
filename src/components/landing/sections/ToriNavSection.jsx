@@ -232,7 +232,7 @@ export default function ToriNavSection() {
             className="tori-nav-cta-short"
             style={{ display: "none", position: "relative", fontSize: "15px" }}
           >
-            {"לפרטים"}
+            {"הצטרפו לתורי"}
           </span>
           <span
             className="tori-nav-cta-arrow"

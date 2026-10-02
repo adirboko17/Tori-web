@@ -1,3 +1,4 @@
+import { Store } from "../StoreLogos";
 export default function ProcessSection() {
   return (
     <section
@@ -197,7 +198,10 @@ export default function ProcessSection() {
                 maxWidth: "30ch",
               }}
             >
-              {"האפליקציה אצלך בטלפון - מ־App Store ומ־Google Play."}
+              {"האפליקציה אצלך בטלפון -"}
+              <Store name="apple" prefix="מ־" />
+              <Store name="google" prefix="ומ־" />
+              {"."}
             </p>
           </a>
           <a href="#lead-form" className="tori-step" data-reveal="2">

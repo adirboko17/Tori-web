@@ -1,23 +1,23 @@
+import { Store } from "../StoreLogos";
 import HomeScreen from "../app-screens/HomeScreen";
-import ProfileScreen from "../app-screens/ProfileScreen";
-import CalendarScreen from "../app-screens/CalendarScreen";
 
 const PINK = { a: "#ff9fd2", b: "#ff4fa3", deep: "#cf2a7d", ink: "#3b0a24" };
 const PURPLE = { a: "#cdb2ff", b: "#8b5cf6", deep: "#6d28d9", ink: "#1e0b3d" };
 const ORANGE = { a: "#ffc56b", b: "#ff9f1a", deep: "#c46a00", ink: "#3a2100" };
 
+// a name shown in place of a logo is always Latin: the app can't draw a Hebrew one
 const NAMES = [
-  { text: "ליאת ציפורניים", font: "var(--font-tenant-round)", color: PINK.b },
-  { text: "סטודיו נועה", font: "var(--font-tenant-heavy)", color: PURPLE.b },
-  { text: "שיר ביוטי", font: "var(--font-tenant-bold)", color: ORANGE.deep },
+  { text: "Liat Nails", font: "'Varela Round', sans-serif", color: PINK.b },
+  { text: "STUDIO NOA", font: "'Rubik', sans-serif", weight: 800, color: PURPLE.b },
+  { text: "Shir Beauty", font: "'Google Sans', sans-serif", weight: 700, color: ORANGE.deep },
 ];
 const SWATCHES = [PINK.b, PURPLE.b, ORANGE.b, "#0cffbe", "#0ea5e9"];
 const STRIP = ["work-1.jpg", "work-4.jpg", "work-2.jpg", "work-5.jpg", "work-3.jpg", "work-6.jpg"];
 const TEAM = ["נ", "ה", "ע", "ט", "ג"];
 const ICONS = [
-  { letter: "ל", bg: PINK.b },
-  { letter: "נ", bg: PURPLE.b },
-  { letter: "ש", bg: ORANGE.b },
+  { letter: "L", bg: PINK.b },
+  { letter: "N", bg: PURPLE.b },
+  { letter: "S", bg: ORANGE.b },
 ];
 
 function Phone({ tilt, glow, children }) {
@@ -33,13 +33,17 @@ function NameCard() {
     <li className="tori-bento is-wide">
       <div className="tori-bento-art tori-bento-names" aria-hidden="true">
         {NAMES.map((n, i) => (
-          <span key={n.text} style={{ fontFamily: n.font, color: n.color, "--k": i }}>
+          <span
+            key={n.text}
+            dir="ltr"
+            style={{ fontFamily: n.font, fontWeight: n.weight, color: n.color, "--k": i }}
+          >
             {n.text}
           </span>
         ))}
       </div>
       <b>השם והלוגו שלכם</b>
-      <small>בראש האפליקציה, בפונט שבחרתם או בלוגו שלכם</small>
+      <small>בראש האפליקציה: הלוגו שלכם, או השם באנגלית בפונט שבחרתם</small>
     </li>
   );
 }
@@ -105,12 +109,20 @@ function StoreCard() {
           ))}
         </span>
         <span className="tori-bento-stores">
-          <small>App Store</small>
-          <small>Google Play</small>
+          <small>
+            <Store name="apple" />
+          </small>
+          <small>
+            <Store name="google" />
+          </small>
         </span>
       </div>
       <b>בחנויות, בשם שלכם</b>
-      <small>אייקון ושם משלכם ב-App Store וב-Google Play</small>
+      <small>
+        {"אייקון ושם משלכם"}
+        <Store name="apple" prefix="ב־" />
+        <Store name="google" prefix="וב־" />
+      </small>
     </li>
   );
 }
@@ -132,14 +144,22 @@ export default function BrandSection() {
             }
           </p>
         </div>
+        {/* the same home screen, three businesses: only the brand changes */}
         <div className="tori-brand-row">
           <Phone tilt="-5deg" glow={PINK.b}>
-            <ProfileScreen theme={PINK} user="נועה כהן" phone="0528419930" />
+            <HomeScreen
+              theme={PINK}
+              logo={{ text: "Liat Nails", font: "'Varela Round', sans-serif" }}
+              photos={["work-2.jpg", "work-6.jpg", "work-4.jpg", "work-1.jpg", "work-3.jpg", "work-5.jpg"]}
+              staff={["ליאת", "רוני", "דנה", "אור", "מאי", "חן"]}
+              user="נועה"
+              delay={2}
+            />
           </Phone>
           <Phone tilt="0deg" glow={PURPLE.b}>
             <HomeScreen
               theme={PURPLE}
-              logo={{ text: "סטודיו נועה", font: "var(--font-tenant-heavy)" }}
+              logo={{ text: "STUDIO NOA", font: "'Rubik', sans-serif", weight: 800 }}
               photos={["work-5.jpg", "work-3.jpg", "work-1.jpg", "work-6.jpg", "work-4.jpg", "work-2.jpg"]}
               staff={["נועה", "הילה", "ענבר", "טל", "גלי", "עדי"]}
               user="מיכל"
@@ -147,7 +167,14 @@ export default function BrandSection() {
             />
           </Phone>
           <Phone tilt="5deg" glow={ORANGE.b}>
-            <CalendarScreen theme={ORANGE} staff="שיר לוי" service="לק ג׳ל" price="180" delay={2} />
+            <HomeScreen
+              theme={ORANGE}
+              logo={{ text: "Shir Beauty", font: "'Google Sans', sans-serif", weight: 700 }}
+              photos={["work-3.jpg", "work-1.jpg", "work-6.jpg", "work-2.jpg", "work-5.jpg", "work-4.jpg"]}
+              staff={["שיר", "יובל", "ליה", "עמית", "רז", "תמר"]}
+              user="יעל"
+              delay={0}
+            />
           </Phone>
         </div>
         <ul className="tori-bento-grid">

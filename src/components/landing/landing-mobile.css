@@ -342,3 +342,27 @@
     padding-top: 96px !important;
   }
 }
+
+/* ---------- floating buttons: in after a short scroll (see onNavScroll) ---------- */
+@media (max-width: 560px) {
+  .tori-lp .tori-a11y,
+  .tori-lp .tori-chat {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(28px) scale(0.8);
+    transition:
+      opacity 0.3s,
+      transform 0.55s cubic-bezier(0.34, 1.42, 0.64, 1),
+      visibility 0.55s;
+  }
+  .tori-lp .tori-a11y.is-visible,
+  .tori-lp .tori-chat.is-visible {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+  }
+  /* the accessibility button follows the chat in, a beat later */
+  .tori-lp .tori-a11y.is-visible {
+    transition-delay: 0.08s;
+  }
+}

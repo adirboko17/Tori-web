@@ -1,3 +1,4 @@
+import { Store } from "../StoreLogos";
 export default function CompareSection() {
   return (
     <section
@@ -70,7 +71,9 @@ export default function CompareSection() {
                 </span>
                 <span className="tori-vs-text">
                   <span className="tori-vs-feat">
-                    {"אפליקציה ממותגת שלכם ב-App Store ובגוגל פליי"}
+                    {"אפליקציה ממותגת שלכם"}
+                    <Store name="apple" prefix="ב־" />
+                    <Store name="google" prefix="וב־" />
                   </span>
                   <span className="tori-vs-note">
                     {"הלקוחות מורידים אפליקציה בשם שלכם"}
@@ -307,7 +310,9 @@ export default function CompareSection() {
                 </span>
                 <span className="tori-vs-text">
                   <span className="tori-vs-feat">
-                    {"אפליקציה ממותגת שלכם ב-App Store ובגוגל פליי"}
+                    {"אפליקציה ממותגת שלכם"}
+                    <Store name="apple" prefix="ב־" />
+                    <Store name="google" prefix="וב־" />
                   </span>
                   <span className="tori-vs-note">
                     {"הזמנה דרך קישור או עמוד עסקי"}

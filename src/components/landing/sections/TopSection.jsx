@@ -1,4 +1,5 @@
-import HomeScreen from "../app-screens/HomeScreen";
+import { Store } from "../StoreLogos";
+import { Tori3D } from "@/components/tori3d/Tori3D";
 
 export default function TopSection() {
   return (
@@ -37,15 +38,6 @@ export default function TopSection() {
             <span className="tori-line">
               <span style={{ "--i": "0" }}>
                 {"היי, אני "}
-                <span className="tori-hero-mark">
-                  <img
-                    src="/assets/brand/tori-mark-inline.png"
-                    alt=""
-                    aria-hidden="true"
-                    decoding="async"
-                  />
-                </span>
-                {" "}
                 <span className="tori-word">{"תורי."}</span>
               </span>
             </span>
@@ -65,9 +57,10 @@ export default function TopSection() {
               margin: "24px 0 26px",
             }}
           >
-            {
-              "אפליקציה ממותגת אישית לעסק שלך  ב־App Store וב־Google Play תוך 72 שעות. "
-            }
+            {"אפליקציה ממותגת אישית לעסק שלך"}
+            <Store name="apple" prefix="ב־" />
+            <Store name="google" prefix="וב־" />
+            {" תוך 72 שעות."}
           </p>
           <div
             style={{
@@ -175,85 +168,11 @@ export default function TopSection() {
             </a>
           </div>
         </div>
-        <div
-          className="tori-stage"
-          style={{
-            flex: "1 1 360px",
-            minWidth: "0",
-            display: "grid",
-            justifyItems: "center",
-          }}
-        >
-          <div
-            style={{
-              position: "relative",
-              width: "min(100%,470px)",
-              padding: "76px 0 70px",
-            }}
-          >
-            <span
-              style={{
-                position: "absolute",
-                insetInlineStart: "6%",
-                top: "0",
-                width: "7px",
-                height: "7px",
-                borderRadius: "50%",
-                background: "var(--lime-500)",
-                opacity: ".8",
-                pointerEvents: "none",
-              }}
-            ></span>
-            <span
-              style={{
-                position: "absolute",
-                insetInlineEnd: "34%",
-                bottom: "2px",
-                width: "5px",
-                height: "5px",
-                borderRadius: "50%",
-                background: "var(--green-400)",
-                pointerEvents: "none",
-              }}
-            ></span>
-            <span
-              style={{
-                position: "absolute",
-                inset: "12% 14%",
-                borderRadius: "50%",
-                background:
-                  "radial-gradient(closest-side,rgba(12,255,190,.55),rgba(191,255,81,.34) 60%,rgba(191,255,81,0) 100%)",
-                filter: "blur(48px)",
-                zIndex: "1",
-                pointerEvents: "none",
-              }}
-            ></span>
-            <div
-              className="tori-hero-phone"
-              style={{
-                position: "relative",
-                zIndex: "3",
-                width: "268px",
-                margin: "0 auto",
-                transform: "scale(1.2) rotate(-4deg)",
-                transformOrigin: "50% 50%",
-              }}
-            >
-              <div
-                className="tori-device"
-                style={{
-                  position: "relative",
-                  width: "268px",
-                  background: "var(--ink-900)",
-                  borderRadius: "42px",
-                  padding: "9px",
-                  boxShadow:
-                    "0 36px 80px rgba(23,22,22,.28),0 0 0 1px rgba(255,255,255,.08) inset",
-                }}
-              >
-                <HomeScreen />
-              </div>
-            </div>
+        {/* Tori in 3D, the app's features floating around him */}
+        <div className="tori-stage tori-hero3d">
+          <div className="tori-hero3d-box">
+            <div className="tori-hero3d-glow" aria-hidden="true" />
+            <Tori3D cast="features" afterLoader />
           </div>
         </div>
       </div>

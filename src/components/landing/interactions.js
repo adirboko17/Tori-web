@@ -53,10 +53,16 @@ export function initializeLanding(root) {
     requestAnimationFrame(tick);
   })();
 
+  // the hero's 3D Tori builds under the loader and makes its entrance on this
+  function announceLoaderDone() {
+    window.__toriLoaderDone = true;
+    window.dispatchEvent(new Event("tori:loader-done"));
+  }
   function dismissLoader() {
     if (loaderDone) return;
     paintProgress(100);
     loaderDone = true;
+    announceLoaderDone();
     loaderPlayed = true;
     try {
       sessionStorage.setItem("tori-lp-loader", "1");
@@ -68,7 +74,10 @@ export function initializeLanding(root) {
   }
   on("skipLoader", dismissLoader);
   (function startLoader() {
-    if (!loader) return;
+    if (!loader) {
+      announceLoaderDone();
+      return;
+    }
     const v = ref("loaderVideoRef") || loader.querySelector("video");
     let seen = loaderPlayed;
     try {
@@ -77,6 +86,7 @@ export function initializeLanding(root) {
     if (reduce || seen) {
       loader.style.display = "none";
       loaderDone = true;
+      announceLoaderDone();
       return;
     }
     document.body.style.overflow = "hidden";
@@ -139,7 +149,7 @@ export function initializeLanding(root) {
       v.defaultMuted = true;
       v.volume = 0;
     });
-    $$(".tori-nav-mark video,.tori-hero-mark video", root).forEach((v) => {
+    $$(".tori-nav-mark video", root).forEach((v) => {
       v.loop = true;
       v.playsInline = true;
       const p = v.play();
@@ -337,13 +347,24 @@ export function initializeLanding(root) {
   /* looked up on every call: the nav can be re-rendered under us */
   const getNav = () => $(".tori-nav", root);
   const chatWrap = $(".tori-chat", root);
+  const a11yFloat = $(".tori-a11y", root);
+  const phone = window.matchMedia("(max-width: 560px)");
   /* one class flip; CSS slides the bar over the promo strip (mobile) */
   function onNavScroll() {
     if (root.classList.contains("menu-open")) return;
     const y = window.scrollY;
     const nav = getNav();
     if (nav) nav.classList.toggle("is-scrolled", y > 12);
-    if (chatWrap && y > 320) chatWrap.classList.add("is-visible");
+    if (phone.matches) {
+      /* a clean first screen on a phone: both floating buttons come in after a
+         short scroll and leave again at the top, unless one of them is open */
+      const show = y > 80;
+      if (chatWrap && !chatWrap.classList.contains("is-open")) chatWrap.classList.toggle("is-visible", show);
+      if (a11yFloat && !a11yFloat.classList.contains("is-open")) a11yFloat.classList.toggle("is-visible", show);
+    } else {
+      if (chatWrap && y > 320) chatWrap.classList.add("is-visible");
+      if (a11yFloat) a11yFloat.classList.add("is-visible");
+    }
   }
   listen(window, "scroll", onNavScroll, { passive: true });
   listen(window, "resize", onNavScroll);

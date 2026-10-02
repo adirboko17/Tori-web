@@ -1,3 +1,5 @@
+import { Tori3D } from "@/components/tori3d/Tori3D";
+
 export default function ToriChatSection() {
   return (
     <div
@@ -233,12 +235,13 @@ export default function ToriChatSection() {
       </div>
       <div style={{ display: "flex", alignItems: "flex-end", gap: "12px" }}>
         <button
-          className="tori-chat-fab"
+          className="tori-chat-fab is-3d"
           data-act="toggleChat"
           data-ev="click"
           aria-label="פתיחת צ׳אט עם תורי"
         >
-          <img src="/assets/brand/tori-mark.png" alt="" />
+          {/* Tori in 3D with a typing bubble: reads as "tap to chat" */}
+          <Tori3D cast="chat" className="tori-chat-3d" />
           <span className="tori-chat-x">
             <svg
               width="22"
