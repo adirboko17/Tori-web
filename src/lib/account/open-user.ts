@@ -1,4 +1,8 @@
 import { randomInt } from "node:crypto";
+import {
+  ENGLISH_DISPLAY_NAME_ERROR,
+  isEnglishDisplayName,
+} from "@/lib/display-name";
 import { mapBusinessFields } from "@/lib/business-onboarding-map";
 import { paidAccounts } from "@/lib/account/profile";
 import {
@@ -25,6 +29,9 @@ export async function openCustomerUser(input: {
 }) {
   const fullName = input.fullName.trim();
   const businessName = input.businessName.trim();
+  if (!isEnglishDisplayName(businessName)) {
+    return { ok: false as const, error: ENGLISH_DISPLAY_NAME_ERROR };
+  }
   const found = await listAccountsByPhone(input.phone);
   if (!found.ok) return { ok: false as const, error: found.error };
   if (paidAccounts(found.accounts).length > 0) {

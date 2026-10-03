@@ -1,4 +1,8 @@
 import { openCustomerUser } from "@/lib/account/open-user";
+import {
+  ENGLISH_DISPLAY_NAME_ERROR,
+  isEnglishDisplayName,
+} from "@/lib/display-name";
 import { clearSignupPhone, readSignupPhone } from "@/lib/account/phone-ticket";
 import { startSubscriptionCheckout } from "@/lib/account/start-checkout";
 import {
@@ -31,9 +35,8 @@ export async function POST(request: Request) {
 
   const fullName = text(body.fullName);
   const businessName = text(body.businessName);
-  if (fullName.length < 2 || businessName.length < 2) {
-    return jsonError("צריך למלא שם מלא ושם העסק.");
-  }
+  if (fullName.length < 2) return jsonError("צריך למלא שם מלא.");
+  if (!isEnglishDisplayName(businessName)) return jsonError(ENGLISH_DISPLAY_NAME_ERROR);
 
   try {
     const opened = await openCustomerUser({ phone, fullName, businessName });

@@ -4,6 +4,11 @@ import Link from "next/link";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import ServiceAgreement from "@/components/service-agreement";
 import type { AccountLanguage } from "@/lib/account/profile";
+import {
+  ENGLISH_DISPLAY_NAME_ERROR,
+  hasNonEnglishDisplayChars,
+  isEnglishDisplayName,
+} from "@/lib/display-name";
 
 type ServiceRow = {
   id: string;
@@ -165,8 +170,12 @@ function LoginForm({
   async function register(event: FormEvent) {
     event.preventDefault();
     setError("");
-    if (fullName.trim().length < 2 || businessName.trim().length < 2) {
-      setError("צריך למלא שם מלא ושם העסק.");
+    if (fullName.trim().length < 2) {
+      setError("צריך למלא שם מלא.");
+      return;
+    }
+    if (!isEnglishDisplayName(businessName)) {
+      setError(ENGLISH_DISPLAY_NAME_ERROR);
       return;
     }
     if (!agreed) {
@@ -409,13 +418,19 @@ function LoginForm({
                 />
               </label>
               <label className="auth-field">
-                <span className="auth-label">שם העסק</span>
+                <span className="auth-label">שם האפליקציה באנגלית</span>
                 <input
                   className="auth-input"
                   autoComplete="organization"
                   value={businessName}
-                  onChange={(event) => setBusinessName(event.target.value)}
-                  placeholder="למשל: סטודיו נועה"
+                  onChange={(event) => {
+                    const next = event.target.value;
+                    setBusinessName(next);
+                    if (hasNonEnglishDisplayChars(next)) setError(ENGLISH_DISPLAY_NAME_ERROR);
+                    else setError((current) => (current === ENGLISH_DISPLAY_NAME_ERROR ? "" : current));
+                  }}
+                  placeholder="Studio Noa"
+                  dir="ltr"
                 />
               </label>
               <p className="auth-verified">
@@ -544,6 +559,10 @@ function ProfileForm({ initial }: { initial: AccountPortalInitial }) {
     event.preventDefault();
     setError("");
     setSaved("");
+    if (!isEnglishDisplayName(businessName)) {
+      setError(ENGLISH_DISPLAY_NAME_ERROR);
+      return;
+    }
     setLoading(true);
     try {
       const response = await fetch("/api/account/profile", {
@@ -612,8 +631,19 @@ function ProfileForm({ initial }: { initial: AccountPortalInitial }) {
               <Field label="מספר טלפון">
                 <input className="tori-input" value={initial.phone} disabled dir="ltr" />
               </Field>
-              <Field label="שם העסק">
-                <input className="tori-input" value={businessName} onChange={(event) => setBusinessName(event.target.value)} />
+              <Field label="שם האפליקציה באנגלית">
+                <input
+                  className="tori-input"
+                  value={businessName}
+                  onChange={(event) => {
+                    const next = event.target.value;
+                    setBusinessName(next);
+                    if (hasNonEnglishDisplayChars(next)) setError(ENGLISH_DISPLAY_NAME_ERROR);
+                    else setError((current) => (current === ENGLISH_DISPLAY_NAME_ERROR ? "" : current));
+                  }}
+                  placeholder="Studio Noa"
+                  dir="ltr"
+                />
               </Field>
             </div>
           </section>
