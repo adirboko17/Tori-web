@@ -33,6 +33,23 @@ const todayFormat = new Intl.DateTimeFormat("he-IL", {
   month: "long",
 });
 
+function mrrHint(summary: AdminSummary) {
+  const count = `${formatNumber(summary.activeSubscriptions)} מנויים`;
+  if (summary.mrrSource === "recurring") {
+    if (summary.uniformRecurringIls != null) {
+      return `${count} × ${formatIls(summary.uniformRecurringIls)}`;
+    }
+    if (summary.recurringAmountsIls.length > 0 && summary.recurringAmountsIls.length <= 4) {
+      return `${count} · ${summary.recurringAmountsIls.map((amount) => formatIls(amount)).join(" + ")}`;
+    }
+    return `${count} לפי הוראות הקבע`;
+  }
+  if (summary.mrrSource === "mixed") {
+    return `${count} · סכום חסר הושלם לפי מחירון`;
+  }
+  return `${count} × ${formatIls(summary.monthlyPriceIls)}`;
+}
+
 function buildAttention(
   summary: AdminSummary,
   balances: ReturnType<typeof useSmsBalances>,
@@ -157,11 +174,7 @@ export default function DashboardPage() {
             icon="trending-up"
             label="הכנסה חודשית צפויה"
             value={formatIls(summary?.expectedMrrIls)}
-            hint={
-              summary
-                ? `${formatNumber(summary.activeSubscriptions)} מנויים × ${formatIls(summary.monthlyPriceIls)}`
-                : undefined
-            }
+            hint={summary ? mrrHint(summary) : undefined}
           />
           <MainPulseemStat balance={mainBalance} />
           <StatCard

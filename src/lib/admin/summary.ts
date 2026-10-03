@@ -11,6 +11,11 @@ import {
 } from "./cancellations";
 import { loadMonthlyPriceIls } from "./catalog";
 import { listPurchases, type AdminPurchase } from "./customers";
+import { expectedMonthlyRevenue, type RecurringMrrSource } from "./mrr";
+import {
+  enrichPayplusSubscriptionsWithLive,
+  loadPayplusSubscriptionsByBusiness,
+} from "./payplus-subscriptions";
 
 export type ActivityItem = {
   id: string;
@@ -35,6 +40,9 @@ export type AdminSummary = {
   clients: number;
   activeSubscriptions: number;
   expectedMrrIls: number;
+  mrrSource: RecurringMrrSource;
+  uniformRecurringIls: number | null;
+  recurringAmountsIls: number[];
   smsRevenueThisMonthIls: number;
   smsPurchasesThisMonth: number;
   openCancellations: CancellationRequest[];
@@ -165,9 +173,23 @@ export async function loadAdminSummary(): Promise<AdminSummary> {
       PAID_ORDER_STATUSES.includes(purchase.status) &&
       monthKey(purchase.paidAt || purchase.createdAt) === thisMonth,
   );
-  const activeSubscriptions = businesses.filter(
-    (business) => business.subscription === "active",
-  ).length;
+  const activeIds = businesses
+    .filter((business) => business.subscription === "active")
+    .map((business) => business.id);
+  const subscriptions = await settle(
+    "הוראות קבע",
+    errors,
+    loadPayplusSubscriptionsByBusiness(activeIds).then(enrichPayplusSubscriptionsWithLive),
+    null,
+  );
+  const recurringAmounts = activeIds.map((id) => {
+    const subscription = subscriptions?.get(id);
+    return subscription?.status === "active" ? subscription.amountIls : null;
+  });
+  const mrr = expectedMonthlyRevenue(recurringAmounts, monthlyPriceIls);
+  if (subscriptions && activeIds.length > 0 && mrr.source !== "recurring") {
+    errors.push("סכומי הוראות קבע");
+  }
 
   return {
     monthlyPriceIls,
@@ -176,8 +198,11 @@ export async function loadAdminSummary(): Promise<AdminSummary> {
       (business) => monthKey(business.createdAt) === thisMonth,
     ).length,
     clients: businesses.reduce((sum, business) => sum + business.clientCount, 0),
-    activeSubscriptions,
-    expectedMrrIls: activeSubscriptions * monthlyPriceIls,
+    activeSubscriptions: activeIds.length,
+    expectedMrrIls: mrr.totalIls,
+    mrrSource: mrr.source,
+    uniformRecurringIls: mrr.uniformIls,
+    recurringAmountsIls: mrr.amountsIls,
     smsRevenueThisMonthIls: paidThisMonth.reduce((sum, purchase) => sum + purchase.amountIls, 0),
     smsPurchasesThisMonth: paidThisMonth.length,
     openCancellations: cancellations.filter((request) =>

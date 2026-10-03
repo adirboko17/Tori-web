@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { hashManagerPassword } from "@/lib/account/password";
 import {
   ENGLISH_DISPLAY_NAME_ERROR,
@@ -343,6 +344,89 @@ export async function upsertSignupAccount(input: {
     language: user?.language ?? "he",
   });
   if (error) throw new Error("שמירת החשבון נכשלה.");
+}
+
+/**
+ * A visitor who filled in the signup form but has not paid yet.
+ * Only a row in site_customer_accounts is kept. No business, user or SMS balance exists
+ * until the payment is confirmed. The row id is reused as the business id once paid.
+ */
+export async function savePendingSignup(input: {
+  phone: string;
+  fullName: string;
+  businessName: string;
+  appNameEn: string;
+}) {
+  const phone = normalizeIsraeliMobile(input.phone);
+  if (!phone || input.fullName.trim().length < 2 || input.businessName.trim().length < 2) {
+    throw new Error("שמירת הפרטים נכשלה.");
+  }
+  const supabase = getServiceSupabase();
+  const now = new Date().toISOString();
+
+  const { data: existing, error: lookupError } = await supabase
+    .from("site_customer_accounts")
+    .select("id")
+    .eq("phone", phone)
+    .is("business_id", null)
+    .is("paid_at", null)
+    .order("created_at", { ascending: true })
+    .limit(1);
+  if (lookupError) throw new Error("שמירת הפרטים נכשלה.");
+
+  const existingId = existing?.[0]?.id ? String(existing[0].id) : "";
+  if (existingId) {
+    const { error } = await supabase
+      .from("site_customer_accounts")
+      .update({
+        full_name: input.fullName.trim(),
+        business_name: input.businessName.trim(),
+        agreement_accepted_at: now,
+        updated_at: now,
+      })
+      .eq("id", existingId);
+    if (error) throw new Error("שמירת הפרטים נכשלה.");
+    return existingId;
+  }
+
+  const id = randomUUID();
+  const { error } = await supabase.from("site_customer_accounts").insert({
+    id,
+    phone,
+    full_name: input.fullName.trim(),
+    business_name: input.businessName.trim(),
+    app_name_en: input.appNameEn.trim() || null,
+    agreement_accepted_at: now,
+  });
+  if (error) throw new Error("שמירת הפרטים נכשלה.");
+  return id;
+}
+
+/** Returns the signup only while it has no business yet. */
+export async function loadPendingSignup(signupId: string) {
+  const supabase = getServiceSupabase();
+  const { data, error } = await supabase
+    .from("site_customer_accounts")
+    .select(ACCOUNT_COLUMNS)
+    .eq("id", signupId)
+    .is("business_id", null)
+    .maybeSingle();
+  if (error) throw new Error("איתור ההרשמה נכשל.");
+  return data ? toAccount(asRecord(data)) : null;
+}
+
+export async function attachBusinessToSignup(signupId: string, businessId: string) {
+  const supabase = getServiceSupabase();
+  const user = await findAdminUser(businessId);
+  const { error } = await supabase
+    .from("site_customer_accounts")
+    .update({
+      business_id: businessId,
+      user_id: user?.id ?? null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", signupId);
+  if (error) throw new Error("חיבור החשבון לעסק נכשל.");
 }
 
 export async function rememberCheckoutDetails(input: {

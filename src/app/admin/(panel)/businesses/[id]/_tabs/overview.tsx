@@ -6,6 +6,7 @@ import type { BusinessDetails } from "@/lib/superadmin/types";
 import { formatDate, formatIls, formatNumber } from "../../../../_ui/format";
 import { Icon } from "../../../../_ui/icon";
 import { Avatar, Badge, StatCard } from "../../../../_ui/parts";
+import { AppSiteLink } from "../../_parts";
 
 function text(value: unknown) {
   return typeof value === "string" && value.trim() ? value.trim() : null;
@@ -76,6 +77,10 @@ export function OverviewTab({
               <dt>שם האפליקציה</dt>
               <dd className="ad-ltr" style={{ textAlign: "right" }}>
                 {details.brandingFolder ?? text(profile.branding_client_name) ?? "—"}
+              </dd>
+              <dt>קישור לאתר</dt>
+              <dd style={{ textAlign: "right" }}>
+                <AppSiteLink clientName={text(profile.branding_client_name)} />
               </dd>
               <dt>צבע ראשי</dt>
               <dd>

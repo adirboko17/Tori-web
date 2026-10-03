@@ -112,7 +112,7 @@ export function SmsTab({
     if (!amountValid) return;
     const ok = await confirm({
       title: `להטעין ${formatNumber(amount)} הודעות?`,
-      body: `ההודעות יועברו מהחשבון הראשי בפולסים אל ${name}. אי אפשר להחזיר אותן אחרי ההעברה.`,
+      body: `ההודעות יועברו מהחשבון הראשי בפולסים אל ${name}. החזרה לחשבון הראשי אפשרית רק ידנית מתוך פולסים.`,
       confirmLabel: "הטענה",
     });
     if (!ok) return;

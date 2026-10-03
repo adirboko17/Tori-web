@@ -1,11 +1,17 @@
-import { randomInt, randomUUID } from "node:crypto";
+import { randomInt } from "node:crypto";
 import {
   ENGLISH_DISPLAY_NAME_ERROR,
   isEnglishDisplayName,
 } from "@/lib/display-name";
 import { mapBusinessFields } from "@/lib/business-onboarding-map";
 import { paidAccounts } from "@/lib/account/profile";
-import { listAccountsByPhone, upsertSignupAccount } from "@/lib/account/store";
+import {
+  attachBusinessToSignup,
+  listAccountsByPhone,
+  loadPendingSignup,
+  savePendingSignup,
+  upsertSignupAccount,
+} from "@/lib/account/store";
 import { getSupabaseUrl } from "@/lib/sms/env";
 import { getServiceSupabase } from "@/lib/sms/supabase-admin";
 
@@ -35,6 +41,7 @@ export async function openCustomerUser(input: {
     };
   }
 
+  // Older signups that already got a business before paying keep working.
   const resume = found.accounts.find((account) => account.businessId && !account.paidAt);
   if (resume?.businessId) {
     await upsertSignupAccount({
@@ -44,23 +51,51 @@ export async function openCustomerUser(input: {
       businessName,
     });
     await refreshOpenedNames(resume.businessId, fullName, businessName);
-    return { ok: true as const, businessId: resume.businessId };
+    return { ok: true as const, checkoutId: resume.businessId };
   }
 
-  const created = await createBusiness({
+  // New signups only keep the details. The business is opened after payment.
+  const mapped = mapBusinessFields({
+    managerName: fullName,
+    phone: found.phone,
+    businessNameHe: businessName,
+  });
+  const checkoutId = await savePendingSignup({
     phone: found.phone,
     fullName,
     businessName,
+    appNameEn: randomAppName(mapped.app_name_en),
+  });
+  return { ok: true as const, checkoutId };
+}
+
+function randomAppName(base: string) {
+  return `${base}${randomInt(1000, 10000)}`.slice(0, 40);
+}
+
+/**
+ * Called only after a subscription payment was confirmed.
+ * Opens the business for a signup that has none yet and returns the business id.
+ */
+export async function openBusinessAfterPayment(signupId: string) {
+  const pending = await loadPendingSignup(signupId);
+  if (!pending) return { ok: true as const, businessId: signupId };
+
+  const created = await createBusiness({
+    id: pending.id,
+    phone: pending.phone,
+    fullName: pending.fullName,
+    businessName: pending.businessName,
+    appNameEn: pending.appNameEn || randomAppName(
+      mapBusinessFields({
+        managerName: pending.fullName,
+        businessNameHe: pending.businessName,
+      }).app_name_en,
+    ),
   });
   if (!created.ok) return created;
 
-  await upsertSignupAccount({
-    businessId: created.businessId,
-    fullName,
-    phone: found.phone,
-    businessName,
-    appNameEn: created.appNameEn,
-  });
+  await attachBusinessToSignup(pending.id, created.businessId);
   return { ok: true as const, businessId: created.businessId };
 }
 
@@ -92,9 +127,11 @@ async function refreshOpenedNames(
 }
 
 async function createBusiness(input: {
+  id: string;
   phone: string;
   fullName: string;
   businessName: string;
+  appNameEn: string;
 }) {
   const secret = (process.env.ONBOARDING_WEBHOOK_SECRET ?? "").trim();
   const base = getSupabaseUrl().replace(/\/$/, "");
@@ -110,8 +147,8 @@ async function createBusiness(input: {
     plan: "monthly",
     commitment: "pending-payment",
   });
-  const appNameEn = `${mapped.app_name_en}${randomInt(1000, 10000)}`.slice(0, 40);
-  const id = randomUUID();
+  const appNameEn = input.appNameEn;
+  const id = input.id;
   const payload = {
     event: "new_business_onboarded",
     timestamp: new Date().toISOString(),

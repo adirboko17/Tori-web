@@ -1,4 +1,8 @@
-import { deletePayplusRecurring, listPayplusRecurrings } from "@/lib/sms/payplus";
+import {
+  deletePayplusRecurring,
+  listPayplusRecurrings,
+  viewPayplusRecurring,
+} from "@/lib/sms/payplus";
 import { getServiceSupabase } from "@/lib/sms/supabase-admin";
 import {
   isCancellationId,
@@ -180,27 +184,103 @@ export async function loadPayplusSubscriptionsByBusiness(businessIds: string[]) 
   return found;
 }
 
+function sameIls(left: number | null, right: number) {
+  return left != null && Math.round(left * 100) === Math.round(right * 100);
+}
+
+function applyRecurringAmount(
+  sub: PayplusSubscription,
+  amount: number,
+  nextChargeAt: string | null,
+  lastChargeAt: string,
+): PayplusSubscription {
+  return {
+    ...sub,
+    amountIls: amount > 0 ? amount : sub.amountIls,
+    nextChargeAt: nextChargeAt || sub.nextChargeAt,
+    lastChargeAt: lastChargeAt || sub.lastChargeAt,
+  };
+}
+
+async function rememberRecurringAmount(sub: PayplusSubscription) {
+  if (!sub.amountIls || sub.amountIls <= 0 || sub.status !== "active") return;
+  try {
+    await savePayplusSubscription({
+      businessId: sub.businessId,
+      recurringUid: sub.recurringUid,
+      terminalUid: sub.terminalUid,
+      customerUid: sub.customerUid,
+      transactionUid: sub.transactionUid,
+      amountIls: sub.amountIls,
+      nextChargeAt: sub.nextChargeAt,
+      lastChargeAt: sub.lastChargeAt,
+    });
+  } catch (error) {
+    console.error("payplus recurring amount save failed", error);
+  }
+}
+
 export async function enrichPayplusSubscriptionsWithLive(
   found: Map<string, PayplusSubscription>,
 ) {
   if (found.size === 0) return found;
+  const storedAmounts = new Map(
+    [...found.entries()].map(([businessId, sub]) => [businessId, sub.amountIls]),
+  );
   try {
     const live = await listPayplusRecurrings("");
-    if (!live.ok) return found;
-    const byUid = new Map(live.recurrings.map((row) => [row.uid, row]));
-    for (const [businessId, sub] of found) {
-      const row = byUid.get(sub.recurringUid);
-      if (!row) continue;
-      found.set(businessId, {
-        ...sub,
-        amountIls: row.amount || sub.amountIls,
-        nextChargeAt: row.nextChargeAt || sub.nextChargeAt,
-        lastChargeAt: row.lastChargeDate || sub.lastChargeAt,
-      });
+    if (live.ok) {
+      const byUid = new Map(live.recurrings.map((row) => [row.uid, row]));
+      for (const [businessId, sub] of found) {
+        const row = byUid.get(sub.recurringUid);
+        if (!row) continue;
+        found.set(
+          businessId,
+          applyRecurringAmount(sub, row.amount, row.nextChargeAt, row.lastChargeDate),
+        );
+      }
     }
   } catch (error) {
     console.error("payplus live recurring enrich failed", error);
   }
+
+  const missing = [...found.values()].filter(
+    (sub) =>
+      sub.status === "active" &&
+      !(sub.amountIls && sub.amountIls > 0) &&
+      sub.recurringUid,
+  );
+  await Promise.all(
+    missing.map(async (sub) => {
+      try {
+        const viewed = await viewPayplusRecurring(sub.recurringUid);
+        if (!viewed.ok) return;
+        found.set(
+          sub.businessId,
+          applyRecurringAmount(
+            sub,
+            viewed.recurring.amount,
+            viewed.recurring.nextChargeAt,
+            viewed.recurring.lastChargeDate,
+          ),
+        );
+      } catch (error) {
+        console.error("payplus recurring amount lookup failed", error);
+      }
+    }),
+  );
+
+  await Promise.all(
+    [...found.values()]
+      .filter(
+        (sub) =>
+          sub.status === "active" &&
+          sub.amountIls != null &&
+          sub.amountIls > 0 &&
+          !sameIls(storedAmounts.get(sub.businessId) ?? null, sub.amountIls),
+      )
+      .map((sub) => rememberRecurringAmount(sub)),
+  );
   return found;
 }
 

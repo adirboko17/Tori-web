@@ -260,6 +260,9 @@ export interface CreditTransferResponse {
   smsCreditsAfter?: number;
   emailCreditsAfter?: number;
   directEmailCreditsAfter?: number;
+  /** Main-account SMS pool after a reclaim (`smsCredits` < 0). */
+  mainSmsCreditsAfter?: number;
+  reclaimed?: number;
   /** Ledger of purchased extras kept on top of the monthly package (when `asPrepaid`). */
   prepaidSmsCreditsAfter?: number;
 }

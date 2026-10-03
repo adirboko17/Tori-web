@@ -1,3 +1,4 @@
+import { openBusinessAfterPayment } from "@/lib/account/open-user";
 import { markAccountPaid } from "@/lib/account/store";
 import { loadMonthlyPriceIls } from "@/lib/admin/catalog";
 import { savePayplusSubscription } from "@/lib/admin/payplus-subscriptions";
@@ -61,11 +62,23 @@ export async function fulfillPaidSubscription(input: {
   if (!amountsMatch(input.amount, subscriptionChargeIls(await loadMonthlyPriceIls()))) {
     return { ok: false as const, message: "סכום התשלום אינו תואם למנוי." };
   }
-  await markAccountPaid(input.businessId);
+  // The business is opened here, only after the payment was confirmed.
+  let businessId = input.businessId;
+  try {
+    const opened = await openBusinessAfterPayment(input.businessId);
+    if (!opened.ok) {
+      return { ok: false as const, message: opened.error };
+    }
+    businessId = opened.businessId;
+  } catch (error) {
+    console.error("business opening after payment failed", error);
+    return { ok: false as const, message: "פתיחת העסק אחרי התשלום נכשלה." };
+  }
+  await markAccountPaid(businessId);
   if (input.recurringUid) {
     try {
       await savePayplusSubscription({
-        businessId: input.businessId,
+        businessId,
         recurringUid: input.recurringUid,
         terminalUid: input.terminalUid,
         customerUid: input.customerUid,
@@ -76,7 +89,7 @@ export async function fulfillPaidSubscription(input: {
     }
   }
   try {
-    const business = await loadBusinessForSubscription(input.businessId);
+    const business = await loadBusinessForSubscription(businessId);
     if (!business) {
       return { ok: true as const, idempotent: false };
     }
@@ -91,7 +104,7 @@ export async function fulfillPaidSubscription(input: {
         price: String(subscriptionChargeIls(await loadMonthlyPriceIls())),
         commitment: "paid",
       })
-      .eq("id", input.businessId)
+      .eq("id", businessId)
       .neq("commitment", "paid")
       .select("id")
       .maybeSingle();
