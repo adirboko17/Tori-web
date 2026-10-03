@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     if (!opened.ok) return jsonError(opened.error, 400);
 
     const checkout = await startSubscriptionCheckout(request, {
-      businessId: opened.businessId,
+      businessId: opened.checkoutId,
       customerName: fullName,
       phone,
     });

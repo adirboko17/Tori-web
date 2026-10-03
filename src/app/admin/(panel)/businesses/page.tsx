@@ -17,7 +17,7 @@ import {
 } from "../../_ui/parts";
 import { useAdminData } from "../../_ui/use-admin-data";
 import { useSmsBalances, type SmsBalance } from "../../_ui/use-sms-balances";
-import { SubscriptionBadge } from "./_parts";
+import { AppSiteLink, SubscriptionBadge } from "./_parts";
 
 type Filter = "all" | "active" | "cancelling" | "low" | "no-sms";
 
@@ -189,6 +189,7 @@ function BusinessesList() {
                 <thead>
                   <tr>
                     <th>עסק</th>
+                    <th>קישור לאתר</th>
                     <th>טלפון</th>
                     <th>יתרת SMS</th>
                     <th>מנוי</th>
@@ -213,6 +214,9 @@ function BusinessesList() {
                               </span>
                             </div>
                           </div>
+                        </td>
+                        <td data-label="קישור לאתר" className="is-wrap">
+                          <AppSiteLink clientName={business.clientName} />
                         </td>
                         <td data-label="טלפון" className="is-nowrap" dir="ltr">
                           {business.phone || "—"}
