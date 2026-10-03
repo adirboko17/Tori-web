@@ -1,3 +1,8 @@
+import {
+  ENGLISH_DISPLAY_NAME_ERROR,
+  isEnglishDisplayName,
+} from "../display-name.ts";
+
 export const ACCOUNT_LANGUAGES = ["he", "en", "ru", "ar"] as const;
 
 export type AccountLanguage = (typeof ACCOUNT_LANGUAGES)[number];
@@ -81,7 +86,9 @@ export function validateAccountProfile(
   if (fullName.length < 2) return { ok: false, error: "צריך להזין שם מלא." };
 
   const businessName = text(body.businessName, 120);
-  if (businessName.length < 2) return { ok: false, error: "צריך להזין את שם העסק." };
+  if (!isEnglishDisplayName(businessName)) {
+    return { ok: false, error: ENGLISH_DISPLAY_NAME_ERROR };
+  }
 
   const email = text(body.email, 200).toLowerCase();
   if (email && !EMAIL_RE.test(email)) {

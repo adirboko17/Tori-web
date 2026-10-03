@@ -148,11 +148,12 @@ export default function LeadFormSection({ monthlyPrice = 299 }) {
                 />
               </Field>
             </div>
-            <Field label="שם העסק">
+            <Field label="שם האפליקציה באנגלית">
               <input
                 className="tori-input"
                 type="text"
-                placeholder="סטודיו נועה"
+                placeholder="Studio Noa"
+                dir="ltr"
               />
             </Field>
             <div className="tori-field">

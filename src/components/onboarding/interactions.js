@@ -1,13 +1,18 @@
 import { createDomScope } from "@/lib/dom-scope";
 import { phoneSchema, priceSummary } from "@/lib/booking";
 import { submitBusinessOnboarding } from "@/lib/business-onboarding";
+import {
+  ENGLISH_DISPLAY_NAME_ERROR,
+  hasNonEnglishDisplayChars,
+  isEnglishDisplayName,
+} from "@/lib/display-name";
 import { watchMarkVideo } from "@/lib/mark-video";
 
 const FIELDS = ["fullName", "phone", "appName"];
 const LABELS = {
   fullName: "שם מלא",
   phone: "מספר טלפון",
-  appName: "שם העסק",
+  appName: "שם האפליקציה באנגלית",
 };
 
 export function initializeOnboarding(root) {
@@ -77,6 +82,12 @@ export function initializeOnboarding(root) {
       listen(el, "input", () => {
         st.f[key] = el.value;
         el.classList.remove("is-bad");
+        if (key === "appName" && hasNonEnglishDisplayChars(el.value)) {
+          el.classList.add("is-bad");
+          showError(ENGLISH_DISPLAY_NAME_ERROR);
+        } else if (key === "appName") {
+          showError("");
+        }
         persist();
       });
     });
@@ -100,6 +111,11 @@ export function initializeOnboarding(root) {
     }
     if (!phoneSchema.safeParse(st.f.phone || "").success) {
       showError("צריך להזין מספר נייד ישראלי תקין.");
+      return false;
+    }
+    if (!isEnglishDisplayName(st.f.appName || "")) {
+      acts("on.appName").forEach((el) => el.classList.add("is-bad"));
+      showError(ENGLISH_DISPLAY_NAME_ERROR);
       return false;
     }
     if (!st.agreed) {

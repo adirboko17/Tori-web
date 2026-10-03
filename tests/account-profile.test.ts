@@ -9,7 +9,7 @@ import {
 
 const base = {
   fullName: "דנה לוי",
-  businessName: "סטודיו נועה",
+  businessName: "Studio Noa",
   email: "noa@studio.co.il",
   appNameEn: "Studio Noa",
   address: "הרצל 12",
@@ -36,6 +36,14 @@ test("profile rejects a short identity and a bad id number", () => {
   assert.equal(validateAccountProfile({ ...base, fullName: "ד" }).ok, false);
   assert.equal(validateAccountProfile({ ...base, idNumber: "123" }).ok, false);
   assert.equal(validateAccountProfile({ ...base, language: "fr" }).ok, false);
+});
+
+test("profile requires the app name saved as display_name to be English", () => {
+  const hebrew = validateAccountProfile({ ...base, businessName: "סטודיו נועה" });
+  assert.equal(hebrew.ok, false);
+  const english = validateAccountProfile({ ...base, businessName: "Studio Noa" });
+  assert.equal(english.ok, true);
+  if (english.ok) assert.equal(english.value.businessName, "Studio Noa");
 });
 
 test("manager password matches the app hash", () => {

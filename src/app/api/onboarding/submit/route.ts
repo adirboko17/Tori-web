@@ -1,4 +1,8 @@
 import { upsertSignupAccount } from "@/lib/account/store";
+import {
+  ENGLISH_DISPLAY_NAME_ERROR,
+  isEnglishDisplayName,
+} from "@/lib/display-name";
 import { getSupabaseUrl } from "@/lib/sms/env";
 import { jsonError, jsonOk, readJsonBody } from "@/lib/sms/http";
 
@@ -44,8 +48,11 @@ export async function POST(request: Request) {
   const phone = text(business.phone, 40);
   const businessNameHe = text(business.business_name_he);
   const appNameEn = text(business.app_name_en, 40);
-  if (!UUID_RE.test(id) || !managerName || !phone || !businessNameHe) {
+  if (!UUID_RE.test(id) || !managerName || !phone) {
     return jsonError("צריך למלא שם וטלפון.");
+  }
+  if (!isEnglishDisplayName(businessNameHe)) {
+    return jsonError(ENGLISH_DISPLAY_NAME_ERROR);
   }
   if (!/^[A-Za-z][A-Za-z0-9]*$/.test(appNameEn)) {
     return jsonError("שם האפליקציה באנגלית לא תקין.");

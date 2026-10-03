@@ -89,7 +89,7 @@ export default function Onboarding() {
                   בואו נכיר את העסק
                 </h1>
                 <p style={{ margin: "0", fontSize: "14.5px", lineHeight: "1.5", color: "#5C5A58", maxWidth: "52ch" }}>
-                  שם, טלפון ושם העסק. את שאר הפרטים משלימים באזור האישי אחרי התשלום.
+                  שם, טלפון ושם האפליקציה באנגלית. את שאר הפרטים משלימים באזור האישי אחרי התשלום.
                 </p>
               </div>
               <div className="ob-two" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(205px,1fr))", gap: "10px 16px" }}>
@@ -102,8 +102,8 @@ export default function Onboarding() {
                   <input className="ob-input" type="tel" data-act="on.phone" data-ev="change" placeholder="050-000-0000" autoComplete="tel" dir="ltr" style={{ textAlign: "right" }} />
                 </label>
                 <label style={{ display: "grid", gap: "5px" }}>
-                  <span style={{ fontSize: "13px", fontWeight: "600", color: "#3D3B3A" }}>שם העסק</span>
-                  <input className="ob-input" data-act="on.appName" data-ev="change" placeholder="סטודיו נועה" />
+                  <span style={{ fontSize: "13px", fontWeight: "600", color: "#3D3B3A" }}>שם האפליקציה באנגלית</span>
+                  <input className="ob-input" data-act="on.appName" data-ev="change" placeholder="Studio Noa" dir="ltr" />
                 </label>
               </div>
               <div data-ref="contractRef" style={{ maxHeight: "180px", overflowY: "auto", border: "1px solid #E3E3E0", borderRadius: "16px", padding: "16px 18px", background: "#FAFAF8" }}>

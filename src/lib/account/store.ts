@@ -1,4 +1,8 @@
 import { hashManagerPassword } from "@/lib/account/password";
+import {
+  ENGLISH_DISPLAY_NAME_ERROR,
+  isEnglishDisplayName,
+} from "@/lib/display-name";
 import type { AccountLanguage, AccountProfileDraft } from "@/lib/account/profile";
 import { normalizeIsraeliMobile } from "@/lib/sms/phone";
 import { getServiceSupabase } from "@/lib/sms/supabase-admin";
@@ -146,6 +150,9 @@ export async function loadPortal(accountId: string, userId: string) {
 export async function savePortal(account: CustomerAccount, draft: AccountProfileDraft) {
   if (!account.businessId || !account.userId) {
     return { ok: false as const, error: "החשבון עדיין לא מחובר לעסק." };
+  }
+  if (!isEnglishDisplayName(draft.businessName)) {
+    return { ok: false as const, error: ENGLISH_DISPLAY_NAME_ERROR };
   }
 
   const supabase = getServiceSupabase();

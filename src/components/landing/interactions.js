@@ -1,5 +1,9 @@
 import { createDomScope } from "@/lib/dom-scope";
 import { submitBusinessOnboarding } from "@/lib/business-onboarding";
+import {
+  ENGLISH_DISPLAY_NAME_ERROR,
+  isEnglishDisplayName,
+} from "@/lib/display-name";
 
 /** True once the loader has actually finished, not merely started. Survives a
     remount within the same page load (React re-runs effects in development). */
@@ -671,6 +675,11 @@ export function initializeLanding(root) {
       tel.focus();
       return;
     }
+    if (!biz || !isEnglishDisplayName(biz.value)) {
+      say(ENGLISH_DISPLAY_NAME_ERROR, false);
+      if (biz) biz.focus();
+      return;
+    }
     const type = form.querySelector('input[name="biz-type"]:checked');
     const typeLabel =
       type && type.parentElement ? type.parentElement.textContent.trim() : "";
@@ -685,7 +694,7 @@ export function initializeLanding(root) {
         {
           managerName: name.value.trim(),
           phone: tel.value.trim(),
-          businessNameHe: (biz && biz.value.trim()) || name.value.trim(),
+          businessNameHe: biz.value.trim(),
           businessType: typeLabel || null,
           note: note ? note.value.trim() : "",
         },
