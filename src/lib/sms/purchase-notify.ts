@@ -7,8 +7,10 @@ export { purchaseBuyerLabel, purchaseSmsText, newAppSmsText } from "./purchase-s
 async function sendOwnerSms(text: string) {
   const result = await invokeEdgeFunction("sms-purchase-notify", { text });
   if (!result.ok) {
-    console.error("owner sms failed", result.status);
+    console.error("owner sms failed", result.status, result.data);
+    return false;
   }
+  return true;
 }
 
 export async function notifySmsPurchase(input: {
@@ -46,11 +48,8 @@ export async function notifySmsPurchase(input: {
   }
 }
 
-export async function notifyNewAppPayment(input: {
-  businessId: string;
-  payplusStatusCode: string;
-}) {
-  if (!isSuccessfulPayplusStatus(input.payplusStatusCode)) return;
+/** Called once per purchase, by the request that marked the business paid. */
+export async function notifyNewAppPayment(input: { businessId: string }) {
   try {
     const supabase = getServiceSupabase();
     const [{ data: business }, { data: admin }] = await Promise.all([

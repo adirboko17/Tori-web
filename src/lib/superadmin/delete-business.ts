@@ -65,7 +65,7 @@ export async function deleteBusiness(businessId: string): Promise<DeleteBusiness
   // 2. Collect every Storage object referenced by this business.
   const { data: profilePeek } = await db
     .from('business_profile')
-    .select('branding_client_name, home_hero_images, home_hero_single_url')
+    .select('branding_client_name, home_hero_images, home_hero_single_url, home_logo_url')
     .eq('id', businessId)
     .maybeSingle();
 
@@ -73,6 +73,7 @@ export async function deleteBusiness(businessId: string): Promise<DeleteBusiness
     branding_client_name?: string | null;
     home_hero_images?: unknown;
     home_hero_single_url?: unknown;
+    home_logo_url?: unknown;
   } | null;
 
   const brandingFolder = peek?.branding_client_name?.trim() || null;
@@ -80,6 +81,7 @@ export async function deleteBusiness(businessId: string): Promise<DeleteBusiness
   const storagePathsByBucket = new Map<string, Set<string>>();
   addStorageUrlsFromList(storagePathsByBucket, peek?.home_hero_images);
   addStorageUrlToMap(storagePathsByBucket, peek?.home_hero_single_url);
+  addStorageUrlToMap(storagePathsByBucket, peek?.home_logo_url);
 
   const [designsRes, usersRes, productsRes] = await Promise.all([
     db.from('designs').select('image_url, image_urls').eq('business_id', businessId),

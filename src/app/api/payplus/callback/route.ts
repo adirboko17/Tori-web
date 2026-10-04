@@ -15,8 +15,6 @@ import {
   verifyPayplusHash,
 } from "@/lib/sms/payplus";
 import { loadMonthlyPriceIls } from "@/lib/admin/catalog";
-import { loadPayplusSubscription } from "@/lib/admin/payplus-subscriptions";
-import { notifyNewAppPayment } from "@/lib/sms/purchase-notify";
 import {
   parseSubscriptionMoreInfo,
   subscriptionChargeIls,
@@ -37,13 +35,7 @@ async function completeConfirmedSubscription(input: {
   if (!isSuccessfulPayplusStatus(input.payplusStatusCode)) {
     return { ok: false as const, message: "התשלום לא אושר." };
   }
-  let alreadyRecorded = true;
-  try {
-    alreadyRecorded = Boolean(await loadPayplusSubscription(input.businessId));
-  } catch (error) {
-    console.error("subscription lookup before sms failed", error);
-  }
-  const result = await fulfillPaidSubscription({
+  return fulfillPaidSubscription({
     businessId: input.businessId,
     amount: input.amount,
     recurringUid: input.recurringUid,
@@ -51,13 +43,6 @@ async function completeConfirmedSubscription(input: {
     customerUid: input.customerUid,
     transactionUid: input.transactionUid,
   });
-  if (result.ok && !alreadyRecorded) {
-    await notifyNewAppPayment({
-      businessId: input.businessId,
-      payplusStatusCode: input.payplusStatusCode,
-    });
-  }
-  return result;
 }
 
 function firstHeader(request: Request, name: string) {

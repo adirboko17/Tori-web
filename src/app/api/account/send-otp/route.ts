@@ -4,7 +4,7 @@ import {
   payableAccounts,
 } from "@/lib/account/profile";
 import { loadSignupSenderBusinessId } from "@/lib/account/otp-sender";
-import { writeOtpPending } from "@/lib/account/phone-ticket";
+import { writeOtpPending, type OtpPurpose } from "@/lib/account/phone-ticket";
 import { listAccountsByPhone, type CustomerAccount } from "@/lib/account/store";
 import {
   CONFIG_ERRORS,
@@ -52,32 +52,28 @@ export async function POST(request: Request) {
       if (!account?.businessId) {
         return jsonError("העסק שנבחר אינו משויך למספר זה.");
       }
-      const sent = await sendLoginOtp(account.businessId, found.phone);
+      const { sent, senderId, purpose } = await sendPlatformOtp(found.phone);
       if (!sent.ok) {
         return jsonError(sent.message, 400, sent.code ? { code: sent.code } : undefined);
       }
       await writeOtpPending({
         phone: found.phone,
         businessId: account.businessId,
-        purpose: "login",
+        senderId,
+        purpose,
         flow,
       });
       return jsonOk({ ok: true, phone: found.phone, flow });
     }
 
-    const senderId = await loadSignupSenderBusinessId();
-    let sent = await sendRegisterOtp(senderId, found.phone);
-    let purpose: "login" | "register" = "register";
-    if (!sent.ok && sent.code === "phone_registered") {
-      sent = await sendLoginOtp(senderId, found.phone);
-      purpose = "login";
-    }
+    const { sent, senderId, purpose } = await sendPlatformOtp(found.phone);
     if (!sent.ok) {
       return jsonError(sent.message, 400, sent.code ? { code: sent.code } : undefined);
     }
     await writeOtpPending({
       phone: found.phone,
       businessId: senderId,
+      senderId,
       purpose,
       flow: "signup",
     });
@@ -86,6 +82,21 @@ export async function POST(request: Request) {
     const message = error instanceof Error ? error.message : "שליחת הקוד נכשלה.";
     return jsonError(message, 500);
   }
+}
+
+/**
+ * Website codes always go out from the platform sender. A customer's own business
+ * may not have a working SMS sender yet, right after payment.
+ */
+async function sendPlatformOtp(phone: string) {
+  const senderId = await loadSignupSenderBusinessId();
+  let sent = await sendRegisterOtp(senderId, phone);
+  let purpose: OtpPurpose = "register";
+  if (!sent.ok && sent.code === "phone_registered") {
+    sent = await sendLoginOtp(senderId, phone);
+    purpose = "login";
+  }
+  return { sent, senderId, purpose };
 }
 
 function pickAccount(accounts: CustomerAccount[], businessId: string) {

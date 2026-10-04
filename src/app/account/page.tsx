@@ -38,6 +38,7 @@ export default async function AccountPage() {
           language: portal.language,
           brandColor: portal.brandColor,
           services: portal.services,
+          design: portal.design,
         };
       } else {
         await clearAccountSession();

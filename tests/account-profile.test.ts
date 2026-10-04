@@ -6,6 +6,10 @@ import {
   paidAccounts,
   validateAccountProfile,
 } from "../src/lib/account/profile.ts";
+import {
+  purchaseCandidateIds,
+  recurringMatchesPhone,
+} from "../src/lib/account/resume-paid-match.ts";
 
 const base = {
   fullName: "דנה לוי",
@@ -20,6 +24,7 @@ const base = {
   brandColor: "#d4a574",
   password: "",
   services: [{ name: "תספורת", price: 120, durationMinutes: 45 }],
+  design: { fromNumber: "StudioNoa" },
 };
 
 test("profile keeps the fields that move out of the short signup form", () => {
@@ -92,4 +97,19 @@ test("a new phone signs up, an unpaid user pays, and a paid user enters", () => 
     entryForAccounts([{ paidAt: "2026-10-02T00:00:00Z", businessId: "biz", userId: "user" }]),
     "login",
   );
+});
+
+test("a returning purchase is matched by the signup id and the same mobile", () => {
+  assert.deepEqual(
+    purchaseCandidateIds({
+      checkoutId: "signup-1",
+      accounts: [
+        { id: "signup-1", businessId: null },
+        { id: "other", businessId: "biz-2" },
+      ],
+    }),
+    ["signup-1", "biz-2", "other"],
+  );
+  assert.equal(recurringMatchesPhone("+972501234567", "0501234567"), true);
+  assert.equal(recurringMatchesPhone("0509999999", "0501234567"), false);
 });

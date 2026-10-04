@@ -2,6 +2,7 @@ import {
   ENGLISH_DISPLAY_NAME_ERROR,
   isEnglishDisplayName,
 } from "../display-name.ts";
+import { validateDesign, type AccountDesign } from "./design.ts";
 
 export const ACCOUNT_LANGUAGES = ["he", "en", "ru", "ar"] as const;
 
@@ -27,6 +28,7 @@ export type AccountProfileDraft = {
   brandColor: string;
   password: string;
   services: AccountServiceDraft[];
+  design: AccountDesign;
 };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -125,6 +127,9 @@ export function validateAccountProfile(
     return { ok: false, error: "סיסמת המנהל היא 6 ספרות." };
   }
 
+  const design = validateDesign(body.design);
+  if (!design.ok) return design;
+
   const servicesRaw = Array.isArray(body.services) ? body.services : [];
   if (servicesRaw.length > 40) {
     return { ok: false, error: "אפשר לשמור עד 40 שירותים." };
@@ -172,6 +177,7 @@ export function validateAccountProfile(
       brandColor,
       password,
       services,
+      design: design.value,
     },
   };
 }

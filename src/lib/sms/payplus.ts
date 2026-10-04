@@ -1,5 +1,6 @@
 import { loadMonthlyPriceIls } from "@/lib/admin/catalog";
 import { priceSummary } from "@/lib/booking";
+import { SUBSCRIPTION_RETURN_PATH } from "@/lib/payplus-return";
 import {
   SUBSCRIPTION_ITEM_NAME,
   subscriptionMoreInfo,
@@ -151,7 +152,7 @@ export async function generatePayplusSubscriptionLink(
     more_info_1: input.businessId,
     more_info_2: "subscription",
     more_info_3: "monthly",
-    refURL_success: `${appUrl}/subscribe/success`,
+    refURL_success: `${appUrl}${SUBSCRIPTION_RETURN_PATH}`,
     refURL_failure: `${appUrl}/subscribe/failure`,
     refURL_callback: payplusCallbackUrl(input.request),
     customer,

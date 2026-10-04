@@ -8,6 +8,8 @@ export type OtpPurpose = "login" | "register";
 export type OtpPending = {
   phone: string;
   businessId: string;
+  /** The business whose SMS account sent the code; verification must use it too. */
+  senderId: string;
   purpose: OtpPurpose;
   flow: OtpFlow;
   exp: number;
@@ -88,6 +90,8 @@ export async function readOtpPending() {
   return {
     phone: payload.phone,
     businessId: payload.businessId,
+    // Codes requested before senderId existed were sent from the account's business.
+    senderId: typeof payload.senderId === "string" ? payload.senderId : payload.businessId,
     purpose: payload.purpose,
     flow: payload.flow,
     exp: payload.exp,
