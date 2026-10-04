@@ -3,6 +3,16 @@
 import Link from "next/link";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import ServiceAgreement from "@/components/service-agreement";
+import {
+  MAX_HERO_IMAGES,
+  MAX_UPLOAD_BYTES,
+  SENDER_NAME_MAX,
+  acceptsFor,
+  cleanSenderName,
+  type AccountDesign,
+  type HeroKind,
+  type UploadKind,
+} from "@/lib/account/design";
 import type { AccountLanguage } from "@/lib/account/profile";
 import {
   ENGLISH_DISPLAY_NAME_ERROR,
@@ -30,7 +40,15 @@ export type AccountPortalInitial = {
   language: AccountLanguage;
   brandColor: string;
   services: { id: string; name: string; price: number; durationMinutes: number }[];
+  design: AccountDesign;
 };
+
+const HERO_OPTIONS: { value: HeroKind; label: string }[] = [
+  { value: "none", label: "ברירת המחדל" },
+  { value: "image", label: "תמונה אחת" },
+  { value: "video", label: "סרטון" },
+  { value: "images", label: "כמה תמונות" },
+];
 
 type BusinessChoice = { id: string; name: string };
 
@@ -57,16 +75,106 @@ async function api(url: string, body: unknown) {
 
 function Field({
   label,
+  hint,
   children,
 }: {
   label: string;
+  hint?: string;
   children: ReactNode;
 }) {
   return (
-    <label className="account-field">
-      <span>{label}</span>
+    <label className="auth-field">
+      <span className="auth-label">{label}</span>
       {children}
+      {hint ? <span className="auth-hint">{hint}</span> : null}
     </label>
+  );
+}
+
+/** Uploads straight to Storage with a one-time URL from the server. */
+async function uploadDesignFile(kind: UploadKind, file: File) {
+  if (file.size > MAX_UPLOAD_BYTES) throw new Error("הקובץ גדול מ-10MB.");
+  const response = await fetch("/api/account/upload", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ kind, contentType: file.type, size: file.size }),
+  });
+  const data = (await response.json().catch(() => ({}))) as {
+    error?: string;
+    uploadUrl?: string;
+    publicUrl?: string;
+    apikey?: string;
+  };
+  if (!response.ok || !data.uploadUrl || !data.publicUrl) {
+    throw new Error(data.error || "העלאת הקובץ נכשלה.");
+  }
+  const form = new FormData();
+  form.append("cacheControl", "3600");
+  form.append("", file);
+  const put = await fetch(data.uploadUrl, {
+    method: "PUT",
+    headers: { "x-upsert": "false", ...(data.apikey ? { apikey: data.apikey } : {}) },
+    body: form,
+  });
+  if (!put.ok) {
+    throw new Error(put.status === 413 ? "הקובץ גדול מ-10MB." : "העלאת הקובץ נכשלה. נסו שוב.");
+  }
+  return data.publicUrl;
+}
+
+function UploadSlot({
+  kind,
+  url,
+  busy,
+  disabled,
+  wide,
+  onPick,
+  onRemove,
+}: {
+  kind: UploadKind;
+  url: string;
+  busy: boolean;
+  disabled: boolean;
+  wide?: boolean;
+  onPick: (file: File) => void;
+  onRemove: () => void;
+}) {
+  const video = kind === "hero-video";
+  return (
+    <div className={wide ? "auth-upload auth-upload--wide" : "auth-upload"}>
+      <div className="auth-upload-preview">
+        {url ? (
+          video ? (
+            <video src={url} muted playsInline loop autoPlay />
+          ) : (
+            <img src={url} alt="" />
+          )
+        ) : (
+          <span>{video ? "עוד לא הועלה סרטון" : "עוד לא הועלתה תמונה"}</span>
+        )}
+      </div>
+      <div className="auth-upload-actions">
+        <label className={disabled ? "auth-upload-button is-disabled" : "auth-upload-button"}>
+          <input
+            className="auth-file-input"
+            type="file"
+            accept={acceptsFor(kind)}
+            disabled={disabled}
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              event.target.value = "";
+              if (file) onPick(file);
+            }}
+          />
+          {busy ? "מעלים..." : url ? "החלפה" : video ? "העלאת סרטון" : "העלאת תמונה"}
+        </label>
+        {url && !busy ? (
+          <button className="auth-link" type="button" disabled={disabled} onClick={onRemove}>
+            הסרה
+          </button>
+        ) : null}
+      </div>
+    </div>
   );
 }
 
@@ -189,6 +297,10 @@ function LoginForm({
         businessName,
         agreed: true,
       });
+      if (data.next === "account") {
+        window.location.assign("/account?paid=1");
+        return;
+      }
       if (!data.url) throw new Error("לא נפתח קישור לתשלום.");
       window.location.assign(data.url);
     } catch (err) {
@@ -220,7 +332,7 @@ function LoginForm({
     details: {
       kicker: "עוד רגע מתחילים",
       title: "פרטי העסק",
-      lead: "אחרי האישור נפתח לכם משתמש וממשיכים לתשלום. את שאר הפרטים משלימים באזור האישי.",
+      lead: "אם כבר שילמתם עם המספר הזה, נעביר אתכם להשלמת שאר הפרטים. אם עוד לא, ממשיכים לתשלום.",
     },
   }[step];
 
@@ -453,6 +565,30 @@ function LoginForm({
                 <span className="auth-check-box" aria-hidden="true" />
                 <span>קראתי ואני מאשר/ת את הסכם השירות</span>
               </label>
+              <div className="auth-next">
+                <p className="auth-next-title">מה קורה אחרי התשלום?</p>
+                <p className="auth-next-lead">
+                  מיד אחרי התשלום תגיעו לאזור האישי, ושם ממלאים את כל מה שצריך כדי להשלים את בניית האפליקציה:
+                </p>
+                <ul className="auth-next-list">
+                  <li>
+                    <span aria-hidden="true">✓</span>
+                    <strong>עיצוב ומיתוג</strong>
+                    <em>לוגו, צבע ותמונות או סרטון לדף הבית</em>
+                  </li>
+                  <li>
+                    <span aria-hidden="true">✓</span>
+                    <strong>שירותי העסק</strong>
+                    <em>שם, מחיר ומשך לכל שירות</em>
+                  </li>
+                  <li>
+                    <span aria-hidden="true">✓</span>
+                    <strong>פרטי העסק</strong>
+                    <em>כתובת ופרטים לקבלות</em>
+                  </li>
+                </ul>
+                <p className="auth-next-foot">לא צריך להכין כלום מראש. הכל נשמר, ואפשר לחזור ולעדכן בכל רגע.</p>
+              </div>
               {priceLabel ? (
                 <div className="auth-price">
                   <span>מנוי חודשי</span>
@@ -534,6 +670,17 @@ function ProfileForm({ initial }: { initial: AccountPortalInitial }) {
   const [receiptVat, setReceiptVat] = useState(initial.receiptVat);
   const [language, setLanguage] = useState(initial.language);
   const [brandColor, setBrandColor] = useState(initial.brandColor || "#D4A574");
+  const [fromNumber, setFromNumber] = useState(initial.design.fromNumber);
+  const [logoUrl, setLogoUrl] = useState(initial.design.logoUrl);
+  const [heroKind, setHeroKind] = useState<HeroKind>(initial.design.heroKind);
+  const [heroImageUrl, setHeroImageUrl] = useState(
+    initial.design.heroKind === "image" ? initial.design.heroUrl : "",
+  );
+  const [heroVideoUrl, setHeroVideoUrl] = useState(
+    initial.design.heroKind === "video" ? initial.design.heroUrl : "",
+  );
+  const [heroImages, setHeroImages] = useState(initial.design.heroImages);
+  const [uploading, setUploading] = useState<UploadKind | "">("");
   const [password, setPassword] = useState("");
   const [services, setServices] = useState<ServiceRow[]>(
     initial.services.length
@@ -548,6 +695,33 @@ function ProfileForm({ initial }: { initial: AccountPortalInitial }) {
   const [error, setError] = useState("");
   const [saved, setSaved] = useState("");
   const [loading, setLoading] = useState(false);
+  const [justPaid, setJustPaid] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("paid") !== "1") return;
+    setJustPaid(true);
+    url.searchParams.delete("paid");
+    const next = `${url.pathname}${url.search}${url.hash}`;
+    window.history.replaceState(null, "", next);
+  }, []);
+
+  async function upload(kind: UploadKind, files: File[], apply: (urls: string[]) => void) {
+    if (!files.length) return;
+    setError("");
+    setSaved("");
+    setUploading(kind);
+    const urls: string[] = [];
+    try {
+      for (const file of files) urls.push(await uploadDesignFile(kind, file));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "העלאת הקובץ נכשלה.");
+    } finally {
+      if (urls.length) apply(urls);
+      setUploading("");
+    }
+  }
 
   function updateService(index: number, patch: Partial<ServiceRow>) {
     setServices((rows) =>
@@ -580,6 +754,13 @@ function ProfileForm({ initial }: { initial: AccountPortalInitial }) {
           language,
           brandColor,
           password,
+          design: {
+            fromNumber,
+            logoUrl,
+            heroKind,
+            heroUrl: heroKind === "video" ? heroVideoUrl : heroImageUrl,
+            heroImages,
+          },
           services: services.map((service) => ({
             id: service.id,
             name: service.name,
@@ -600,40 +781,87 @@ function ProfileForm({ initial }: { initial: AccountPortalInitial }) {
   }
 
   async function logout() {
-    await fetch("/api/account/logout", { method: "POST" });
+    if (loggingOut) return;
+    setLoggingOut(true);
+    await fetch("/api/account/logout", { method: "POST" }).catch(() => null);
     window.location.assign("/account");
   }
 
   return (
-    <main className="account-page">
-      <div className="account-shell">
-        <header className="account-brand">
-          <Link href="/" aria-label="חזרה לאתר תורי">
-            <img src="/assets/brand/tori-app-icon.png" width={36} height={36} alt="tori" />
+    <main className="auth-page" dir="rtl">
+      <span className="auth-glow auth-glow--a" aria-hidden="true" />
+      <span className="auth-glow auth-glow--b" aria-hidden="true" />
+      <header className="auth-head">
+        <Link href="/" className="auth-logo" aria-label="חזרה לאתר תורי">
+          <span className="auth-mark">
+            <img src="/assets/brand/tori-mark.png" alt="" />
+            <video loop playsInline autoPlay muted preload="auto" src="/assets/video/tori-mark-loop.webm" />
+          </span>
+          <img className="auth-wordmark" src="/assets/brand/tori-wordmark.png" alt="tori" />
+        </Link>
+        <div className="auth-head-actions">
+          <Link href="/" className="auth-home">
+            חזרה לאתר
           </Link>
-          <button className="tori-btn tori-btn--ghost" type="button" onClick={() => void logout()}>
-            יציאה
+          <button
+            className="auth-home auth-logout"
+            type="button"
+            disabled={loggingOut}
+            onClick={() => void logout()}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3" />
+              <path d="M10 8l-4 4 4 4" />
+              <path d="M6 12h10" />
+            </svg>
+            {loggingOut ? "מתנתקים..." : "התנתקות"}
           </button>
-        </header>
-        <form className="account-card" onSubmit={(event) => void save(event)}>
-          <p className="account-kicker">אזור אישי</p>
-          <h1>{businessName || "הפרטים שלי"}</h1>
-          <p className="account-lead">
-            כאן משלימים את פרטי העסק. השם, הכתובת, השירותים והעיצוב מתעדכנים גם באפליקציה.
-          </p>
+        </div>
+      </header>
 
-          <section className="account-section">
+      <div className="auth-stage auth-stage--wide">
+        <form className="auth-card auth-card--wide" onSubmit={(event) => void save(event)}>
+          <ol className="auth-steps" aria-label="שלבים">
+            {["נייד", "קוד", "פרטים"].map((label, index) => (
+              <li key={label} className={index < 2 ? "is-done" : "is-current"}>
+                <span>{label}</span>
+              </li>
+            ))}
+          </ol>
+
+          <div className="auth-intro">
+            <span className="auth-badge" aria-hidden="true">
+              <StepIcon step="details" />
+            </span>
+            <p className="auth-kicker">{justPaid ? "התשלום נקלט" : "אזור אישי"}</p>
+            <h1>{businessName || "הפרטים שלי"}</h1>
+            <p className="auth-lead">
+              {justPaid
+                ? "תודה! נשאר רק להשלים את שאר פרטי העסק. הם מתעדכנים גם באפליקציה."
+                : "כאן משלימים את פרטי העסק. השם, הכתובת, השירותים והעיצוב מתעדכנים גם באפליקציה."}
+            </p>
+          </div>
+
+          {justPaid ? (
+            <p className="auth-verified">
+              <span aria-hidden="true">✓</span>
+              המנוי פעיל
+              <bdi dir="ltr">{formatPhone(initial.phone)}</bdi>
+            </p>
+          ) : null}
+
+          <section className="auth-section">
             <h2>פרטי ההרשמה</h2>
-            <div className="account-grid">
+            <div className="auth-grid">
               <Field label="שם מלא">
-                <input className="tori-input" value={fullName} onChange={(event) => setFullName(event.target.value)} />
+                <input className="auth-input" value={fullName} onChange={(event) => setFullName(event.target.value)} />
               </Field>
               <Field label="מספר טלפון">
-                <input className="tori-input" value={initial.phone} disabled dir="ltr" />
+                <input className="auth-input" value={initial.phone} disabled dir="ltr" />
               </Field>
               <Field label="שם האפליקציה באנגלית">
                 <input
-                  className="tori-input"
+                  className="auth-input"
                   value={businessName}
                   onChange={(event) => {
                     const next = event.target.value;
@@ -648,29 +876,43 @@ function ProfileForm({ initial }: { initial: AccountPortalInitial }) {
             </div>
           </section>
 
-          <section className="account-section">
+          <section className="auth-section">
             <h2>פרטים להשלמה</h2>
-            <div className="account-grid">
+            <div className="auth-grid">
               <Field label="אימייל לקבלות">
-                <input className="tori-input" type="email" value={email} onChange={(event) => setEmail(event.target.value)} dir="ltr" />
+                <input className="auth-input" type="email" value={email} onChange={(event) => setEmail(event.target.value)} dir="ltr" />
               </Field>
               <Field label="שם באנגלית">
-                <input className="tori-input" value={appNameEn} onChange={(event) => setAppNameEn(event.target.value)} dir="ltr" placeholder="StudioNoa" />
+                <input className="auth-input" value={appNameEn} onChange={(event) => setAppNameEn(event.target.value)} dir="ltr" placeholder="StudioNoa" />
+              </Field>
+              <Field
+                label="שם השולח ב-SMS"
+                hint={`השם שהלקוחות שלך יראו בהודעות. באנגלית, בלי רווחים, עד ${SENDER_NAME_MAX} תווים.`}
+              >
+                <input
+                  className="auth-input"
+                  value={fromNumber}
+                  onChange={(event) => setFromNumber(cleanSenderName(event.target.value))}
+                  dir="ltr"
+                  autoComplete="off"
+                  spellCheck={false}
+                  placeholder="StudioNoa"
+                />
               </Field>
               <Field label="כתובת העסק">
-                <input className="tori-input" value={address} onChange={(event) => setAddress(event.target.value)} />
+                <input className="auth-input" value={address} onChange={(event) => setAddress(event.target.value)} />
               </Field>
               <Field label="תעודת זהות">
-                <input className="tori-input" inputMode="numeric" value={idNumber} onChange={(event) => setIdNumber(event.target.value)} dir="ltr" />
+                <input className="auth-input" inputMode="numeric" value={idNumber} onChange={(event) => setIdNumber(event.target.value)} dir="ltr" />
               </Field>
               <Field label="שם על הקבלה">
-                <input className="tori-input" value={receiptName} onChange={(event) => setReceiptName(event.target.value)} />
+                <input className="auth-input" value={receiptName} onChange={(event) => setReceiptName(event.target.value)} />
               </Field>
               <Field label="מספר ח.פ">
-                <input className="tori-input" inputMode="numeric" value={receiptVat} onChange={(event) => setReceiptVat(event.target.value)} dir="ltr" />
+                <input className="auth-input" inputMode="numeric" value={receiptVat} onChange={(event) => setReceiptVat(event.target.value)} dir="ltr" />
               </Field>
               <Field label="שפת האפליקציה">
-                <select className="tori-select" value={language} onChange={(event) => setLanguage(event.target.value as AccountLanguage)}>
+                <select className="auth-input auth-select" value={language} onChange={(event) => setLanguage(event.target.value as AccountLanguage)}>
                   <option value="he">עברית</option>
                   <option value="ru">Русский</option>
                   <option value="en">English</option>
@@ -678,50 +920,171 @@ function ProfileForm({ initial }: { initial: AccountPortalInitial }) {
                 </select>
               </Field>
               <Field label="צבע המותג">
-                <input className="tori-input" type="color" value={brandColor} onChange={(event) => setBrandColor(event.target.value)} />
+                <span className="auth-input auth-color">
+                  <input type="color" value={brandColor} onChange={(event) => setBrandColor(event.target.value)} />
+                  <bdi dir="ltr">{brandColor.toUpperCase()}</bdi>
+                </span>
               </Field>
               <Field label="סיסמה למנהל/ת">
-                <input className="tori-input" type="password" inputMode="numeric" autoComplete="new-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="6 ספרות, אם רוצים להחליף" dir="ltr" />
+                <input className="auth-input" type="password" inputMode="numeric" autoComplete="new-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="6 ספרות, אם רוצים להחליף" dir="ltr" />
               </Field>
             </div>
           </section>
 
-          <section className="account-section">
+          <section className="auth-section">
+            <h2>עיצוב האפליקציה</h2>
+            <p className="auth-section-lead">הכל כאן אופציונלי. מה שלא תעלו יישאר בעיצוב ברירת המחדל.</p>
+
+            <div className="auth-design-block">
+              <h3>לוגו</h3>
+              <p className="auth-hint">מופיע בראש דף הבית. הכי טוב PNG עם רקע שקוף.</p>
+              <UploadSlot
+                kind="logo"
+                url={logoUrl}
+                busy={uploading === "logo"}
+                disabled={Boolean(uploading)}
+                onPick={(file) => void upload("logo", [file], ([url]) => setLogoUrl(url))}
+                onRemove={() => setLogoUrl("")}
+              />
+            </div>
+
+            <div className="auth-design-block">
+              <h3>תמונת הפתיחה בדף הבית</h3>
+              <div className="auth-hero-kinds" role="radiogroup" aria-label="תמונת הפתיחה בדף הבית">
+                {HERO_OPTIONS.map((option) => (
+                  <label
+                    key={option.value}
+                    className={heroKind === option.value ? "auth-chip is-active" : "auth-chip"}
+                  >
+                    <input
+                      className="auth-file-input"
+                      type="radio"
+                      name="hero-kind"
+                      value={option.value}
+                      checked={heroKind === option.value}
+                      onChange={() => setHeroKind(option.value)}
+                    />
+                    {option.label}
+                  </label>
+                ))}
+              </div>
+
+              {heroKind === "none" ? (
+                <p className="auth-hint">דף הבית יוצג עם התמונות של עיצוב ברירת המחדל.</p>
+              ) : null}
+
+              {heroKind === "image" ? (
+                <UploadSlot
+                  kind="hero-image"
+                  url={heroImageUrl}
+                  wide
+                  busy={uploading === "hero-image"}
+                  disabled={Boolean(uploading)}
+                  onPick={(file) => void upload("hero-image", [file], ([url]) => setHeroImageUrl(url))}
+                  onRemove={() => setHeroImageUrl("")}
+                />
+              ) : null}
+
+              {heroKind === "video" ? (
+                <>
+                  <p className="auth-hint">סרטון MP4 או MOV עד 10MB. הוא מתנגן בלולאה ובלי קול.</p>
+                  <UploadSlot
+                    kind="hero-video"
+                    url={heroVideoUrl}
+                    wide
+                    busy={uploading === "hero-video"}
+                    disabled={Boolean(uploading)}
+                    onPick={(file) => void upload("hero-video", [file], ([url]) => setHeroVideoUrl(url))}
+                    onRemove={() => setHeroVideoUrl("")}
+                  />
+                </>
+              ) : null}
+
+              {heroKind === "images" ? (
+                <>
+                  <p className="auth-hint">{`עד ${MAX_HERO_IMAGES} תמונות שמתחלפות בדף הבית.`}</p>
+                  <div className="auth-hero-grid">
+                    {heroImages.map((src, index) => (
+                      <div className="auth-hero-thumb" key={src}>
+                        <img src={src} alt="" />
+                        <button
+                          type="button"
+                          aria-label="הסרת התמונה"
+                          disabled={Boolean(uploading)}
+                          onClick={() =>
+                            setHeroImages((rows) => rows.filter((_, rowIndex) => rowIndex !== index))
+                          }
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                    {heroImages.length < MAX_HERO_IMAGES ? (
+                      <label className={uploading ? "auth-hero-add is-disabled" : "auth-hero-add"}>
+                        <input
+                          className="auth-file-input"
+                          type="file"
+                          multiple
+                          accept={acceptsFor("hero-images")}
+                          disabled={Boolean(uploading)}
+                          onChange={(event) => {
+                            const files = Array.from(event.target.files ?? []).slice(
+                              0,
+                              MAX_HERO_IMAGES - heroImages.length,
+                            );
+                            event.target.value = "";
+                            void upload("hero-images", files, (urls) =>
+                              setHeroImages((rows) => [...rows, ...urls].slice(0, MAX_HERO_IMAGES)),
+                            );
+                          }}
+                        />
+                        {uploading === "hero-images" ? "מעלים..." : "+ הוספת תמונות"}
+                      </label>
+                    ) : null}
+                  </div>
+                </>
+              ) : null}
+            </div>
+          </section>
+
+          <section className="auth-section">
             <h2>שירותים</h2>
             {services.map((service, index) => (
-              <div className="account-service" key={`${service.id}-${index}`}>
-                <Field label={index === 0 ? "שם" : ""}>
-                  <input className="tori-input" value={service.name} onChange={(event) => updateService(index, { name: event.target.value })} />
+              <div className="auth-service" key={`${service.id}-${index}`}>
+                <Field label="שם השירות">
+                  <input className="auth-input" value={service.name} onChange={(event) => updateService(index, { name: event.target.value })} />
                 </Field>
-                <Field label={index === 0 ? "מחיר" : ""}>
-                  <input className="tori-input" inputMode="decimal" value={service.price} onChange={(event) => updateService(index, { price: event.target.value })} dir="ltr" />
+                <Field label="מחיר ₪">
+                  <input className="auth-input" inputMode="decimal" value={service.price} onChange={(event) => updateService(index, { price: event.target.value })} dir="ltr" />
                 </Field>
-                <Field label={index === 0 ? "דקות" : ""}>
-                  <input className="tori-input" inputMode="numeric" value={service.duration} onChange={(event) => updateService(index, { duration: event.target.value })} dir="ltr" />
+                <Field label="דקות">
+                  <input className="auth-input" inputMode="numeric" value={service.duration} onChange={(event) => updateService(index, { duration: event.target.value })} dir="ltr" />
                 </Field>
                 <button
-                  className="tori-btn tori-btn--ghost"
+                  className="auth-remove"
                   type="button"
+                  aria-label="הסרת השירות"
                   onClick={() => setServices((rows) => rows.filter((_, rowIndex) => rowIndex !== index))}
                 >
-                  הסרה
+                  ✕
                 </button>
               </div>
             ))}
             <button
-              className="tori-btn tori-btn--secondary"
+              className="auth-add"
               type="button"
               onClick={() =>
                 setServices((rows) => [...rows, { id: "", name: "", price: "", duration: "" }])
               }
             >
-              הוספת שירות
+              + הוספת שירות
             </button>
           </section>
 
-          {error ? <p className="account-error">{error}</p> : null}
-          {saved ? <p className="account-note">{saved}</p> : null}
-          <button className="tori-btn tori-btn--primary" type="submit" disabled={loading}>
+          {error ? <p className="auth-error" role="alert">{error}</p> : null}
+          {saved ? <p className="auth-verified"><span aria-hidden="true">✓</span>{saved}</p> : null}
+          <button className="auth-submit" type="submit" disabled={loading || Boolean(uploading)}>
+            {loading ? <span className="auth-spinner" aria-hidden="true" /> : null}
             {loading ? "שומרים..." : "שמירת הפרטים"}
           </button>
         </form>

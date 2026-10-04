@@ -4,7 +4,16 @@ import {
   ENGLISH_DISPLAY_NAME_ERROR,
   isEnglishDisplayName,
 } from "@/lib/display-name";
+import {
+  DESIGN_BUCKET,
+  DESIGN_FOLDER,
+  designFromProfile,
+  designProfilePatch,
+  unknownMediaUrl,
+  type AccountDesign,
+} from "@/lib/account/design";
 import type { AccountLanguage, AccountProfileDraft } from "@/lib/account/profile";
+import { getSupabaseUrl } from "@/lib/sms/env";
 import { normalizeIsraeliMobile } from "@/lib/sms/phone";
 import { getServiceSupabase } from "@/lib/sms/supabase-admin";
 
@@ -35,7 +44,22 @@ export type PortalService = {
 
 export type PortalProfile = CustomerAccount & {
   services: PortalService[];
+  design: AccountDesign;
 };
+
+const DESIGN_COLUMNS =
+  "home_logo_url, home_hero_mode, home_hero_single_url, home_hero_single_kind, home_hero_images, pulseem_from_number";
+
+async function loadDesign(businessId: string) {
+  const supabase = getServiceSupabase();
+  const { data, error } = await supabase
+    .from("business_profile")
+    .select(DESIGN_COLUMNS)
+    .eq("id", businessId)
+    .maybeSingle();
+  if (error) throw new Error("טעינת עיצוב האפליקציה נכשלה.");
+  return designFromProfile(asRecord(data));
+}
 
 const ACCOUNT_COLUMNS =
   "id, phone, full_name, business_name, paid_at, business_id, user_id, email, app_name_en, address, id_number, receipt_name, receipt_vat, language, brand_color";
@@ -130,9 +154,11 @@ export async function loadPortal(accountId: string, userId: string) {
     .eq("business_id", account.businessId)
     .order("order_index", { ascending: true });
   if (servicesError) throw new Error("טעינת השירותים נכשלה.");
+  const design = await loadDesign(account.businessId);
 
   return {
     ...account,
+    design,
     services: (services ?? [])
       .map((row) => asRecord(row))
       .filter((row) => {
@@ -154,6 +180,12 @@ export async function savePortal(account: CustomerAccount, draft: AccountProfile
   }
   if (!isEnglishDisplayName(draft.businessName)) {
     return { ok: false as const, error: ENGLISH_DISPLAY_NAME_ERROR };
+  }
+
+  const current = await loadDesign(account.businessId);
+  const uploadPrefix = `${getSupabaseUrl().replace(/\/$/, "")}/storage/v1/object/public/${DESIGN_BUCKET}/${DESIGN_FOLDER}/`;
+  if (unknownMediaUrl(draft.design, current, uploadPrefix)) {
+    return { ok: false as const, error: "אחד הקבצים לא הועלה מהאזור האישי. העלו אותו שוב." };
   }
 
   const supabase = getServiceSupabase();
@@ -198,6 +230,7 @@ export async function savePortal(account: CustomerAccount, draft: AccountProfile
   }
 
   const profilePatch: Record<string, unknown> = {
+    ...designProfilePatch(draft.design),
     display_name: draft.businessName,
     address: draft.address,
     updated_at: now,
@@ -386,7 +419,7 @@ export async function savePendingSignup(input: {
       })
       .eq("id", existingId);
     if (error) throw new Error("שמירת הפרטים נכשלה.");
-    return existingId;
+    return { id: existingId, existed: true };
   }
 
   const id = randomUUID();
@@ -399,7 +432,7 @@ export async function savePendingSignup(input: {
     agreement_accepted_at: now,
   });
   if (error) throw new Error("שמירת הפרטים נכשלה.");
-  return id;
+  return { id, existed: false };
 }
 
 /** Returns the signup only while it has no business yet. */
@@ -456,6 +489,17 @@ export async function rememberCheckoutDetails(input: {
       updated_at: new Date().toISOString(),
     })
     .eq("id", data.id);
+}
+
+export async function loadAccountByBusinessId(businessId: string) {
+  const supabase = getServiceSupabase();
+  const { data, error } = await supabase
+    .from("site_customer_accounts")
+    .select(ACCOUNT_COLUMNS)
+    .eq("business_id", businessId)
+    .maybeSingle();
+  if (error) throw new Error("איתור החשבון נכשל.");
+  return data ? toAccount(asRecord(data)) : null;
 }
 
 export async function markAccountPaid(businessId: string) {

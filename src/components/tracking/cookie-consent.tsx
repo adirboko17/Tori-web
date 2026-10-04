@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { SUBSCRIBE_TRACK_COOKIE } from "@/lib/payplus-return";
 import "./cookie-consent.css";
 
 const CONSENT_KEY = "tori-cookie-consent";
@@ -101,6 +102,13 @@ function installGtm(containerId: string) {
   gtmReady = true;
 }
 
+function takeSubscribeCookie() {
+  const marked = document.cookie.split("; ").includes(`${SUBSCRIBE_TRACK_COOKIE}=1`);
+  if (!marked) return false;
+  document.cookie = `${SUBSCRIBE_TRACK_COOKIE}=; path=/; max-age=0; SameSite=Lax`;
+  return true;
+}
+
 function trackPage(pathname: string) {
   if (META_PIXEL_ID) {
     installMeta(META_PIXEL_ID);
@@ -118,7 +126,7 @@ function trackPage(pathname: string) {
     installGtm(GTM_ID);
     window.dataLayer?.push({ event: "page_view", page_path: pathname });
   }
-  if (pathname === "/subscribe/success") {
+  if (pathname === "/subscribe/success" || takeSubscribeCookie()) {
     const onceKey = "tori-tracked-subscribe";
     if (!sessionStorage.getItem(onceKey)) {
       sessionStorage.setItem(onceKey, "1");

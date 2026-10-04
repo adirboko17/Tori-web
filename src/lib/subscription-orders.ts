@@ -4,6 +4,7 @@ import { loadMonthlyPriceIls } from "@/lib/admin/catalog";
 import { savePayplusSubscription } from "@/lib/admin/payplus-subscriptions";
 import { priceSummary } from "@/lib/booking";
 import { amountsMatch } from "@/lib/sms/payplus";
+import { notifyNewAppPayment } from "@/lib/sms/purchase-notify";
 import { getServiceSupabase } from "@/lib/sms/supabase-admin";
 import {
   SUBSCRIPTION_PLAN,
@@ -105,13 +106,17 @@ export async function fulfillPaidSubscription(input: {
         commitment: "paid",
       })
       .eq("id", businessId)
-      .neq("commitment", "paid")
+      .or("commitment.is.null,commitment.neq.paid")
       .select("id")
       .maybeSingle();
     if (error) {
       console.error("subscription status update failed", error.message);
       return { ok: true as const, idempotent: false };
     }
+    // The PayPlus callback and the browser return can arrive together. Only the
+    // request whose update flipped the business to paid gets a row back, so the
+    // owners get exactly one SMS per purchase.
+    if (data) await notifyNewAppPayment({ businessId });
     return { ok: true as const, idempotent: !data };
   } catch (error) {
     console.error("subscription status update skipped", error);

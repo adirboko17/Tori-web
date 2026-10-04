@@ -51,7 +51,7 @@ export async function openCustomerUser(input: {
       businessName,
     });
     await refreshOpenedNames(resume.businessId, fullName, businessName);
-    return { ok: true as const, checkoutId: resume.businessId };
+    return { ok: true as const, checkoutId: resume.businessId, returning: true };
   }
 
   // New signups only keep the details. The business is opened after payment.
@@ -60,13 +60,13 @@ export async function openCustomerUser(input: {
     phone: found.phone,
     businessNameHe: businessName,
   });
-  const checkoutId = await savePendingSignup({
+  const pending = await savePendingSignup({
     phone: found.phone,
     fullName,
     businessName,
     appNameEn: randomAppName(mapped.app_name_en),
   });
-  return { ok: true as const, checkoutId };
+  return { ok: true as const, checkoutId: pending.id, returning: pending.existed };
 }
 
 function randomAppName(base: string) {

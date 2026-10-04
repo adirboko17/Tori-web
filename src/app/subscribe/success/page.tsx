@@ -1,31 +1,16 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import Image from "next/image";
+import { Suspense } from "react";
 import { loadMonthlyPriceIls } from "@/lib/admin/catalog";
 import "../../sms/sms.css";
+import { SubscribeSuccess, SubscribeSuccessFallback } from "./continue";
 
 export const metadata: Metadata = { title: "הוראת הקבע נקלטה" };
 
 export default async function SubscribeSuccessPage() {
   const monthlyPrice = await loadMonthlyPriceIls();
   return (
-    <main className="sms-result">
-      <Image
-        src="/assets/brand/tori-app-icon.png"
-        width={72}
-        height={72}
-        alt="tori"
-      />
-      <h1>הוראת הקבע נקלטה</h1>
-      <p>
-        {`החיוב החודשי של ${monthlyPrice} ₪ + מע״מ נקלט. באזור האישי מתחברים עם הנייד שאיתו שילמתם, ומקבלים קוד ב-SMS.`}
-      </p>
-      <Link className="tori-btn tori-btn--secondary" href="/account">
-        לאזור האישי
-      </Link>
-      <Link className="tori-btn tori-btn--ghost" href="/">
-        לדף הבית
-      </Link>
-    </main>
+    <Suspense fallback={<SubscribeSuccessFallback />}>
+      <SubscribeSuccess monthlyPrice={monthlyPrice} />
+    </Suspense>
   );
 }

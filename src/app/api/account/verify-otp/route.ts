@@ -41,8 +41,8 @@ export async function POST(request: Request) {
 
     const verified =
       pending.purpose === "register"
-        ? await verifyRegisterOtp(pending.businessId, found.phone, code)
-        : await verifyLoginOtp(pending.businessId, found.phone, code, {
+        ? await verifyRegisterOtp(pending.senderId, found.phone, code)
+        : await verifyLoginOtp(pending.senderId, found.phone, code, {
             allowEmergency: pending.flow !== "signup",
           });
     if (!verified.ok) {
