@@ -1,3 +1,7 @@
+import { FEATURE_ART } from "../feature-art/FeatureArt";
+
+const [Art0, Art1, Art2, Art3, Art4, Art5] = FEATURE_ART;
+
 export default function CapabilitiesSection() {
   return (
     <section
@@ -42,13 +46,7 @@ export default function CapabilitiesSection() {
         <div className="tori-feats">
           <article className="tori-feat" data-reveal="2">
             <div className="tori-feat-media">
-              <video
-                src="/assets/features/f1.mp4"
-                muted={true}
-                loop={true}
-                playsInline={true}
-                preload="none"
-              ></video>
+              <Art0 />
             </div>
             <div className="tori-feat-body">
               <span className="tori-feat-num">{"01"}</span>
@@ -65,13 +63,7 @@ export default function CapabilitiesSection() {
           </article>
           <article className="tori-feat" data-reveal="2">
             <div className="tori-feat-media">
-              <video
-                src="/assets/features/f5.mp4"
-                muted={true}
-                loop={true}
-                playsInline={true}
-                preload="none"
-              ></video>
+              <Art1 />
             </div>
             <div className="tori-feat-body">
               <span className="tori-feat-num">{"02"}</span>
@@ -88,13 +80,7 @@ export default function CapabilitiesSection() {
           </article>
           <article className="tori-feat" data-reveal="2">
             <div className="tori-feat-media">
-              <video
-                src="/assets/features/f4.mp4"
-                muted={true}
-                loop={true}
-                playsInline={true}
-                preload="none"
-              ></video>
+              <Art2 />
             </div>
             <div className="tori-feat-body">
               <span className="tori-feat-num">{"03"}</span>
@@ -111,13 +97,7 @@ export default function CapabilitiesSection() {
           </article>
           <article className="tori-feat" data-reveal="2">
             <div className="tori-feat-media">
-              <video
-                src="/assets/features/f3.mp4"
-                muted={true}
-                loop={true}
-                playsInline={true}
-                preload="none"
-              ></video>
+              <Art3 />
             </div>
             <div className="tori-feat-body">
               <span className="tori-feat-num">{"04"}</span>
@@ -134,13 +114,7 @@ export default function CapabilitiesSection() {
           </article>
           <article className="tori-feat" data-reveal="2">
             <div className="tori-feat-media">
-              <video
-                src="/assets/features/f6.mp4"
-                muted={true}
-                loop={true}
-                playsInline={true}
-                preload="none"
-              ></video>
+              <Art4 />
             </div>
             <div className="tori-feat-body">
               <span className="tori-feat-num">{"05"}</span>
@@ -157,13 +131,7 @@ export default function CapabilitiesSection() {
           </article>
           <article className="tori-feat" data-reveal="2">
             <div className="tori-feat-media">
-              <video
-                src="/assets/features/f2.mp4"
-                muted={true}
-                loop={true}
-                playsInline={true}
-                preload="none"
-              ></video>
+              <Art5 />
             </div>
             <div className="tori-feat-body">
               <span className="tori-feat-num">{"06"}</span>

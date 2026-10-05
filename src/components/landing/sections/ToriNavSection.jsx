@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { id: "compare", label: "השוואה", hint: "תורי מול הדרך הישנה" },
   { id: "pricing", label: "מחיר", hint: "מחיר אחד, הכל כלול" },
   { id: "faq", label: "שאלות", hint: "כל מה ששאלתם" },
+  { id: "sms", label: "רכישת SMS", hint: "עוד הודעות לעסק", href: "/sms" },
 ];
 
 /** Refraction map for the liquid-glass bar: red bends x, green bends y.
@@ -194,8 +195,8 @@ export default function ToriNavSection() {
           {NAV_ITEMS.map((item) => (
             <a
               key={item.id}
-              href={"#" + item.id}
-              data-nav={item.id}
+              href={item.href ?? "#" + item.id}
+              data-nav={item.href ? undefined : item.id}
               style={{ fontWeight: "500", borderRadius: "5px" }}
             >
               {item.label}
@@ -278,8 +279,8 @@ export default function ToriNavSection() {
           {NAV_ITEMS.map((item, i) => (
             <a
               key={item.id}
-              href={"#" + item.id}
-              data-menu-link={item.id}
+              href={item.href ?? "#" + item.id}
+              data-menu-link={item.href ? undefined : item.id}
               data-act="closeMenu"
               style={{ "--i": i }}
             >

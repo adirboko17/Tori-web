@@ -72,6 +72,60 @@
   animation-delay: -5.2s;
 }
 
+/* dots + a swipe hint, only where the phones become a carousel */
+.tori-lp .tori-brand-nav {
+  display: none;
+  justify-items: center;
+  gap: 10px;
+  margin: -18px 0 34px;
+}
+.tori-lp .tori-brand-dots {
+  display: flex;
+  gap: 8px;
+}
+.tori-lp .tori-brand-dots button {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink-200);
+  cursor: pointer;
+  transition:
+    width 0.35s cubic-bezier(0.22, 0.61, 0.36, 1),
+    background 0.35s;
+}
+.tori-lp .tori-brand-dots button.is-on {
+  width: 28px;
+  background: var(--ink-900);
+}
+.tori-lp .tori-brand-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink-500);
+  transition: opacity 0.4s;
+}
+.tori-lp .tori-brand-hint span {
+  display: inline-block;
+  animation: tori-brand-nudge 1.4s ease-in-out infinite;
+}
+.tori-lp .tori-brand-hint.is-gone {
+  opacity: 0;
+}
+@keyframes tori-brand-nudge {
+  0%,
+  100% {
+    transform: none;
+  }
+  50% {
+    transform: translateX(-6px);
+  }
+}
+
 /* ---------- bento: what gets branded ---------- */
 .tori-lp .tori-bento-grid {
   list-style: none;
@@ -379,19 +433,24 @@
   .tori-lp .tori-brand-item:nth-child(2) {
     margin-top: 0;
   }
+  .tori-lp .tori-brand-nav {
+    display: grid;
+  }
   .tori-lp .tori-bento,
   .tori-lp .tori-bento.is-wide {
     grid-column: span 3;
   }
 }
 @media (max-width: 640px) {
-  /* a swipeable row where every phone snaps to the centre of the screen */
+  /* a swipeable row where every phone snaps to the centre of the screen; the
+     phones are a bit smaller so the neighbours peek in from both sides */
   .tori-lp .tori-brand-row {
     margin-inline: calc(-1 * var(--m-gutter, 24px));
-    padding: 40px calc(50% - 134px) 56px;
-    gap: 28px;
+    padding: 36px calc(50% - 112px) 52px;
+    gap: 18px;
   }
   .tori-lp .tori-brand-device {
+    zoom: 0.84;
     box-shadow:
       0 16px 34px rgba(23, 22, 22, 0.2),
       0 0 0 1px rgba(255, 255, 255, 0.08) inset;

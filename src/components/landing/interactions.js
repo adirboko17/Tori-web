@@ -616,27 +616,6 @@ export function initializeLanding(root) {
     });
   renderChat();
 
-  /* ---------- feature videos: play only in view ---------- */
-  const featVids = $$(".tori-feat-media video", root);
-  if (featVids.length) {
-    const vo = scope.observe(
-      (es) => {
-        es.forEach((e) => {
-          const v = e.target;
-          if (e.isIntersecting) {
-            v.muted = true;
-            v.playsInline = true;
-            if (v.preload === "none") v.preload = "auto";
-            const p = v.play();
-            if (p && p.catch) p.catch(() => {});
-          } else if (!v.paused) v.pause();
-        });
-      },
-      { threshold: 0.25 },
-    );
-    featVids.forEach((v) => vo.observe(v));
-  }
-
   /* ---------- lead form ---------- */
   const leadMsg = ref("leadMsg");
   function say(msg, ok) {

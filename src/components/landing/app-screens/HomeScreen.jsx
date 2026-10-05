@@ -16,12 +16,12 @@ const TORI_STAFF = ["אליאן", "יעל", "מאיה", "מיכל", "נועה", 
 const DAYS = ["היום", "יום ו׳", "שבת", "יום א׳", "יום ב׳", "יום ג׳"];
 const SPARKS = [0, 45, 90, 135, 180, 225, 270, 315];
 
-function columnsOf(photos) {
+function rowsOf(photos) {
   const [p1, p2, p3, p4, p5, p6] = photos;
   return [
-    [p1, p2, p3],
-    [p4, p5, p6],
-    [p3, p6, p2],
+    [p1, p2, p3, p4],
+    [p5, p6, p1, p2],
+    [p3, p4, p5, p6],
   ];
 }
 
@@ -29,8 +29,8 @@ function Mosaic({ photos }) {
   return (
     <div className="ha-mosaic" aria-hidden="true">
       <div className="ha-mosaic-grid">
-        {columnsOf(photos).map((tiles, c) => (
-          <div key={c} className="ha-col" style={{ "--c": c }}>
+        {rowsOf(photos).map((tiles, row) => (
+          <div key={row} className="ha-row" style={{ "--row": row }}>
             <div className="ha-track">
               {[...tiles, ...tiles].map((src, i) => (
                 <img
