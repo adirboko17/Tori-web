@@ -98,21 +98,21 @@ function Alert({ children }) {
   );
 }
 
+/** The onboarding's stepper: done steps turn ink with a check. */
 function Progress({ current }) {
   return (
-    <div className="sms-progress">
-      <div className="sms-progress-bars" aria-hidden="true">
-        {STEP_LABELS.map((label, index) => (
-          <span key={label} className={index <= current ? "is-on" : ""} />
-        ))}
-      </div>
-      <p className="sms-progress-label">
-        <span>
-          שלב {current + 1} מתוך {STEP_LABELS.length}
-        </span>
-        <b>{STEP_LABELS[current]}</b>
-      </p>
-    </div>
+    <ol className="sms-steps" aria-label={`שלב ${current + 1} מתוך ${STEP_LABELS.length}`}>
+      {STEP_LABELS.map((label, index) => (
+        <li
+          key={label}
+          className={index < current ? "is-done" : index === current ? "is-current" : ""}
+          aria-current={index === current ? "step" : undefined}
+        >
+          <span className="sms-steps-num">{index < current ? <CheckIcon size={12} /> : index + 1}</span>
+          <span className="sms-steps-label">{label}</span>
+        </li>
+      ))}
+    </ol>
   );
 }
 
@@ -481,28 +481,24 @@ export function SmsShop() {
               </div>
               <label className="sms-field">
                 <span className="sms-field-label">מספר נייד</span>
-                <span className={`sms-phone ${phoneError ? "is-invalid" : ""}`}>
-                  <span className="sms-phone-ico" aria-hidden="true">
-                    <Icon name="phone" size={18} />
-                  </span>
-                  <input
-                    name="phone"
-                    type="tel"
-                    inputMode="tel"
-                    autoComplete="tel"
-                    dir="ltr"
-                    placeholder="050-000-0000"
-                    value={phone}
-                    aria-invalid={phoneError ? true : undefined}
-                    autoFocus
-                    onFocus={() => setTyping(true)}
-                    onBlur={() => setTyping(false)}
-                    onChange={(event) => {
-                      setPhone(event.target.value);
-                      setPhoneError("");
-                    }}
-                  />
-                </span>
+                <input
+                  className={`sms-input is-phone ${phoneError ? "is-invalid" : ""}`}
+                  name="phone"
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  dir="ltr"
+                  placeholder="050-000-0000"
+                  value={phone}
+                  aria-invalid={phoneError ? true : undefined}
+                  autoFocus
+                  onFocus={() => setTyping(true)}
+                  onBlur={() => setTyping(false)}
+                  onChange={(event) => {
+                    setPhone(event.target.value);
+                    setPhoneError("");
+                  }}
+                />
               </label>
               {phoneError ? <Alert>{phoneError}</Alert> : null}
               <Cta type="submit" busy={loading} disabled={loading || phoneDigits.length < 9}>
@@ -632,7 +628,6 @@ export function SmsShop() {
               </div>
 
               <div className="sms-balance">
-                <div className="sms-balance-glow" aria-hidden="true" />
                 <span className="sms-balance-label">היתרה שלכם עכשיו</span>
                 {balance?.ok ? (
                   <>
@@ -702,7 +697,6 @@ export function SmsShop() {
               {!shop.checkoutReady ? <Alert>התשלום עדיין לא זמין. נסו שוב מאוחר יותר.</Alert> : null}
 
               <Cta
-                tone="brand"
                 busy={loading}
                 disabled={loading || !selected || !shop.checkoutReady}
                 onClick={() => void checkout()}
