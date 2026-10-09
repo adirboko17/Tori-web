@@ -1,6 +1,6 @@
 import { getServiceSupabase } from "@/lib/sms/supabase-admin";
 
-const ACTIVE_MS = 2 * 60 * 1000;
+const ACTIVE_MS = 45 * 1000;
 const RECENT_MS = 24 * 60 * 60 * 1000;
 const CHECKOUT_NOW_MS = 30 * 60 * 1000;
 
@@ -140,12 +140,25 @@ export async function touchLiveSession(input: {
   const supabase = getServiceSupabase();
   const stage = liveStageForPath(input.path);
   const now = new Date().toISOString();
-  const { data: existing, error: readError } = await supabase
+  const { data: matched, error: readError } = await supabase
     .from("site_live_sessions")
     .select("session_key, path, stage")
     .eq("session_key", input.sessionKey)
     .maybeSingle();
   if (readError) throw new Error(readError.message);
+
+  let existing = matched;
+  if (!existing && input.visitorKey) {
+    const { data: sibling, error: siblingError } = await supabase
+      .from("site_live_sessions")
+      .select("session_key, path, stage")
+      .eq("visitor_key", input.visitorKey)
+      .order("last_seen_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (siblingError) throw new Error(siblingError.message);
+    if (sibling) existing = sibling;
+  }
 
   if (!existing) {
     const { error } = await supabase.from("site_live_sessions").insert({
@@ -173,7 +186,7 @@ export async function touchLiveSession(input: {
       visitor_key: input.visitorKey,
       last_seen_at: now,
     })
-    .eq("session_key", input.sessionKey);
+    .eq("session_key", existing.session_key);
   if (error) throw new Error(error.message);
 
   const pathChanged = existing.path !== input.path;
@@ -185,6 +198,19 @@ export async function touchLiveSession(input: {
       placeLabel(input.country, input.city),
     );
   }
+}
+
+export async function leaveLiveSession(sessionKey: string, visitorKey: string | null) {
+  const supabase = getServiceSupabase();
+  const gone = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+  const { error } = await supabase.from("site_live_sessions").update({ last_seen_at: gone }).eq("session_key", sessionKey);
+  if (error) throw new Error(error.message);
+  if (!visitorKey) return;
+  const { error: visitorError } = await supabase
+    .from("site_live_sessions")
+    .update({ last_seen_at: gone })
+    .eq("visitor_key", visitorKey);
+  if (visitorError) throw new Error(visitorError.message);
 }
 
 export async function pruneLiveRows() {
@@ -208,7 +234,7 @@ export async function loadLiveSnapshot(): Promise<LiveSnapshot> {
   const [sessions, daySessions, yesterdaySessions, events, smsRows, accountRows, pricing] = await Promise.all([
     supabase
       .from("site_live_sessions")
-      .select("session_key, path, stage, country, city, last_seen_at")
+      .select("session_key, visitor_key, path, stage, country, city, last_seen_at")
       .gte("last_seen_at", activeSince)
       .order("last_seen_at", { ascending: false })
       .limit(40),
@@ -247,8 +273,16 @@ export async function loadLiveSnapshot(): Promise<LiveSnapshot> {
   const failure = [sessions.error, daySessions.error, yesterdaySessions.error, events.error, smsRows.error, accountRows.error, pricing.error].find(Boolean);
   if (failure) throw new Error(failure.message);
 
-  const visitors: LiveVisitor[] = (sessions.data ?? []).map((row) => ({
-    id: String(row.session_key),
+  const people = new Map<string, NonNullable<typeof sessions.data>[number]>();
+  for (const row of sessions.data ?? []) {
+    const key = row.visitor_key ? `v:${row.visitor_key}` : `s:${row.session_key}`;
+    const previous = people.get(key);
+    if (!previous || Date.parse(String(row.last_seen_at)) > Date.parse(String(previous.last_seen_at))) {
+      people.set(key, row);
+    }
+  }
+  const visitors: LiveVisitor[] = [...people.values()].map((row) => ({
+    id: String(row.visitor_key || row.session_key),
     label: pageLabel(String(row.path || "/")),
     place: placeLabel(row.country ? String(row.country) : null, row.city ? String(row.city) : null) || "באתר",
     stage: row.stage === "checkout" ? "checkout" : "browsing",

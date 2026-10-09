@@ -29,24 +29,27 @@ export function LiveBeacon() {
       return;
     }
 
-    const send = () => {
+    const send = (left = false) => {
       void fetch("/api/live", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId, visitorId, path: pathname }),
+        body: JSON.stringify({ sessionId, visitorId, path: pathname, left }),
         keepalive: true,
       }).catch(() => undefined);
     };
 
-    send();
-    const timer = window.setInterval(send, 15_000);
-    const onHide = () => {
-      if (document.visibilityState === "hidden") send();
-    };
-    document.addEventListener("visibilitychange", onHide);
+    send(false);
+    const timer = window.setInterval(() => {
+      if (document.visibilityState === "visible") send(false);
+    }, 15_000);
+    const onHide = () => send(true);
+    const onVisibility = () => send(document.visibilityState === "hidden");
+    window.addEventListener("pagehide", onHide);
+    document.addEventListener("visibilitychange", onVisibility);
     return () => {
       window.clearInterval(timer);
-      document.removeEventListener("visibilitychange", onHide);
+      window.removeEventListener("pagehide", onHide);
+      document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [pathname]);
 

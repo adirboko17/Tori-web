@@ -1,4 +1,4 @@
-import { pruneLiveRows, touchLiveSession } from "@/lib/live/store";
+import { leaveLiveSession, pruneLiveRows, touchLiveSession } from "@/lib/live/store";
 import { jsonError, jsonOk, readJsonBody } from "@/lib/sms/http";
 
 export const runtime = "nodejs";
@@ -31,11 +31,16 @@ export async function POST(request: Request) {
   const visitorRaw = String(body?.visitorId ?? "");
   const path = cleanPath(body?.path);
   if (!SESSION_RE.test(sessionKey) || !path) return jsonError("בקשה לא תקינה.");
+  const visitorKey = SESSION_RE.test(visitorRaw) ? visitorRaw : null;
 
   try {
+    if (body?.left === true) {
+      await leaveLiveSession(sessionKey, visitorKey);
+      return jsonOk({ ok: true });
+    }
     await touchLiveSession({
       sessionKey,
-      visitorKey: SESSION_RE.test(visitorRaw) ? visitorRaw : null,
+      visitorKey,
       path,
       country: headerValue(request, "x-vercel-ip-country", 8),
       city: headerValue(request, "x-vercel-ip-city", 80),
