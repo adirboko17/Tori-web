@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { CookieConsent } from "@/components/tracking/cookie-consent";
+import { LiveBeacon } from "@/components/tracking/live-beacon";
 import "@/styles/design-system.css";
 import "./globals.css";
 
@@ -26,6 +27,7 @@ export default function RootLayout({
     <html lang="he" dir="rtl">
       <body>
         {children}
+        <LiveBeacon />
         <CookieConsent />
       </body>
     </html>
