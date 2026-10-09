@@ -1,4 +1,5 @@
 import { HelpCenterError, deleteHelpVideo, updateHelpVideo } from "@/lib/superadmin/help-center";
+import { readHelpVideoAudience } from "@/lib/superadmin/help-shared";
 import { fail, guardAdmin, ok, UUID_RE } from "@/lib/superadmin/http";
 import type { HelpI18n } from "@/lib/superadmin/types";
 
@@ -41,6 +42,11 @@ export async function PATCH(request: Request, context: RouteContext) {
     }
     if (body.sort_order !== undefined) patch.sort_order = Number(body.sort_order);
     if (body.is_published !== undefined) patch.is_published = body.is_published === true;
+    if (body.audience !== undefined) {
+      const audience = readHelpVideoAudience(body.audience);
+      if (audience === "invalid") return fail("קהל יעד לא תקין");
+      patch.audience = audience;
+    }
     return ok({ video: await updateHelpVideo(id, patch) });
   } catch (error) {
     if (error instanceof HelpCenterError) return fail(error.message);

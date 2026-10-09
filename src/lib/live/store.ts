@@ -23,11 +23,21 @@ export type LiveActivity = {
   at: string;
 };
 
+export type LiveLocation = { label: string; count: number };
+
 export type LiveSnapshot = {
   visitorsNow: number;
   checkoutsNow: number;
   purchasesRecent: number;
   sessionsToday: number;
+  salesTodayIls: number;
+  salesChangePct: number | null;
+  sessionsChangePct: number | null;
+  ordersToday: number;
+  ordersChangePct: number | null;
+  behavior: { viewing: number; checkout: number; purchased: number };
+  locations: LiveLocation[];
+  customers: { fresh: number; returning: number };
   visitors: LiveVisitor[];
   activity: LiveActivity[];
 };
@@ -90,6 +100,23 @@ function money(value: unknown) {
   return `${Math.round(amount).toLocaleString("he-IL")} ₪`;
 }
 
+function amount(value: unknown) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : 0;
+}
+
+function changePct(current: number, previous: number) {
+  if (previous <= 0) return null;
+  return Math.round(((current - previous) / previous) * 100);
+}
+
+function paidIn<T extends { paid_at?: string | null }>(rows: T[], start: number, end: number) {
+  return rows.filter((row) => {
+    const at = Date.parse(String(row.paid_at || ""));
+    return at >= start && at < end;
+  });
+}
+
 export async function recordLiveEvent(kind: EventKind, title: string, detail = "") {
   try {
     const { error } = await getServiceSupabase().from("site_live_events").insert({
@@ -105,6 +132,7 @@ export async function recordLiveEvent(kind: EventKind, title: string, detail = "
 
 export async function touchLiveSession(input: {
   sessionKey: string;
+  visitorKey: string | null;
   path: string;
   country: string | null;
   city: string | null;
@@ -126,6 +154,7 @@ export async function touchLiveSession(input: {
       stage,
       country: input.country,
       city: input.city,
+      visitor_key: input.visitorKey,
       started_at: now,
       last_seen_at: now,
     });
@@ -141,6 +170,7 @@ export async function touchLiveSession(input: {
       stage,
       country: input.country,
       city: input.city,
+      visitor_key: input.visitorKey,
       last_seen_at: now,
     })
     .eq("session_key", input.sessionKey);
@@ -170,9 +200,12 @@ export async function loadLiveSnapshot(): Promise<LiveSnapshot> {
   const now = Date.now();
   const activeSince = new Date(now - ACTIVE_MS).toISOString();
   const recentSince = new Date(now - RECENT_MS).toISOString();
-  const dayStart = startOfJerusalemDayIso();
+  const dayStartIso = startOfJerusalemDayIso();
+  const dayStart = Date.parse(dayStartIso);
+  const yesterdayStart = dayStart - 24 * 60 * 60 * 1000;
+  const yesterdayStartIso = new Date(yesterdayStart).toISOString();
 
-  const [sessions, sessionCount, events, smsRows, accountRows] = await Promise.all([
+  const [sessions, daySessions, yesterdaySessions, events, smsRows, accountRows, pricing] = await Promise.all([
     supabase
       .from("site_live_sessions")
       .select("session_key, path, stage, country, city, last_seen_at")
@@ -181,8 +214,15 @@ export async function loadLiveSnapshot(): Promise<LiveSnapshot> {
       .limit(40),
     supabase
       .from("site_live_sessions")
-      .select("session_key", { count: "exact", head: true })
-      .gte("started_at", dayStart),
+      .select("session_key, visitor_key, country, city, started_at")
+      .gte("started_at", dayStartIso)
+      .limit(1000),
+    supabase
+      .from("site_live_sessions")
+      .select("visitor_key, session_key")
+      .gte("started_at", yesterdayStartIso)
+      .lt("started_at", dayStartIso)
+      .limit(1000),
     supabase
       .from("site_live_events")
       .select("id, kind, title, detail, created_at")
@@ -192,18 +232,19 @@ export async function loadLiveSnapshot(): Promise<LiveSnapshot> {
     supabase
       .from("sms_topup_orders")
       .select("id, sms_credits, amount_ils, status, created_at, paid_at")
-      .gte("created_at", recentSince)
+      .or(`paid_at.gte.${yesterdayStartIso},created_at.gte.${recentSince}`)
       .order("created_at", { ascending: false })
-      .limit(30),
+      .limit(80),
     supabase
       .from("site_customer_accounts")
       .select("id, business_name, created_at, paid_at")
-      .or(`paid_at.gte.${recentSince},created_at.gte.${recentSince}`)
+      .or(`paid_at.gte.${yesterdayStartIso},created_at.gte.${recentSince}`)
       .order("created_at", { ascending: false })
-      .limit(30),
+      .limit(80),
+    supabase.from("site_pricing").select("monthly_price_ils").eq("id", "default").maybeSingle(),
   ]);
 
-  const failure = [sessions.error, sessionCount.error, events.error, smsRows.error, accountRows.error].find(Boolean);
+  const failure = [sessions.error, daySessions.error, yesterdaySessions.error, events.error, smsRows.error, accountRows.error, pricing.error].find(Boolean);
   if (failure) throw new Error(failure.message);
 
   const visitors: LiveVisitor[] = (sessions.data ?? []).map((row) => ({
@@ -260,11 +301,53 @@ export async function loadLiveSnapshot(): Promise<LiveSnapshot> {
     (smsRows.data ?? []).filter((row) => row.status === "paid" || row.status === "fulfilled").length +
     (accountRows.data ?? []).filter((row) => row.paid_at && Date.parse(String(row.paid_at)) >= now - RECENT_MS).length;
 
+  const smsPaid = (smsRows.data ?? []).filter((row) => row.status === "paid" || row.status === "fulfilled");
+  const accountsPaid = (accountRows.data ?? []).filter((row) => row.paid_at);
+  const monthlyPrice = amount(pricing.data?.monthly_price_ils);
+  const salesBetween = (start: number, end: number) =>
+    paidIn(smsPaid, start, end).reduce((sum, row) => sum + amount(row.amount_ils), 0) +
+    paidIn(accountsPaid, start, end).length * monthlyPrice;
+  const ordersBetween = (start: number, end: number) =>
+    paidIn(smsPaid, start, end).length + paidIn(accountsPaid, start, end).length;
+
+  const todaySessions = daySessions.data ?? [];
+  const seenYesterday = new Set(
+    (yesterdaySessions.data ?? []).map((row) => String(row.visitor_key || row.session_key)),
+  );
+  let freshCustomers = 0;
+  let returningCustomers = 0;
+  const locationCounts = new Map<string, number>();
+  for (const row of todaySessions) {
+    const key = String(row.visitor_key || row.session_key);
+    if (seenYesterday.has(key)) returningCustomers += 1;
+    else freshCustomers += 1;
+    const label = placeLabel(row.country ? String(row.country) : null, row.city ? String(row.city) : null) || "לא ידוע";
+    locationCounts.set(label, (locationCounts.get(label) ?? 0) + 1);
+  }
+  const purchasedNow =
+    paidIn(smsPaid, now - CHECKOUT_NOW_MS, now + 1).length +
+    paidIn(accountsPaid, now - CHECKOUT_NOW_MS, now + 1).length;
+
   return {
     visitorsNow: visitors.length,
     checkoutsNow: checkoutSessions + freshOrders + freshSignups,
     purchasesRecent,
-    sessionsToday: sessionCount.count ?? 0,
+    sessionsToday: todaySessions.length,
+    salesTodayIls: salesBetween(dayStart, now + 1),
+    salesChangePct: changePct(salesBetween(dayStart, now + 1), salesBetween(yesterdayStart, dayStart)),
+    sessionsChangePct: changePct(todaySessions.length, (yesterdaySessions.data ?? []).length),
+    ordersToday: ordersBetween(dayStart, now + 1),
+    ordersChangePct: changePct(ordersBetween(dayStart, now + 1), ordersBetween(yesterdayStart, dayStart)),
+    behavior: {
+      viewing: visitors.filter((visitor) => visitor.stage === "browsing").length,
+      checkout: visitors.filter((visitor) => visitor.stage === "checkout").length,
+      purchased: purchasedNow,
+    },
+    locations: [...locationCounts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6)
+      .map(([label, count]) => ({ label, count })),
+    customers: { fresh: freshCustomers, returning: returningCustomers },
     visitors,
     activity: activity.slice(0, 30),
   };

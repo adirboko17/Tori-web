@@ -12,8 +12,21 @@ import { Badge, EmptyState, ErrorState, Field, SkeletonRows, Switch } from "../.
 import { UploadTile } from "../../../_ui/upload-tile";
 import { useAdminData } from "../../../_ui/use-admin-data";
 
+type VideoAudienceChoice = HelpAudience | "inherit";
+
 function audienceLabel(audience: HelpAudience) {
   return HELP_AUDIENCES.find((item) => item.value === audience)?.label ?? audience;
+}
+
+const AUDIENCE_LIST: Record<HelpAudience, string> = {
+  admin: "מיועד למנהל",
+  client: "מיועד ללקוח",
+  all: "מיועד לכולם",
+};
+
+function videoAudienceText(video: HelpVideo, category: HelpCategory) {
+  if (!video.audience) return `כמו הקטגוריה (${audienceLabel(category.audience)})`;
+  return AUDIENCE_LIST[video.audience];
 }
 
 function nextSortOrder(items: { sort_order: number }[]) {
@@ -178,7 +191,7 @@ function CategoryDrawer({
         <textarea className="ad-textarea" rows={2} value={description} onChange={(event) => setDescription(event.target.value)} />
       </Field>
       <div className="ad-form-grid">
-        <Field label="למי מוצג">
+        <Field label="למי זה מיועד">
           <select className="ad-select" value={audience} onChange={(event) => setAudience(event.target.value as HelpAudience)}>
             {HELP_AUDIENCES.map((item) => (
               <option key={item.value} value={item.value}>
@@ -244,6 +257,7 @@ function VideoDrawer({
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [thumbFile, setThumbFile] = useState<File | null>(null);
   const [duration, setDuration] = useState(video?.duration_seconds ? String(video.duration_seconds) : "");
+  const [audience, setAudience] = useState<VideoAudienceChoice>(video?.audience ?? "inherit");
   const [published, setPublished] = useState(video?.is_published ?? true);
   const [pending, setPending] = useState(false);
   const cleanSlug = slug.trim().toLowerCase();
@@ -274,6 +288,7 @@ function VideoDrawer({
         description,
         duration_seconds: duration.trim() ? Number(duration) : null,
         is_published: published,
+        audience: audience === "inherit" ? null : audience,
       };
       if (thumbFile) {
         const ext = thumbFile.type === "image/png" ? "png" : thumbFile.type === "image/webp" ? "webp" : "jpg";
@@ -344,6 +359,20 @@ function VideoDrawer({
       </Field>
       <Field label="תיאור" hint="לא חובה">
         <textarea className="ad-textarea" rows={2} value={description} onChange={(event) => setDescription(event.target.value)} />
+      </Field>
+      <Field label="למי זה מיועד" hint={`הקטגוריה: ${audienceLabel(category.audience)}`}>
+        <select
+          className="ad-select"
+          value={audience}
+          onChange={(event) => setAudience(event.target.value as VideoAudienceChoice)}
+        >
+          <option value="inherit">כמו הקטגוריה</option>
+          {HELP_AUDIENCES.map((item) => (
+            <option key={item.value} value={item.value}>
+              {item.label}
+            </option>
+          ))}
+        </select>
       </Field>
 
       {video ? null : (
@@ -492,7 +521,7 @@ function CategoryCard({
             {category.is_published ? null : <Badge>טיוטה</Badge>}
           </h2>
           <p>
-            {audienceLabel(category.audience)} · {category.videos.length} סרטונים
+            {AUDIENCE_LIST[category.audience]} · {category.videos.length} סרטונים
           </p>
         </div>
         <span className="ad-row">
@@ -525,6 +554,8 @@ function CategoryCard({
               <span className="ad-list-main">
                 <span className="ad-list-title">{video.title}</span>
                 <span className="ad-list-sub">
+                  {videoAudienceText(video, category)}
+                  {" · "}
                   <span dir="ltr">{formatDurationSeconds(video.duration_seconds)}</span>
                   {video.slug ? (
                     <>

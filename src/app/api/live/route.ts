@@ -28,12 +28,14 @@ function headerValue(request: Request, name: string, max: number) {
 export async function POST(request: Request) {
   const body = await readJsonBody(request);
   const sessionKey = String(body?.sessionId ?? "");
+  const visitorRaw = String(body?.visitorId ?? "");
   const path = cleanPath(body?.path);
   if (!SESSION_RE.test(sessionKey) || !path) return jsonError("בקשה לא תקינה.");
 
   try {
     await touchLiveSession({
       sessionKey,
+      visitorKey: SESSION_RE.test(visitorRaw) ? visitorRaw : null,
       path,
       country: headerValue(request, "x-vercel-ip-country", 8),
       city: headerValue(request, "x-vercel-ip-city", 80),

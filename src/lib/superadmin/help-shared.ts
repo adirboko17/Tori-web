@@ -54,9 +54,9 @@ export const HELP_ICONS = [
 export type HelpIconName = (typeof HELP_ICONS)[number];
 
 export const HELP_AUDIENCES: { value: HelpAudience; label: string }[] = [
-  { value: 'admin', label: 'מנהלים' },
+  { value: 'admin', label: 'מנהל' },
+  { value: 'client', label: 'לקוח' },
   { value: 'all', label: 'כולם' },
-  { value: 'client', label: 'לקוחות' },
 ];
 
 /** Lowercase English words separated by hyphens — `book-for-client`. */
@@ -96,6 +96,13 @@ export function compactI18n(input: HelpI18n): HelpI18n {
 
 export function isHelpAudience(raw: unknown): raw is HelpAudience {
   return raw === 'admin' || raw === 'client' || raw === 'all';
+}
+
+/** Empty, null, or "inherit" stores null so a video follows its category. */
+export function readHelpVideoAudience(raw: unknown): HelpAudience | null | 'invalid' {
+  if (raw == null || raw === '' || raw === 'inherit') return null;
+  if (isHelpAudience(raw)) return raw;
+  return 'invalid';
 }
 
 export function isHelpIcon(raw: unknown): raw is HelpIconName {

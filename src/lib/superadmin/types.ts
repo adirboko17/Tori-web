@@ -129,6 +129,8 @@ export interface HelpVideo {
   duration_seconds: number | null;
   sort_order: number;
   is_published: boolean;
+  /** null inherits the category audience. */
+  audience: HelpAudience | null;
 }
 
 export interface HelpCategory {

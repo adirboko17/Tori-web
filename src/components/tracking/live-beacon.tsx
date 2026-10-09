@@ -3,13 +3,15 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
-const STORAGE_KEY = "tori-live-session";
+const SESSION_KEY = "tori-live-session";
+const VISITOR_KEY = "tori-live-visitor";
+const ID_RE = /^[a-zA-Z0-9_-]{16,64}$/;
 
-function sessionId() {
-  const existing = sessionStorage.getItem(STORAGE_KEY);
-  if (existing && /^[a-zA-Z0-9_-]{16,64}$/.test(existing)) return existing;
+function storedId(storage: Storage, key: string) {
+  const existing = storage.getItem(key);
+  if (existing && ID_RE.test(existing)) return existing;
   const created = crypto.randomUUID().replace(/-/g, "");
-  sessionStorage.setItem(STORAGE_KEY, created);
+  storage.setItem(key, created);
   return created;
 }
 
@@ -18,9 +20,11 @@ export function LiveBeacon() {
 
   useEffect(() => {
     if (pathname.startsWith("/admin") || pathname.startsWith("/api")) return;
-    let id = "";
+    let sessionId = "";
+    let visitorId = "";
     try {
-      id = sessionId();
+      sessionId = storedId(sessionStorage, SESSION_KEY);
+      visitorId = storedId(localStorage, VISITOR_KEY);
     } catch {
       return;
     }
@@ -29,7 +33,7 @@ export function LiveBeacon() {
       void fetch("/api/live", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId: id, path: pathname }),
+        body: JSON.stringify({ sessionId, visitorId, path: pathname }),
         keepalive: true,
       }).catch(() => undefined);
     };

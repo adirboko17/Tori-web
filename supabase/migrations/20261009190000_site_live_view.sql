@@ -7,13 +7,15 @@ create table public.site_live_sessions (
   stage text not null default 'browsing',
   country text,
   city text,
+  visitor_key text,
   started_at timestamptz not null default now(),
   last_seen_at timestamptz not null default now(),
   constraint site_live_sessions_session_key_check check (char_length(session_key) between 16 and 64),
   constraint site_live_sessions_path_check check (char_length(path) between 1 and 180),
   constraint site_live_sessions_stage_check check (stage in ('browsing', 'checkout')),
   constraint site_live_sessions_country_check check (country is null or char_length(country) <= 8),
-  constraint site_live_sessions_city_check check (city is null or char_length(city) <= 80)
+  constraint site_live_sessions_city_check check (city is null or char_length(city) <= 80),
+  constraint site_live_sessions_visitor_key_check check (visitor_key is null or char_length(visitor_key) between 16 and 64)
 );
 
 create index site_live_sessions_last_seen_idx

@@ -22,7 +22,7 @@ const CATEGORY_COLUMNS =
   'id, slug, title, title_i18n, description, description_i18n, icon, sort_order, is_published, audience';
 
 const VIDEO_COLUMNS =
-  'id, category_id, slug, title, title_i18n, description, description_i18n, video_url, storage_path, thumbnail_url, duration_seconds, sort_order, is_published';
+  'id, category_id, slug, title, title_i18n, description, description_i18n, video_url, storage_path, thumbnail_url, duration_seconds, sort_order, is_published, audience';
 
 interface CategoryRow {
   id: string;
@@ -51,6 +51,7 @@ interface VideoRow {
   duration_seconds: number | null;
   sort_order: number | null;
   is_published: boolean | null;
+  audience: string | null;
 }
 
 function mapVideo(row: VideoRow): HelpVideo {
@@ -68,6 +69,7 @@ function mapVideo(row: VideoRow): HelpVideo {
     duration_seconds: row.duration_seconds,
     sort_order: row.sort_order ?? 0,
     is_published: row.is_published !== false,
+    audience: isHelpAudience(row.audience) ? row.audience : null,
   };
 }
 
@@ -262,6 +264,8 @@ export interface VideoInput {
   duration_seconds?: number | null;
   sort_order?: number;
   is_published?: boolean;
+  /** null inherits the category audience. Omit on update to leave the stored value. */
+  audience?: HelpAudience | null;
 }
 
 function normalizeVideoInput(input: VideoInput) {
@@ -285,6 +289,9 @@ function normalizeVideoInput(input: VideoInput) {
   const duration =
     input.duration_seconds == null ? null : Math.max(0, Math.round(Number(input.duration_seconds)));
 
+  const audience = input.audience ?? null;
+  if (audience !== null && !isHelpAudience(audience)) throw new HelpCenterError('קהל יעד לא תקין');
+
   return {
     category_id: categoryId,
     slug: slugRaw,
@@ -298,6 +305,7 @@ function normalizeVideoInput(input: VideoInput) {
     duration_seconds: Number.isFinite(duration as number) ? duration : null,
     sort_order: Number.isFinite(input.sort_order) ? Number(input.sort_order) : 0,
     is_published: input.is_published !== false,
+    audience,
   };
 }
 
@@ -341,6 +349,12 @@ export async function updateHelpVideo(id: string, input: Partial<VideoInput>): P
     duration_seconds: input.duration_seconds === undefined ? current.duration_seconds : input.duration_seconds,
     sort_order: input.sort_order ?? current.sort_order ?? 0,
     is_published: input.is_published ?? current.is_published !== false,
+    audience:
+      input.audience === undefined
+        ? isHelpAudience(current.audience)
+          ? current.audience
+          : null
+        : input.audience,
   });
 
   const { data, error } = await db

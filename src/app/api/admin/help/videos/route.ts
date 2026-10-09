@@ -1,4 +1,5 @@
 import { HelpCenterError, createHelpVideo } from "@/lib/superadmin/help-center";
+import { readHelpVideoAudience } from "@/lib/superadmin/help-shared";
 import { fail, guardAdmin, ok } from "@/lib/superadmin/http";
 import type { HelpI18n } from "@/lib/superadmin/types";
 
@@ -19,6 +20,8 @@ export async function POST(request: Request) {
   if (!auth.ok) return auth.response;
   try {
     const body = (await request.json()) as Record<string, unknown>;
+    const audience = readHelpVideoAudience(body.audience);
+    if (audience === "invalid") return fail("קהל יעד לא תקין");
     const video = await createHelpVideo({
       category_id: asString(body.category_id),
       slug: asString(body.slug) || null,
@@ -35,6 +38,7 @@ export async function POST(request: Request) {
           : Number(body.duration_seconds),
       sort_order: Number(body.sort_order ?? 0),
       is_published: body.is_published !== false,
+      audience,
     });
     return ok({ video });
   } catch (error) {
