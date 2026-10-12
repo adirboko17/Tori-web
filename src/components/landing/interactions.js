@@ -1,9 +1,4 @@
 import { createDomScope } from "@/lib/dom-scope";
-import { submitBusinessOnboarding } from "@/lib/business-onboarding";
-import {
-  ENGLISH_DISPLAY_NAME_ERROR,
-  isEnglishDisplayName,
-} from "@/lib/display-name";
 
 /** True once the loader has actually finished, not merely started. Survives a
     remount within the same page load (React re-runs effects in development). */
@@ -250,6 +245,61 @@ export function initializeLanding(root) {
     { threshold: 0, rootMargin: "0px 0px -6% 0px" },
   );
   $$("[data-reveal]", root).forEach((el) => io.observe(el));
+
+  /* ---------- capabilities carousel (mobile) ---------- */
+  const feats = $(".tori-feats", root);
+  const featCards = $$(".tori-feat", root);
+  const featDots = $$(".tori-feats-dot", root);
+  /** Pixels the card must travel to sit on the carousel's start (right) edge. */
+  function featOffset(card) {
+    const box = feats.getBoundingClientRect();
+    const pad = parseFloat(getComputedStyle(feats).paddingRight) || 0;
+    return card.getBoundingClientRect().right - (box.right - pad);
+  }
+  function featIndex() {
+    let best = 0;
+    featCards.forEach((card, i) => {
+      if (Math.abs(featOffset(card)) < Math.abs(featOffset(featCards[best])))
+        best = i;
+    });
+    return best;
+  }
+  function featGo(i) {
+    const card = featCards[Math.max(0, Math.min(featCards.length - 1, i))];
+    feats.scrollBy({ left: featOffset(card), behavior: reduce ? "auto" : "smooth" });
+  }
+  function featPaint() {
+    const at = featIndex();
+    featDots.forEach((dot, i) => dot.classList.toggle("is-on", i === at));
+    const prev = $('[data-act="featsPrev"]', root);
+    const next = $('[data-act="featsNext"]', root);
+    if (prev) prev.disabled = at === 0;
+    if (next) next.disabled = at === featCards.length - 1;
+  }
+  if (feats && featCards.length) {
+    on("featsPrev", () => featGo(featIndex() - 1));
+    on("featsNext", () => featGo(featIndex() + 1));
+    on("featsDot", (e) => featGo(Number(e.currentTarget.getAttribute("data-i"))));
+    let featFrame = 0;
+    listen(feats, "scroll", () => {
+      if (featFrame) return;
+      featFrame = requestAnimationFrame(() => {
+        featFrame = 0;
+        featPaint();
+      });
+    }, { passive: true });
+    featPaint();
+    // one peek at the next card the first time the carousel shows up
+    const nudge = scope.observe(
+      ([e]) => {
+        if (!e.isIntersecting) return;
+        nudge.disconnect();
+        if (!reduce) feats.classList.add("is-nudging");
+      },
+      { threshold: 0.6 },
+    );
+    nudge.observe(feats);
+  }
 
   /* ---------- count-ups ---------- */
   $$("[data-count]", root).forEach((el) => {
@@ -573,14 +623,7 @@ export function initializeLanding(root) {
     msgs = msgs.concat({ from: "bot", text: String(text) });
     chips = followChips();
     renderChat();
-    if (act === "form") {
-      const t = document.getElementById("lead-form");
-      if (t)
-        window.scrollTo({
-          top: t.getBoundingClientRect().top + window.scrollY - 70,
-          behavior: "smooth",
-        });
-    }
+    if (act === "form") window.location.assign("/onboarding");
     if (act === "wa") window.open("https://wa.me/972535575303", "_blank");
   }
   function ask(key) {
@@ -615,96 +658,5 @@ export function initializeLanding(root) {
       }
     });
   renderChat();
-
-  /* ---------- lead form ---------- */
-  const leadMsg = ref("leadMsg");
-  function say(msg, ok) {
-    if (!leadMsg) return;
-    leadMsg.textContent = msg || "";
-    leadMsg.style.display = msg ? "block" : "none";
-    leadMsg.style.color = ok ? "var(--green-700)" : "var(--red-600, #C2231C)";
-  }
-  let leadSavedId = "";
-  let leadBusy = false;
-  on("submitLead", async () => {
-    const form = $("#lead-form", root);
-    if (!form || leadBusy) return;
-    const name = form.querySelector('input[autocomplete="name"]');
-    const tel = form.querySelector('input[type="tel"]');
-    const biz = form.querySelector(
-      'input[type="text"]:not([autocomplete="name"])',
-    );
-    const note = form.querySelector("textarea");
-    const submitBtn = form.querySelector('[data-act="submitLead"]');
-    const missing = [];
-    [
-      [name, "שם מלא"],
-      [tel, "טלפון לחזרה"],
-    ].forEach((p) => {
-      if (p[0] && !p[0].value.trim()) missing.push(p[1]);
-    });
-    if (missing.length) {
-      say("צריך למלא: " + missing.join(" ו"), false);
-      if (name && !name.value.trim()) name.focus();
-      else if (tel) tel.focus();
-      return;
-    }
-    if (!/^0\d[\d\- ]{7,}$/.test(tel.value.trim())) {
-      say("מספר הטלפון לא נראה תקין.", false);
-      tel.focus();
-      return;
-    }
-    if (!biz || !isEnglishDisplayName(biz.value)) {
-      say(ENGLISH_DISPLAY_NAME_ERROR, false);
-      if (biz) biz.focus();
-      return;
-    }
-    const type = form.querySelector('input[name="biz-type"]:checked');
-    const typeLabel =
-      type && type.parentElement ? type.parentElement.textContent.trim() : "";
-    leadBusy = true;
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.setAttribute("aria-busy", "true");
-    }
-    say("שולחים את הפרטים...", true);
-    try {
-      const result = await submitBusinessOnboarding(
-        {
-          managerName: name.value.trim(),
-          phone: tel.value.trim(),
-          businessNameHe: biz.value.trim(),
-          businessType: typeLabel || null,
-          note: note ? note.value.trim() : "",
-        },
-        leadSavedId || undefined,
-      );
-      leadSavedId = result.id;
-      if (name) name.value = "";
-      if (tel) tel.value = "";
-      if (biz) biz.value = "";
-      if (note) note.value = "";
-      const radios = form.querySelectorAll('input[name="biz-type"]');
-      if (radios[0]) radios[0].checked = true;
-      leadSavedId = "";
-      say("הפרטים נשלחו בהצלחה. נחזור אליך תוך 72 שעות.", true);
-    } catch (error) {
-      const cause =
-        error && typeof error === "object" ? error.cause : null;
-      if (cause && typeof cause.id === "string") leadSavedId = cause.id;
-      say(
-        error instanceof Error
-          ? error.message
-          : "השליחה נכשלה. נסו שוב בעוד רגע.",
-        false,
-      );
-    } finally {
-      leadBusy = false;
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.removeAttribute("aria-busy");
-      }
-    }
-  });
   return () => scope.dispose();
 }
