@@ -1,34 +1,51 @@
-/** The real store marks, for every place the site names App Store or Google Play. */
+/** The official store icons (Wikimedia Commons artwork), for every place the site names App Store or Google Play. */
 
-export function AppleLogo({ size = "1em" }) {
+export function AppStoreLogo({ size = "1em" }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701" />
+    <svg width={size} height={size} viewBox="0 0 800 800" aria-hidden="true">
+      <defs>
+        <linearGradient id="tori-appstore-bg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#18BFFB" />
+          <stop offset="1" stopColor="#2072F3" />
+        </linearGradient>
+      </defs>
+      <path
+        fill="url(#tori-appstore-bg)"
+        d="M638.4,0H161.6C72.3,0,0,72.3,0,161.6v476.9C0,727.7,72.3,800,161.6,800h476.9 c89.2,0,161.6-72.3,161.6-161.6V161.6C800,72.3,727.7,0,638.4,0z"
+      />
+      <path
+        fill="#fff"
+        d="M396.6,183.8l16.2-28c10-17.5,32.3-23.4,49.8-13.4s23.4,32.3,13.4,49.8L319.9,462.4h112.9 c36.6,0,57.1,43,41.2,72.8H143c-20.2,0-36.4-16.2-36.4-36.4c0-20.2,16.2-36.4,36.4-36.4h92.8l118.8-205.9l-37.1-64.4 c-10-17.5-4.1-39.6,13.4-49.8c17.5-10,39.6-4.1,49.8,13.4L396.6,183.8L396.6,183.8z M256.2,572.7l-35,60.7 c-10,17.5-32.3,23.4-49.8,13.4S148,614.5,158,597l26-45C213.4,542.9,237.3,549.9,256.2,572.7L256.2,572.7z M557.6,462.6h94.7 c20.2,0,36.4,16.2,36.4,36.4c0,20.2-16.2,36.4-36.4,36.4h-52.6l35.5,61.6c10,17.5,4.1,39.6-13.4,49.8c-17.5,10-39.6,4.1-49.8-13.4 c-59.8-103.7-104.7-181.3-134.5-233c-30.5-52.6-8.7-105.4,12.8-123.3C474.2,318.1,509.9,380,557.6,462.6L557.6,462.6z"
+      />
     </svg>
   );
 }
 
 export function GooglePlayLogo({ size = "1em" }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
-      <g strokeLinejoin="round" strokeWidth="1.4">
-        <path d="M3.4 2 13.5 12 3.4 22Z" fill="#4285F4" stroke="#4285F4" />
-        <path d="M3.4 2 16.4 9.1 13.5 12Z" fill="#34A853" stroke="#34A853" />
-        <path d="M16.4 9.1 21.2 12 16.4 14.9 13.5 12Z" fill="#FBBC04" stroke="#FBBC04" />
-        <path d="M3.4 22 13.5 12 16.4 14.9Z" fill="#EA4335" stroke="#EA4335" />
-      </g>
+    <svg width={size} height={size} viewBox="0 0 28.99 31.99" aria-hidden="true">
+      <path fill="#EA4335" d="M13.54 15.28.12 29.34a3.66 3.66 0 0 0 5.33 2.16l15.1-8.6Z" />
+      <path
+        fill="#FBBC04"
+        d="m27.11 12.89-6.53-3.74-7.35 6.45 7.38 7.28 6.48-3.7a3.54 3.54 0 0 0 1.5-4.79 3.62 3.62 0 0 0-1.5-1.5z"
+      />
+      <path fill="#4285F4" d="M.12 2.66a3.57 3.57 0 0 0-.12.92v24.84a3.57 3.57 0 0 0 .12.92L14 15.64Z" />
+      <path
+        fill="#34A853"
+        d="m13.64 16 6.94-6.85L5.5.51A3.73 3.73 0 0 0 3.63 0 3.64 3.64 0 0 0 .12 2.65Z"
+      />
     </svg>
   );
 }
 
-/** A store name with its mark, kept on one line (with its Hebrew prefix) and bidi-isolated. */
+/** A store name with its icon, kept on one line (with its Hebrew prefix) and bidi-isolated. */
 export function Store({ name, prefix }) {
   const apple = name === "apple";
   const mark = (
     <span className="tori-store">
       {prefix}
       <bdi dir="ltr">
-        {apple ? <AppleLogo /> : <GooglePlayLogo />}
+        {apple ? <AppStoreLogo /> : <GooglePlayLogo />}
         {apple ? "App Store" : "Google Play"}
       </bdi>
     </span>

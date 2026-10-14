@@ -4,7 +4,7 @@ import { watchMarkVideo } from "@/lib/mark-video";
 const NAV_ITEMS = [
   { id: "pain", label: "למה תורי", hint: "הכאב שאנחנו פותרים" },
   { id: "brand", label: "מיתוג", hint: "האפליקציה בצבעים שלכם" },
-  { id: "process", label: "איך זה עובד", hint: "שלושה צעדים, 72 שעות" },
+  { id: "process", label: "איך זה עובד", hint: "שישה צעדים פשוטים" },
   { id: "capabilities", label: "יכולות", hint: "מה תורי יודעת לעשות" },
   { id: "compare", label: "השוואה", hint: "תורי מול הדרך הישנה" },
   { id: "pricing", label: "מחיר", hint: "מחיר אחד, הכל כלול" },

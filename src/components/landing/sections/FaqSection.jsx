@@ -121,6 +121,59 @@ export default function FaqSection() {
             </p>
           </details>
           <details
+            className="ths4"
+            style={{
+              background: "var(--white)",
+              borderRadius: "16px",
+              padding: "18px 20px",
+              boxShadow: "var(--shadow-sm)",
+            }}
+          >
+            <summary
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "14px",
+                fontSize: "17px",
+                fontWeight: "500",
+                color: "var(--ink-900)",
+              }}
+            >
+              {"כמה זמן עד שהאפליקציה בחנויות?"}
+              <svg
+                className="tori-plus"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="var(--ink-900)"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{
+                  flex: "0 0 auto",
+                  transition: "transform .2s cubic-bezier(.22,.61,.36,1)",
+                }}
+              >
+                <path d="M5 12h14"></path>
+                <path d="M12 5v14"></path>
+              </svg>
+            </summary>
+            <p
+              style={{
+                fontSize: "15px",
+                lineHeight: "1.65",
+                color: "var(--ink-600)",
+                margin: "12px 0 0",
+              }}
+            >
+              {
+                "אישור ב־App Store לוקח עד 7 ימי עסקים, וב־Google Play עד 30 ימי עסקים. בינתיים לא מחכים: מקבלים קישור לאתר זמני שנראה בדיוק כמו האפליקציה, שולחים אותו ללקוחות ומתחילים לקבל תורים כבר מהיום הראשון. כשהאפליקציה מאושרת, הכל מסתנכרן אליה ואפשר להוריד אותה."
+              }
+            </p>
+          </details>
+          <details
             className="ths5"
             style={{
               background: "var(--white)",

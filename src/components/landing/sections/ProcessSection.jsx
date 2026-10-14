@@ -159,7 +159,7 @@ export default function ProcessSection() {
                 maxWidth: "30ch",
               }}
             >
-              {"מקימים את האפליקציה במיתוג מלא ומעלים לחנויות."}
+              {"מקימים את האפליקציה במיתוג מלא ומגישים לחנויות. בינתיים עובדים מהיום הראשון עם אתר זמני שנראה בדיוק כמו האפליקציה."}
             </p>
           </div>
           <div className="tori-step" data-reveal="1">
@@ -198,7 +198,7 @@ export default function ProcessSection() {
                 maxWidth: "30ch",
               }}
             >
-              {"האפליקציה אצלך בטלפון -"}
+              {"אחרי אישור החנויות, הכל מסתנכרן לאפליקציה שלך -"}
               <Store name="apple" prefix="מ־" />
               <Store name="google" prefix="ומ־" />
               {"."}
