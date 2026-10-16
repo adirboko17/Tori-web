@@ -295,14 +295,6 @@
     max-width: 100% !important;
   }
 
-  .tori-lp .tori-cap-head {
-    justify-items: center;
-    text-align: center;
-  }
-  .tori-lp .tori-cap-head > span:first-child {
-    justify-self: center !important;
-  }
-
   /* footer: one centred column that ends clear of the two floating buttons */
   .tori-lp footer {
     padding: 32px var(--m-gutter) calc(92px + var(--m-safe-b)) !important;

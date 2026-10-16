@@ -1,0 +1,171 @@
+/* ============================================================
+   "שני צדדים, אפליקציה אחת": one phone, a switch between the
+   customer's side and the business's side, features around it.
+   ============================================================ */
+
+.tori-lp .tori-sides {
+  display: grid;
+  justify-items: center;
+  gap: 22px;
+}
+
+/* ---------- the switch ---------- */
+.tori-lp .tori-sides-switch {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--ink-900);
+}
+.tori-lp .tori-sides-switch button {
+  position: relative;
+  z-index: 1;
+  min-width: 112px;
+  min-height: 42px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 9px;
+  background: none;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: color 0.3s;
+}
+.tori-lp .tori-sides-switch button[aria-selected="true"] {
+  color: var(--ink-900);
+}
+.tori-lp .tori-sides-switch button:focus-visible {
+  outline: 2px solid var(--green-400);
+  outline-offset: 2px;
+}
+.tori-lp .tori-sides-pill {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  inset-inline-start: 4px;
+  width: calc(50% - 4px);
+  border-radius: 9px;
+  background: var(--gradient-brand);
+  transition: transform 0.45s cubic-bezier(0.22, 1.2, 0.36, 1);
+}
+.tori-lp .tori-sides[data-side="business"] .tori-sides-pill {
+  transform: translateX(-100%);
+}
+
+/* ---------- phone with the features around it ---------- */
+.tori-lp .tori-sides-stage {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-areas:
+    "a phone c"
+    "b phone d";
+  align-items: center;
+  column-gap: clamp(28px, 5vw, 72px);
+  row-gap: 30px;
+}
+.tori-lp .tori-sides-phone {
+  grid-area: phone;
+}
+.tori-lp .tori-sides-feats {
+  display: contents;
+}
+.tori-lp .tori-sides-feat {
+  display: grid;
+  gap: 6px;
+  max-width: 260px;
+  animation: tori-sides-in 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.tori-lp .tori-sides-feat:nth-child(1) {
+  grid-area: a;
+  justify-self: end;
+}
+.tori-lp .tori-sides-feat:nth-child(2) {
+  grid-area: b;
+  justify-self: end;
+  align-self: start;
+  animation-delay: 0.08s;
+}
+.tori-lp .tori-sides-feat:nth-child(3) {
+  grid-area: c;
+  justify-self: start;
+  animation-delay: 0.16s;
+}
+.tori-lp .tori-sides-feat:nth-child(4) {
+  grid-area: d;
+  justify-self: start;
+  align-self: start;
+  animation-delay: 0.24s;
+}
+.tori-lp .tori-sides-feat:nth-child(1),
+.tori-lp .tori-sides-feat:nth-child(3) {
+  align-self: end;
+}
+.tori-lp .tori-sides-ico {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 6px;
+  border-radius: 14px;
+  background: var(--white);
+  border: 1px solid var(--ink-200);
+  color: var(--ink-900);
+}
+.tori-lp .tori-sides-feat b {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink-900);
+}
+.tori-lp .tori-sides-feat > span:last-child {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-600);
+}
+
+@keyframes tori-sides-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tori-lp .tori-sides-pill,
+  .tori-lp .tori-sides-feat {
+    transition: none;
+    animation: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .tori-lp .tori-sides-stage {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      "phone phone"
+      "a c"
+      "b d";
+    column-gap: 16px;
+    row-gap: 22px;
+  }
+  .tori-lp .tori-sides-phone {
+    justify-self: center;
+    margin-bottom: 6px;
+  }
+  .tori-lp .tori-sides-feat,
+  .tori-lp .tori-sides-feat:nth-child(n) {
+    justify-self: stretch;
+    align-self: start;
+    max-width: none;
+    justify-items: center;
+    text-align: center;
+  }
+  .tori-lp .tori-sides-feat b {
+    font-size: 16px;
+  }
+  .tori-lp .tori-sides-feat > span:last-child {
+    font-size: 13.5px !important;
+  }
+}

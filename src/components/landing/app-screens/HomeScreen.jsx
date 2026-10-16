@@ -125,7 +125,7 @@ function Greeting({ name }) {
   );
 }
 
-function Staff({ staff }) {
+function Staff({ staff, photos }) {
   return (
     <div className="ha-staff">
       <b>מד זמינות תורים</b>
@@ -134,7 +134,9 @@ function Staff({ staff }) {
         <span className="ha-avatar-ring" />
         {staff.map((name, i) => (
           <span key={name} className="ha-avatar" style={{ "--i": i }}>
-            <span className="ha-avatar-img">{name[0]}</span>
+            <span className="ha-avatar-img">
+              {photos ? <img src={photos[i]} alt="" /> : name[0]}
+            </span>
             {name}
           </span>
         ))}
@@ -148,6 +150,7 @@ export default function HomeScreen({
   logo = {},
   photos = TORI_PHOTOS,
   staff = TORI_STAFF,
+  staffPhotos,
   user = "איתי",
   delay = 0,
 }) {
@@ -160,7 +163,7 @@ export default function HomeScreen({
       <div className="ha-sheet">
         <span className="ha-handle" />
         <Greeting name={user} />
-        <Staff staff={staff} />
+        <Staff staff={staff} photos={staffPhotos} />
         <div className="ha-days" aria-hidden="true">
           {DAYS.map((d) => (
             <span key={d} className={d === "יום ב׳" ? "is-on" : undefined}>

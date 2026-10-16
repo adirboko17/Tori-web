@@ -132,12 +132,11 @@
   margin: 10px 0 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
 }
 /* the card mirrors the "איך זה עובד" step cards, hover included */
 .tori-lp .tori-bento {
-  grid-column: span 2;
   position: relative;
   overflow: hidden;
   display: flex;
@@ -155,9 +154,6 @@
     transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1),
     border-color 0.35s,
     box-shadow 0.35s;
-}
-.tori-lp .tori-bento.is-wide {
-  grid-column: span 3;
 }
 .tori-lp .tori-bento::before {
   content: "";
@@ -222,17 +218,6 @@
   place-items: center;
 }
 
-/* names flip through business fonts */
-.tori-lp .tori-bento-names span {
-  grid-area: 1 / 1;
-  font-size: 40px;
-  line-height: 1.2;
-  white-space: nowrap;
-  opacity: 0;
-  animation: tori-bento-flip 9s cubic-bezier(0.34, 1.3, 0.64, 1) infinite;
-  animation-delay: calc(var(--k) * 3s);
-}
-
 /* one button repainted in every brand color */
 .tori-lp .tori-bento-colors {
   gap: 16px;
@@ -295,17 +280,20 @@
   margin-inline-start: -12px;
   border-radius: 50%;
   border: 3px solid var(--white);
-  display: grid;
-  place-items: center;
-  font-size: 20px;
-  font-weight: 700;
-  background: linear-gradient(
-    135deg,
-    hsl(calc(10 + var(--i) * 45) 70% 75%),
-    hsl(calc(var(--i) * 45) 50% 48%)
-  );
+  overflow: hidden;
+  background: var(--ink-100);
   animation: tori-bento-hop 7.5s ease-in-out infinite;
   animation-delay: calc(var(--i) * 1.5s);
+}
+
+.tori-lp .tori-bento-team span:first-child {
+  margin-inline-start: 0 !important;
+}
+.tori-lp .tori-bento-team img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* the app icon changes owner */
@@ -317,17 +305,18 @@
   width: 76px;
   height: 76px;
 }
-.tori-lp .tori-bento-icon span {
+.tori-lp .tori-bento-icon img {
   grid-area: 1 / 1;
-  border-radius: 30%;
-  display: grid;
-  place-items: center;
-  font-size: 36px;
-  font-weight: 700;
-  color: #fff;
-  box-shadow: 0 12px 26px rgba(23, 22, 22, 0.2);
+  width: 100%;
+  height: 100%;
+  border-radius: 24%;
+  object-fit: cover;
+  background: #fff;
+  box-shadow:
+    0 12px 26px rgba(23, 22, 22, 0.2),
+    0 0 0 1px rgba(23, 22, 22, 0.06);
   opacity: 0;
-  animation: tori-bento-icon 9s cubic-bezier(0.34, 1.4, 0.64, 1) infinite;
+  animation: tori-bento-icon 15s cubic-bezier(0.34, 1.4, 0.64, 1) infinite;
   animation-delay: calc(var(--k) * 3s);
 }
 .tori-lp .tori-bento-stores {
@@ -346,22 +335,6 @@
   to {
     transform: scale(1.15);
     opacity: 0.45;
-  }
-}
-@keyframes tori-bento-flip {
-  0% {
-    opacity: 0;
-    transform: translateY(40%) rotateX(70deg);
-  }
-  4%,
-  33% {
-    opacity: 1;
-    transform: none;
-  }
-  38%,
-  100% {
-    opacity: 0;
-    transform: translateY(-40%) rotateX(-70deg);
   }
 }
 @keyframes tori-bento-paint {
@@ -436,9 +409,8 @@
   .tori-lp .tori-brand-nav {
     display: grid;
   }
-  .tori-lp .tori-bento,
-  .tori-lp .tori-bento.is-wide {
-    grid-column: span 3;
+  .tori-lp .tori-bento-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (max-width: 640px) {
@@ -460,12 +432,29 @@
     inset: 24% 6%;
     filter: blur(36px);
   }
-  .tori-lp .tori-bento,
-  .tori-lp .tori-bento.is-wide {
-    grid-column: 1 / -1;
-    min-height: 220px;
+  /* four small squares, two by two; each card scales its art down to fit */
+  .tori-lp .tori-bento-grid {
+    gap: 10px;
   }
-  .tori-lp .tori-bento-names span {
-    font-size: 32px;
+  .tori-lp .tori-bento {
+    min-height: 0;
+    padding: 18px 10px 16px;
+  }
+  .tori-lp .tori-bento-art {
+    zoom: 0.68;
+    flex: none;
+    height: 136px;
+    min-height: 0;
+    margin-bottom: 8px;
+  }
+  .tori-lp .tori-bento-team span {
+    margin-inline-start: -17px;
+  }
+  .tori-lp .tori-bento > b {
+    font-size: 15.5px;
+  }
+  .tori-lp .tori-bento > small {
+    font-size: 12px;
+    line-height: 1.45;
   }
 }

@@ -5,7 +5,11 @@ import "@/components/landing/landing-mobile.css";
 import "@/components/landing/app-screens/app-screens.css";
 import "@/components/landing/app-screens/profile.css";
 import "@/components/landing/app-screens/calendar.css";
+import "@/components/landing/app-screens/flow.css";
+import "@/components/landing/app-screens/real/real.css";
+import "@/components/landing/app-screens/real/business.css";
 import "@/components/landing/landing-brand.css";
+import "@/components/landing/landing-sides.css";
 import "@/components/landing/landing-loader.css";
 import "@/components/landing/landing-menu.css";
 

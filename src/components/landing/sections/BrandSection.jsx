@@ -39,7 +39,9 @@ const BUSINESSES = [
 ];
 const SWATCHES = [PINK.b, PURPLE.b, GOLD.b, "#0cffbe", "#0ea5e9"];
 const STRIP = ["work-1.jpg", "lash-1.jpg", "barber-1.jpg", "work-2.jpg", "lash-3.jpg", "barber-4.jpg"];
-const TEAM = ["נ", "ה", "ע", "ט", "ג"];
+// real Tori clients' app icons, taking turns on the store card
+const CLIENT_ICONS = ["as", "lp", "lb", "shirlavy", "te"];
+const TEAM = [1, 2, 3, 4, 5];
 
 function Phone({ tilt, glow, children }) {
   return (
@@ -107,29 +109,9 @@ function BrandPhones() {
   );
 }
 
-function NameCard() {
-  return (
-    <li className="tori-bento is-wide">
-      <div className="tori-bento-art tori-bento-names" aria-hidden="true">
-        {BUSINESSES.map(({ logo, theme }, i) => (
-          <span
-            key={logo.text}
-            dir="ltr"
-            style={{ fontFamily: logo.font, fontWeight: logo.weight, color: theme.b, "--k": i }}
-          >
-            {logo.text}
-          </span>
-        ))}
-      </div>
-      <b>השם והלוגו שלכם</b>
-      <small>בראש האפליקציה: הלוגו שלכם, או השם באנגלית בפונט שבחרתם</small>
-    </li>
-  );
-}
-
 function ColorCard() {
   return (
-    <li className="tori-bento is-wide">
+    <li className="tori-bento">
       <div className="tori-bento-art tori-bento-colors" aria-hidden="true">
         <span className="tori-bento-btn">קביעת תור</span>
         <span className="tori-bento-swatches">
@@ -164,9 +146,9 @@ function TeamCard() {
   return (
     <li className="tori-bento">
       <div className="tori-bento-art tori-bento-team" aria-hidden="true">
-        {TEAM.map((t, i) => (
-          <span key={t} style={{ "--i": i }}>
-            {t}
+        {TEAM.map((n, i) => (
+          <span key={n} style={{ "--i": i }}>
+            <img src={"/assets/team/team-" + n + ".webp"} alt="" decoding="async" />
           </span>
         ))}
       </div>
@@ -181,10 +163,8 @@ function StoreCard() {
     <li className="tori-bento">
       <div className="tori-bento-art tori-bento-store" aria-hidden="true">
         <span className="tori-bento-icon">
-          {BUSINESSES.map(({ logo, theme }, i) => (
-            <span key={logo.text} style={{ background: theme.b, "--k": i }}>
-              {logo.text[0]}
-            </span>
+          {CLIENT_ICONS.map((name, i) => (
+            <img key={name} src={"/assets/clients/" + name + ".webp"} alt="" style={{ "--k": i }} />
           ))}
         </span>
         <span className="tori-bento-stores">
@@ -225,7 +205,6 @@ export default function BrandSection() {
         </div>
         <BrandPhones />
         <ul className="tori-bento-grid">
-          <NameCard />
           <ColorCard />
           <GalleryCard />
           <TeamCard />

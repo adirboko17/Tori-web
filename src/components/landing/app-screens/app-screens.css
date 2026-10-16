@@ -368,6 +368,12 @@
     hsl(calc(var(--i) * 38) 45% 52%)
   );
 }
+.tori-lp .ha-avatar-img img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
 .tori-lp .ha-avatar-ring {
   position: absolute;
   top: 7px;

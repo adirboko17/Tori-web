@@ -1,0 +1,37 @@
+/* A tori app flow inside the phone: six screens, 2.4s each, in a 14.4s loop. */
+
+.tori-lp .hf {
+  background: #fff;
+}
+.tori-lp .hf-slide {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+  animation: hf-slide 14.4s ease-in-out infinite both;
+  animation-delay: calc(var(--k) * 2.4s);
+}
+@keyframes hf-slide {
+  0% {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+  3%,
+  16.7% {
+    opacity: 1;
+    transform: none;
+  }
+  20%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tori-lp .hf-slide {
+    animation: none;
+  }
+  .tori-lp .hf-slide:first-child {
+    opacity: 1;
+  }
+}

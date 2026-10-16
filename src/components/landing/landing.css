@@ -1487,9 +1487,6 @@ body {
   }
 }
 
-.tori-lp .ths2:hover {
-  background: var(--ink-700);
-}
 .tori-lp .ths3:hover {
   color: var(--green-800);
 }
