@@ -25,6 +25,7 @@ create table if not exists public.admin_push_preferences (
   admin_phone_id uuid primary key references public.site_admin_phones (id) on delete cascade,
   enabled boolean not null default true,
   types jsonb not null default '{}'::jsonb,
+  sale_sound text not null default 'register',
   updated_at timestamptz not null default now()
 );
 

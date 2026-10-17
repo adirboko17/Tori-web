@@ -13,6 +13,8 @@ import {
   adminPushEvents,
   chunk,
   normalizePreferences,
+  saleDelivery,
+  usesSaleSound,
   wantsPush,
   type AdminPushEvent,
   type AdminPushPreferences,
@@ -99,7 +101,7 @@ export async function deletePushToken(
 export async function loadPushPreferences(adminId: string) {
   const { data, error } = await getServiceSupabase()
     .from("admin_push_preferences")
-    .select("enabled, types")
+    .select("enabled, types, sale_sound")
     .eq("admin_phone_id", adminId)
     .maybeSingle();
   if (error) {
@@ -120,6 +122,7 @@ export async function savePushPreferences(
         admin_phone_id: adminId,
         enabled: prefs.enabled,
         types: prefs.types,
+        sale_sound: prefs.saleSound,
         updated_at: new Date().toISOString(),
       },
       { onConflict: "admin_phone_id" },
@@ -164,7 +167,7 @@ async function loadRecipients(event: AdminPushEvent) {
   const adminIds = [...new Set(rows.map((row) => row.admin_phone_id))];
   const { data: prefRows } = await db
     .from("admin_push_preferences")
-    .select("admin_phone_id, enabled, types")
+    .select("admin_phone_id, enabled, types, sale_sound")
     .in("admin_phone_id", adminIds);
   const prefs = new Map(
     (prefRows ?? []).map((row) => [
@@ -172,9 +175,12 @@ async function loadRecipients(event: AdminPushEvent) {
       normalizePreferences(row),
     ]),
   );
-  return rows.filter((row) =>
-    wantsPush(prefs.get(row.admin_phone_id) ?? normalizePreferences(null), event.type),
-  );
+  return rows
+    .map((row) => ({
+      ...row,
+      prefs: prefs.get(row.admin_phone_id) ?? normalizePreferences(null),
+    }))
+    .filter((row) => wantsPush(row.prefs, event.type));
 }
 
 async function sendExpoBatch(messages: Record<string, unknown>[]) {
@@ -212,16 +218,21 @@ export async function sendAdminPush(event: AdminPushEvent) {
     let sent = 0;
     for (const group of chunk(recipients, EXPO_BATCH)) {
       const tickets = await sendExpoBatch(
-        group.map((row) => ({
-          to: row.expo_token,
-          title: event.title,
-          body: event.body,
-          sound: "default",
-          badge,
-          priority: "high",
-          channelId: "default",
-          data: { type: event.type, url: event.url },
-        })),
+        group.map((row) => {
+          const delivery = usesSaleSound(event.type)
+            ? saleDelivery(row.prefs.saleSound)
+            : { sound: "default", channelId: "default" };
+          return {
+            to: row.expo_token,
+            title: event.title,
+            body: event.body,
+            sound: delivery.sound,
+            badge,
+            priority: "high",
+            channelId: delivery.channelId,
+            data: { type: event.type, url: event.url },
+          };
+        }),
       );
       tickets.forEach((ticket, index) => {
         if (ticket.status === "ok") sent += 1;
@@ -254,16 +265,18 @@ export async function sendTestPush(adminId: string) {
   if (error) throw new Error("טעינת המכשירים נכשלה.");
   const rows = (data ?? []) as TokenRow[];
   if (rows.length === 0) return { devices: 0, sent: 0 };
+  const prefs = await loadPushPreferences(adminId);
+  const delivery = saleDelivery(prefs.saleSound);
   const badge = (await loadBadgeCounts()).total;
   const tickets = await sendExpoBatch(
     rows.map((row) => ({
       to: row.expo_token,
-      title: "התראת בדיקה",
-      body: "ההתראות מחוברות ופועלות.",
-      sound: "default",
+      title: "מכירה לדוגמה",
+      body: "ככה נשמעת התראה על מכירה.",
+      sound: delivery.sound,
       badge,
       priority: "high",
-      channelId: "default",
+      channelId: delivery.channelId,
       data: { type: "test", url: "/settings/notifications" },
     })),
   );

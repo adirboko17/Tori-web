@@ -4,6 +4,7 @@ import { loadMonthlyPriceIls } from "@/lib/admin/catalog";
 import { savePayplusSubscription } from "@/lib/admin/payplus-subscriptions";
 import { priceSummary } from "@/lib/booking";
 import { amountsMatch } from "@/lib/sms/payplus";
+import { adminPushEvents, queueAdminPush } from "@/lib/admin/push";
 import { notifyNewAppPayment } from "@/lib/sms/purchase-notify";
 import { getServiceSupabase } from "@/lib/sms/supabase-admin";
 import {
@@ -116,7 +117,16 @@ export async function fulfillPaidSubscription(input: {
     // The PayPlus callback and the browser return can arrive together. Only the
     // request whose update flipped the business to paid gets a row back, so the
     // owners get exactly one SMS per purchase.
-    if (data) await notifyNewAppPayment({ businessId });
+    if (data) {
+      await notifyNewAppPayment({ businessId });
+      queueAdminPush(
+        adminPushEvents.subscriptionPaid({
+          businessId,
+          businessName: business.manager_name?.trim() || "עסק חדש",
+          amountIls: input.amount,
+        }),
+      );
+    }
     return { ok: true as const, idempotent: !data };
   } catch (error) {
     console.error("subscription status update skipped", error);

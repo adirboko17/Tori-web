@@ -22,6 +22,7 @@ import { parseExcelBuffer } from "@/lib/whatsapp/excel";
 import { sendMessage, sendProactiveMessage } from "@/lib/whatsapp/graph";
 import { extractMessageName } from "@/lib/whatsapp/message-name";
 import { normalizePhone } from "@/lib/whatsapp/phone";
+import { adminPushEvents, queueAdminPush } from "@/lib/admin/push";
 
 const recentAgentSends = new Map<string, number>();
 const AGENT_SEND_DEDUPE_MS = 10_000;
@@ -172,7 +173,7 @@ export async function addManualLead(input: {
   if (!phoneNorm) throw new Error("מספר טלפון לא תקין");
   const existing = await getExistingLeadPhones();
   if (existing.has(phoneNorm)) throw new Error("מספר טלפון כבר קיים בטבלה");
-  return createLead({
+  const lead = await createLead({
     name: String(input.name || businessName).trim(),
     business: businessName,
     phone: phoneNorm,
@@ -181,6 +182,14 @@ export async function addManualLead(input: {
     source: "manual",
     message_name: extractMessageName(businessName),
   });
+  queueAdminPush(
+    adminPushEvents.whatsappLead({
+      leadId: lead.id,
+      name: lead.name || businessName,
+      business: businessName,
+    }),
+  );
+  return lead;
 }
 
 export async function importLeadFile(buffer: Buffer, businessType: string, sendOpeningFlag: boolean) {
@@ -197,6 +206,15 @@ export async function importLeadFile(buffer: Buffer, businessType: string, sendO
     toInsert.push(lead);
   }
   const inserted = await bulkInsertLeads(toInsert);
+  if (inserted.length > 0) {
+    queueAdminPush(
+      adminPushEvents.whatsappLead({
+        leadId: inserted.length === 1 ? inserted[0].id : `import:${inserted[0].id}`,
+        name: inserted.length === 1 ? inserted[0].name || inserted[0].business : `${inserted.length} לידים חדשים`,
+        business: inserted.length === 1 ? inserted[0].business : "",
+      }),
+    );
+  }
   let openingsSent = 0;
   if (sendOpeningFlag) {
     for (const lead of inserted) {

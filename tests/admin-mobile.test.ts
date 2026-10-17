@@ -47,6 +47,8 @@ test("push preferences default to on and ignore unknown stored keys", () => {
   assert.equal(wantsPush(prefs, "new_client"), false);
   assert.equal(wantsPush(prefs, "whatsapp_human"), true);
   assert.equal(normalizePreferences(null).enabled, true);
+  assert.equal(normalizePreferences(null).saleSound, "register");
+  assert.equal(normalizePreferences({ sale_sound: "bell" }).saleSound, "bell");
   assert.equal(wantsPush({ ...prefs, enabled: false }, "new_business"), false);
 });
 
@@ -60,7 +62,15 @@ test("parsePreferencesInput validates keys and values", () => {
     assert.equal(parsed.value.enabled, false);
     assert.equal(parsed.value.types.new_client, false);
     assert.equal(parsed.value.types.account_deletion, true);
+    assert.equal(parsed.value.saleSound, "register");
   }
+  const kept = parsePreferencesInput({ enabled: true, types: {} }, "coins");
+  assert.equal(kept.ok, true);
+  if (kept.ok) assert.equal(kept.value.saleSound, "coins");
+  assert.equal(parsePreferencesInput({ enabled: true, types: {}, saleSound: "nope" }).ok, false);
+  const chosen = parsePreferencesInput({ enabled: true, types: {}, saleSound: "spark" }, "coins");
+  assert.equal(chosen.ok, true);
+  if (chosen.ok) assert.equal(chosen.value.saleSound, "spark");
 });
 
 test("parsePushTokenInput accepts Expo tokens only", () => {

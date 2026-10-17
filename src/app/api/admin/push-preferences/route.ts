@@ -32,7 +32,8 @@ export async function PUT(request: Request) {
   if (!session) return response;
   const body = await readJsonBody(request);
   if (!body) return jsonError("בקשה לא תקינה.");
-  const parsed = parsePreferencesInput(body);
+  const current = await loadPushPreferences(session.userId);
+  const parsed = parsePreferencesInput(body, current.saleSound);
   if (!parsed.ok) return jsonError(parsed.error);
   try {
     const preferences = await savePushPreferences(session.userId, parsed.value);

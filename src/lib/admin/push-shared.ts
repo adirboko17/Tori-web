@@ -1,11 +1,41 @@
+export const SALE_SOUND_IDS = ["register", "coins", "bell", "spark", "system"] as const;
+
+export type SaleSoundId = (typeof SALE_SOUND_IDS)[number];
+
+const SALE_SOUNDS: Record<SaleSoundId, { file: string | null; channelId: string }> = {
+  register: { file: "register.wav", channelId: "sale-register" },
+  coins: { file: "coins.wav", channelId: "sale-coins" },
+  bell: { file: "bell.wav", channelId: "sale-bell" },
+  spark: { file: "spark.wav", channelId: "sale-spark" },
+  system: { file: null, channelId: "default" },
+};
+
+export const SALE_PUSH_TYPES = ["sms_purchase_paid", "subscription_paid"] as const;
+
+export function isSaleSoundId(value: unknown): value is SaleSoundId {
+  return typeof value === "string" && (SALE_SOUND_IDS as readonly string[]).includes(value);
+}
+
+export function saleDelivery(id: unknown) {
+  const sound = isSaleSoundId(id) ? SALE_SOUNDS[id] : SALE_SOUNDS.register;
+  return { sound: sound.file ?? "default", channelId: sound.channelId };
+}
+
+export function usesSaleSound(type: string) {
+  return (SALE_PUSH_TYPES as readonly string[]).includes(type);
+}
+
 export const ADMIN_PUSH_TYPES = [
   "new_business",
   "new_client",
   "sms_purchase_paid",
+  "subscription_paid",
   "sms_purchase_failed",
   "cancellation_request",
   "account_deletion",
   "whatsapp_human",
+  "whatsapp_message",
+  "whatsapp_lead",
   "sms_low_balance",
   "pulseem_main_low",
 ] as const;
@@ -16,10 +46,13 @@ export const ADMIN_PUSH_TYPE_LABELS: Record<AdminPushType, string> = {
   new_business: "עסק חדש",
   new_client: "לקוח חדש",
   sms_purchase_paid: "רכישת SMS שולמה",
+  subscription_paid: "מנוי חדש שולם",
   sms_purchase_failed: "רכישת SMS נכשלה",
   cancellation_request: "בקשת ביטול מנוי",
   account_deletion: "בקשת מחיקת חשבון",
   whatsapp_human: "שיחת וואטסאפ עברה לנציג",
+  whatsapp_message: "הודעת וואטסאפ",
+  whatsapp_lead: "ליד חדש",
   sms_low_balance: "יתרת SMS נמוכה בעסק",
   pulseem_main_low: "יתרה נמוכה בפולסים הראשי",
 };
@@ -27,6 +60,7 @@ export const ADMIN_PUSH_TYPE_LABELS: Record<AdminPushType, string> = {
 export type AdminPushPreferences = {
   enabled: boolean;
   types: Record<AdminPushType, boolean>;
+  saleSound: SaleSoundId;
 };
 
 export type AdminPushEvent = {
@@ -56,15 +90,25 @@ export function isAdminPushType(value: unknown): value is AdminPushType {
 export function normalizePreferences(row: {
   enabled?: unknown;
   types?: unknown;
+  sale_sound?: unknown;
+  saleSound?: unknown;
 } | null | undefined): AdminPushPreferences {
   const stored =
     row?.types && typeof row.types === "object"
       ? (row.types as Record<string, unknown>)
       : {};
   const types = Object.fromEntries(
-    ADMIN_PUSH_TYPES.map((type) => [type, stored[type] !== false]),
+    ADMIN_PUSH_TYPES.map((type) => [
+      type,
+      type === "whatsapp_message" || type === "whatsapp_lead" ? stored[type] === true : stored[type] !== false,
+    ]),
   ) as Record<AdminPushType, boolean>;
-  return { enabled: row?.enabled !== false, types };
+  const saleSound = row?.saleSound ?? row?.sale_sound;
+  return {
+    enabled: row?.enabled !== false,
+    types,
+    saleSound: isSaleSoundId(saleSound) ? saleSound : "register",
+  };
 }
 
 export function wantsPush(prefs: AdminPushPreferences, type: AdminPushType) {
@@ -73,6 +117,7 @@ export function wantsPush(prefs: AdminPushPreferences, type: AdminPushType) {
 
 export function parsePreferencesInput(
   body: Record<string, unknown>,
+  fallbackSaleSound: SaleSoundId = "register",
 ): { ok: true; value: AdminPushPreferences } | { ok: false; error: string } {
   if (typeof body.enabled !== "boolean") {
     return { ok: false, error: "חסרה הגדרת ההתראות הראשית." };
@@ -86,9 +131,16 @@ export function parsePreferencesInput(
       return { ok: false, error: "סוג התראה לא מוכר." };
     }
   }
+  if (body.saleSound !== undefined && !isSaleSoundId(body.saleSound)) {
+    return { ok: false, error: "צליל ההתראה אינו מוכר." };
+  }
   return {
     ok: true,
-    value: normalizePreferences({ enabled: body.enabled, types: raw }),
+    value: normalizePreferences({
+      enabled: body.enabled,
+      types: raw,
+      saleSound: body.saleSound === undefined ? fallbackSaleSound : body.saleSound,
+    }),
   };
 }
 
@@ -180,6 +232,19 @@ export const adminPushEvents = {
       url: `/business/${input.businessId}?tab=billing`,
     };
   },
+  subscriptionPaid(input: {
+    businessId: string;
+    businessName: string;
+    amountIls: number;
+  }): AdminPushEvent {
+    return {
+      key: `subscription_paid:${input.businessId}`,
+      type: "subscription_paid",
+      title: "מנוי חדש שולם",
+      body: `${input.businessName} · ${ils(input.amountIls)}`,
+      url: `/business/${input.businessId}`,
+    };
+  },
   purchaseFailed(input: {
     orderId: string;
     businessId: string;
@@ -228,6 +293,24 @@ export const adminPushEvents = {
       title: "מחכים לנציג בוואטסאפ",
       body: input.name || input.phone,
       url: `/chat/${input.phone}`,
+    };
+  },
+  whatsappMessage(input: { phone: string; name: string; text: string; at: string }): AdminPushEvent {
+    return {
+      key: `whatsapp_message:${input.phone}:${input.at}`,
+      type: "whatsapp_message",
+      title: "הודעת וואטסאפ",
+      body: `${input.name || input.phone} · ${input.text}`.slice(0, 180),
+      url: `/chat/${input.phone}`,
+    };
+  },
+  whatsappLead(input: { leadId: string; name: string; business: string }): AdminPushEvent {
+    return {
+      key: `whatsapp_lead:${input.leadId}`,
+      type: "whatsapp_lead",
+      title: "ליד חדש",
+      body: [input.name, input.business].filter(Boolean).join(" · ") || "ליד חדש",
+      url: `/whatsapp/lead?id=${input.leadId}`,
     };
   },
   smsLow(input: {
