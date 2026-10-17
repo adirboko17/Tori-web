@@ -516,7 +516,7 @@ export default function PainSection({ monthlyPrice = 299 }) {
             </div>
           </div>
           <a
-            href="#lead-form"
+            href="/onboarding"
             className="tori-cta"
             style={{
               position: "relative",

@@ -2,6 +2,25 @@ import { FEATURE_ART } from "../feature-art/FeatureArt";
 
 const [Art0, Art1, Art2, Art3, Art4, Art5] = FEATURE_ART;
 
+/** Right-pointing chevron; the "next" button mirrors it to point left (RTL). */
+function Arrow() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="m9 18 6-6-6-6"></path>
+    </svg>
+  );
+}
+
 export default function CapabilitiesSection() {
   return (
     <section
@@ -29,7 +48,7 @@ export default function CapabilitiesSection() {
               margin: "0",
             }}
           >
-            {"הפיצ׳רים "}
+            {"היכולות "}
             <span className="tori-word">{"של תורי"}</span>
           </h2>
           <p
@@ -40,7 +59,7 @@ export default function CapabilitiesSection() {
               margin: "0",
             }}
           >
-            {"יכולות שיחודיות לתורי בלבד, אין אפליקציה שעושה את זה כמונו!"}
+            {"יכולות ייחודיות לתורי בלבד, אין אפליקציה שעושה את זה כמונו!"}
           </p>
         </div>
         <div className="tori-feats">
@@ -146,6 +165,36 @@ export default function CapabilitiesSection() {
               </p>
             </div>
           </article>
+        </div>
+        <div className="tori-feats-nav">
+          <button
+            type="button"
+            className="tori-feats-arrow"
+            data-act="featsPrev"
+            aria-label="היכולת הקודמת"
+          >
+            <Arrow />
+          </button>
+          <div className="tori-feats-dots">
+            {FEATURE_ART.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                className="tori-feats-dot"
+                data-act="featsDot"
+                data-i={i}
+                aria-label={`יכולת ${i + 1}`}
+              ></button>
+            ))}
+          </div>
+          <button
+            type="button"
+            className="tori-feats-arrow is-next"
+            data-act="featsNext"
+            aria-label="היכולת הבאה"
+          >
+            <Arrow />
+          </button>
         </div>
       </div>
     </section>

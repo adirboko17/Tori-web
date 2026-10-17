@@ -190,8 +190,7 @@
   .tori-lp .tori-feat,
   .tori-lp .tori-vs-col,
   .tori-lp .tori-q,
-  .tori-lp .tori-step,
-  .tori-lp .tori-lead-form-col {
+  .tori-lp .tori-step {
     border-radius: var(--m-radius) !important;
   }
   .tori-lp .tori-feats {
@@ -296,21 +295,6 @@
     max-width: 100% !important;
   }
 
-  /* the section already owns the gutter; the grid adding its own doubled it */
-  .tori-lp .tori-lead-grid {
-    padding: 0 !important;
-  }
-  .tori-lp .tori-lead-perks {
-    margin-inline: auto !important;
-  }
-  .tori-lp .tori-cap-head {
-    justify-items: center;
-    text-align: center;
-  }
-  .tori-lp .tori-cap-head > span:first-child {
-    justify-self: center !important;
-  }
-
   /* footer: one centred column that ends clear of the two floating buttons */
   .tori-lp footer {
     padding: 32px var(--m-gutter) calc(92px + var(--m-safe-b)) !important;
@@ -364,5 +348,130 @@
   /* the accessibility button follows the chat in, a beat later */
   .tori-lp .tori-a11y.is-visible {
     transition-delay: 0.08s;
+  }
+}
+
+/* ---------- capabilities: a swipe carousel, each title above its art ---------- */
+@media (max-width: 760px) {
+  .tori-lp .tori-feats {
+    display: flex !important;
+    gap: 14px !important;
+    max-width: none !important;
+    margin-inline: calc(-1 * var(--m-gutter)) !important;
+    padding: 4px var(--m-gutter) 10px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--m-gutter);
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .tori-lp .tori-feats::-webkit-scrollbar {
+    display: none;
+  }
+  .tori-lp .tori-feat {
+    flex: 0 0 80%;
+    scroll-snap-align: start;
+    align-content: start;
+    gap: 10px !important;
+  }
+  /* cards off to the side would otherwise fade in mid-swipe */
+  .tori-lp .tori-feat[data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+  .tori-lp .tori-feat-body {
+    display: contents;
+  }
+  .tori-lp .tori-feat-num {
+    order: 0;
+  }
+  .tori-lp .tori-feat-title {
+    order: 1;
+  }
+  .tori-lp .tori-feat-media {
+    order: 2;
+    max-width: 280px;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    overflow: visible;
+  }
+  .tori-lp .tori-feat-text {
+    order: 3;
+  }
+}
+
+/* ---------- capabilities: arrows, dots and a first peek say "swipe me" ---------- */
+@media (max-width: 760px) {
+  .tori-lp .tori-feats-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .tori-lp .tori-feats-arrow {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid var(--ink-200);
+    background: var(--white);
+    color: var(--ink-900);
+    cursor: pointer;
+    transition:
+      opacity 0.25s,
+      transform 0.2s;
+  }
+  .tori-lp .tori-feats-arrow.is-next {
+    border-color: var(--ink-900);
+    background: var(--ink-900);
+    color: var(--green-300);
+  }
+  .tori-lp .tori-feats-arrow.is-next svg {
+    transform: scaleX(-1);
+  }
+  .tori-lp .tori-feats-arrow:active {
+    transform: scale(0.92);
+  }
+  .tori-lp .tori-feats-arrow:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+  .tori-lp .tori-feats-dots {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tori-lp .tori-feats-dot {
+    width: 7px;
+    height: 7px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: var(--ink-200);
+    cursor: pointer;
+    transition:
+      width 0.35s cubic-bezier(0.22, 0.61, 0.36, 1),
+      background 0.35s;
+  }
+  .tori-lp .tori-feats-dot.is-on {
+    width: 26px;
+    background: var(--gradient-brand);
+  }
+  .tori-lp .tori-feats.is-nudging > .tori-feat {
+    animation: tori-feats-nudge 1.2s cubic-bezier(0.22, 0.61, 0.36, 1) 0.25s;
+  }
+}
+@keyframes tori-feats-nudge {
+  0%,
+  100% {
+    transform: none;
+  }
+  35%,
+  60% {
+    transform: translateX(56px);
   }
 }

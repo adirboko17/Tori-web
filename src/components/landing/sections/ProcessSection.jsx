@@ -25,8 +25,8 @@ export default function ProcessSection() {
           >
             {"אפליקציה מותאמת אישית"}
             <br />
-            {"תוך "}
-            <span className="tori-word">{"72 שעות!"}</span>
+            {"בלי "}
+            <span className="tori-word">{"להרים אצבע!"}</span>
           </h2>
           <p
             style={{
@@ -46,7 +46,7 @@ export default function ProcessSection() {
             gap: "16px",
           }}
         >
-          <a href="#lead-form" className="tori-step" data-reveal="1">
+          <div className="tori-step" data-reveal="1">
             <span className="tori-step-num">{"01"}</span>
             <svg
               className="tori-step-ico"
@@ -83,8 +83,8 @@ export default function ProcessSection() {
             >
               {"שם האפליקציה בחנות ושם העסק שממנו יישלחו התזכורות."}
             </p>
-          </a>
-          <a href="#lead-form" className="tori-step" data-reveal="2">
+          </div>
+          <div className="tori-step" data-reveal="2">
             <span className="tori-step-num">{"02"}</span>
             <svg
               className="tori-step-ico"
@@ -124,8 +124,8 @@ export default function ProcessSection() {
             >
               {"צבעי מותג ולוגו - ואנחנו מתאימים את הכל."}
             </p>
-          </a>
-          <a href="#lead-form" className="tori-step" data-reveal="3">
+          </div>
+          <div className="tori-step" data-reveal="3">
             <span className="tori-step-num">{"03"}</span>
             <svg
               className="tori-step-ico"
@@ -159,10 +159,10 @@ export default function ProcessSection() {
                 maxWidth: "30ch",
               }}
             >
-              {"מקימים את האפליקציה במיתוג מלא ומעלים לחנויות."}
+              {"מקימים את האפליקציה במיתוג מלא ומגישים לחנויות. בינתיים עובדים מהיום הראשון עם אתר זמני שנראה בדיוק כמו האפליקציה."}
             </p>
-          </a>
-          <a href="#lead-form" className="tori-step" data-reveal="1">
+          </div>
+          <div className="tori-step" data-reveal="1">
             <span className="tori-step-num">{"04"}</span>
             <svg
               className="tori-step-ico"
@@ -198,13 +198,13 @@ export default function ProcessSection() {
                 maxWidth: "30ch",
               }}
             >
-              {"האפליקציה אצלך בטלפון -"}
+              {"אחרי אישור החנויות, הכל מסתנכרן לאפליקציה שלך -"}
               <Store name="apple" prefix="מ־" />
               <Store name="google" prefix="ומ־" />
               {"."}
             </p>
-          </a>
-          <a href="#lead-form" className="tori-step" data-reveal="2">
+          </div>
+          <div className="tori-step" data-reveal="2">
             <span className="tori-step-num">{"05"}</span>
             <svg
               className="tori-step-ico"
@@ -245,8 +245,8 @@ export default function ProcessSection() {
             >
               {"שעות עבודה, שירותים ומחירון - הכל בניהול עצמי פשוט."}
             </p>
-          </a>
-          <a href="#lead-form" className="tori-step" data-reveal="3">
+          </div>
+          <div className="tori-step" data-reveal="3">
             <span className="tori-step-num">{"06"}</span>
             <svg
               className="tori-step-ico"
@@ -286,7 +286,7 @@ export default function ProcessSection() {
             >
               {"שולחים קישור להורדה - והיומן מתחיל להתמלא לבד."}
             </p>
-          </a>
+          </div>
         </div>
         <div style={{ textAlign: "center", marginTop: "36px" }} data-reveal="1">
           <a

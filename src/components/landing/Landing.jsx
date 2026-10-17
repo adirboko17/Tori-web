@@ -12,7 +12,6 @@ import FeaturesSection from "./sections/FeaturesSection";
 import CompareSection from "./sections/CompareSection";
 import PricingSection from "./sections/PricingSection";
 import FaqSection from "./sections/FaqSection";
-import LeadFormSection from "./sections/LeadFormSection";
 import Footer25Section from "./sections/Footer25Section";
 import ToriA11ySection from "./sections/ToriA11ySection";
 import ToriChatSection from "./sections/ToriChatSection";
@@ -44,7 +43,6 @@ export default function Landing({ monthlyPrice = 299 }) {
       <CompareSection />
       <PricingSection monthlyPrice={monthlyPrice} />
       <FaqSection />
-      <LeadFormSection monthlyPrice={monthlyPrice} />
       <Footer25Section />
       <ToriA11ySection />
       <ToriChatSection />

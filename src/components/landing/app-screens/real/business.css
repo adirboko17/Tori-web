@@ -1,0 +1,661 @@
+/* The owner's side of the tori app, rebuilt from the real screenshots,
+   in the business's own gold theme. Drawn at 375px, scaled by .rx. */
+
+.tori-lp .bx {
+  --gold: linear-gradient(135deg, #f1cf85 0%, #f8e3b4 60%, #fbefd3 100%);
+  --gold-ico: #f2d79c;
+  --brown: #8a6a2e;
+  background: #fff;
+  text-align: start;
+}
+.tori-lp .bx-grey {
+  background: #f2f2f4;
+}
+.tori-lp .bx-ico {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: var(--gold-ico);
+  color: #2b2414;
+}
+.tori-lp .bx-ico.is-sm {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: #fbf0d8;
+  color: #6b5426;
+}
+.tori-lp .bx-ico.is-lg {
+  width: 52px;
+  height: 52px;
+}
+.tori-lp .bx-ico.is-grey {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #f1f1f1;
+  color: #333;
+}
+.tori-lp .bx-round {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #eef0f3;
+  color: #7d8590;
+}
+.tori-lp .bx-round.is-gold {
+  width: 42px;
+  height: 42px;
+  background: #f1cf85;
+  color: #2b2414;
+}
+.tori-lp .bx-round.is-glass {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.4);
+  color: #3a2f1a;
+}
+
+/* ---------- home ---------- */
+.tori-lp .bx-photo {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 140px;
+  background: #3a3532 url("/assets/imagery/work-3.jpg") center / cover;
+  filter: blur(6px) brightness(0.7);
+  transform: scale(1.1);
+}
+.tori-lp .bx .rx-status {
+  color: #fff;
+}
+.tori-lp .bx-grey .rx-status,
+.tori-lp .bx-day .rx-status {
+  color: #1c1b1b;
+}
+.tori-lp .bx-home {
+  position: absolute;
+  inset: 84px 0 0;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 10px 13px 0;
+  border-radius: 30px 30px 0 0;
+  background: #fff;
+}
+.tori-lp .bx-home > .rx-handle {
+  justify-self: center;
+  margin-bottom: 6px;
+}
+.tori-lp .bx-date {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 22px;
+  border-radius: 26px;
+  background: var(--gold);
+  box-shadow: 0 6px 18px rgba(170, 130, 50, 0.18);
+}
+.tori-lp .bx-date > span {
+  display: grid;
+}
+.tori-lp .bx-date small {
+  font-size: 13px;
+  font-weight: 600;
+}
+.tori-lp .bx-date b {
+  font-size: 27px;
+  line-height: 1.1;
+}
+.tori-lp .bx-date-count {
+  justify-items: center;
+}
+.tori-lp .bx-date-count b {
+  font-size: 34px;
+}
+.tori-lp .bx-date-count small {
+  font-size: 11px;
+}
+.tori-lp .bx-card {
+  border-radius: 26px;
+  background: #fff;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.07);
+}
+.tori-lp .bx-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.tori-lp .bx-card-head b {
+  flex: 1;
+  font-size: 13px;
+}
+.tori-lp .bx-card-head > svg {
+  color: #b0b0b0;
+}
+.tori-lp .bx-card-body {
+  display: grid;
+  place-items: center;
+  padding: 12px 16px;
+}
+.tori-lp .bx-next {
+  justify-self: stretch;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tori-lp .bx-next img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.tori-lp .bx-next span {
+  display: grid;
+}
+.tori-lp .bx-next b {
+  font-size: 14px;
+}
+.tori-lp .bx-next small,
+.tori-lp .bx-empty {
+  font-size: 12px;
+  color: #9aa0a6;
+}
+.tori-lp .bx-empty {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.tori-lp .bx-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.tori-lp .bx-tile {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 16px 4px 14px;
+  border-radius: 26px;
+  background: #fff;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.07);
+  font-size: 12px;
+  font-weight: 700;
+}
+.tori-lp .bx-sms {
+  display: grid;
+  gap: 12px;
+  padding: 14px 16px 12px;
+}
+.tori-lp .bx-sms-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.tori-lp .bx-sms-top .bx-ico {
+  width: 44px;
+  height: 44px;
+}
+.tori-lp .bx-sms-text {
+  flex: 1;
+  display: grid;
+}
+.tori-lp .bx-sms-text b {
+  font-size: 14px;
+}
+.tori-lp .bx-sms-text small {
+  font-size: 11px;
+  color: #777;
+}
+.tori-lp .bx-sms-count {
+  display: grid;
+  justify-items: center;
+  color: var(--brown);
+}
+.tori-lp .bx-sms-count b {
+  font-size: 30px;
+  line-height: 1;
+}
+.tori-lp .bx-sms-count small {
+  font-size: 10px;
+}
+.tori-lp .bx-gold-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  border-radius: 22px;
+  background: var(--gold);
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 6px 16px rgba(170, 130, 50, 0.2);
+}
+.tori-lp .bx-more {
+  display: inline-flex;
+  align-items: center;
+  justify-self: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--brown);
+}
+
+/* ---------- the floating bottom menu ---------- */
+.tori-lp .rx-tabs {
+  position: absolute;
+  z-index: 7;
+  bottom: 26px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.14);
+  transform: translateX(-50%);
+  direction: ltr;
+  color: #555;
+}
+.tori-lp .rx-tabs span {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+}
+.tori-lp .rx-tabs .is-on {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #f1cf85;
+  color: #2b2414;
+}
+
+/* ---------- broadcast sheet ---------- */
+.tori-lp .rx-dim.is-grey {
+  z-index: 7;
+  background: rgba(70, 70, 70, 0.45);
+}
+.tori-lp .bx-broadcast {
+  top: 420px;
+  z-index: 8;
+  align-content: start;
+  gap: 8px;
+  padding: 12px 16px 0;
+  text-align: center;
+}
+.tori-lp .bx-broadcast > .bx-ico {
+  margin-top: 10px;
+}
+.tori-lp .bx-broadcast > b {
+  font-size: 21px;
+}
+.tori-lp .bx-broadcast > small {
+  max-width: 300px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #777;
+}
+.tori-lp .bx-gold-btn.is-wide {
+  justify-self: stretch;
+  height: 48px;
+  margin-top: 10px;
+  border-radius: 24px;
+  font-size: 15px;
+}
+.tori-lp .bx-link {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brown);
+  text-decoration: underline;
+}
+.tori-lp .bx-cancel {
+  justify-self: stretch;
+  display: grid;
+  place-items: center;
+  height: 46px;
+  margin-top: 26px;
+  border-radius: 23px;
+  border: 1px solid #e6e6e6;
+  font-size: 15px;
+  color: #b0b0b0;
+}
+
+/* ---------- day calendar ---------- */
+.tori-lp .bx-day-top {
+  position: absolute;
+  inset: 50px 0 auto;
+  padding: 0 18px 10px;
+  background: #f4f7f6;
+}
+.tori-lp .bx-day-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 40px;
+}
+.tori-lp .bx-day-bar b {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 19px;
+}
+.tori-lp .bx-day-bar span {
+  display: flex;
+  gap: 16px;
+  color: var(--brown);
+}
+.tori-lp .bx-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-top: 8px;
+  text-align: center;
+}
+.tori-lp .bx-week span {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+}
+.tori-lp .bx-week small {
+  font-size: 10px;
+  color: #888;
+}
+.tori-lp .bx-week b {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: 500;
+}
+.tori-lp .bx-week .is-on b {
+  background: #f1cf85;
+  font-weight: 700;
+}
+.tori-lp .bx-hours {
+  position: absolute;
+  inset: 190px 0 0;
+  display: grid;
+  grid-auto-rows: 74px;
+  background: #fff;
+}
+.tori-lp .bx-hours > span:not(.bx-event) {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding-right: 16px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #777;
+}
+.tori-lp .bx-hours > span:not(.bx-event)::after {
+  content: "";
+  flex: 1;
+  margin-top: 7px;
+  border-top: 1px solid #e8e8e8;
+}
+.tori-lp .bx-event {
+  position: absolute;
+  right: 72px;
+  left: 14px;
+  height: 64px;
+  display: grid;
+  align-content: center;
+  padding: 0 14px;
+  border-radius: 14px;
+  border-inline-start: 4px solid #c9a24f;
+  background: #fbefd3;
+}
+.tori-lp .bx-event.is-soft {
+  height: 34px;
+  background: #f5f0e6;
+}
+.tori-lp .bx-event b {
+  font-size: 14px;
+}
+.tori-lp .bx-event small {
+  font-size: 11px;
+  color: #7a6a4a;
+}
+.tori-lp .bx-event.is-soft small {
+  display: none;
+}
+
+/* ---------- working hours ---------- */
+.tori-lp .bx-tabs-row {
+  position: absolute;
+  inset: 50px 0 auto;
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  padding: 12px 0 0;
+  background: #fff;
+  font-size: 15px;
+  color: #999;
+}
+.tori-lp .bx-tabs-row b,
+.tori-lp .bx-tabs-row span {
+  padding-bottom: 10px;
+}
+.tori-lp .bx-tabs-row .is-on {
+  color: #1c1b1b;
+  box-shadow: inset 0 -3px 0 #b8954a;
+}
+.tori-lp .bx-list {
+  position: absolute;
+  inset: 108px 14px auto;
+  border-radius: 20px;
+  background: #fff;
+  overflow: hidden;
+}
+.tori-lp .bx-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-top: 1px solid #f0f0f0;
+}
+.tori-lp .bx-row:first-child {
+  border-top: 0;
+}
+.tori-lp .bx-row > span:not(.bx-ico):not(.bx-end) {
+  flex: 1;
+  display: grid;
+}
+.tori-lp .bx-row b {
+  font-size: 15px;
+}
+.tori-lp .bx-row strong {
+  justify-self: start;
+  font-size: 15px;
+}
+.tori-lp .bx-row small {
+  font-size: 11.5px;
+  color: #8a8a8a;
+}
+.tori-lp .bx-row.is-off b {
+  color: #999;
+}
+.tori-lp .bx-toggle {
+  position: relative;
+  flex: 0 0 auto;
+  width: 50px;
+  height: 30px;
+  border-radius: 15px;
+  background: #e5e5ea;
+}
+.tori-lp .bx-toggle::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+.tori-lp .bx-toggle.is-on {
+  background: #34c759;
+}
+.tori-lp .bx-toggle.is-on::after {
+  right: auto;
+  left: 2px;
+}
+
+/* ---------- profile header (services, settings) ---------- */
+.tori-lp .bx-profile {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 164px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 44px 18px 0;
+  background: var(--gold);
+}
+.tori-lp .bx-profile > img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  object-fit: cover;
+}
+.tori-lp .bx-profile-text {
+  flex: 1;
+  display: grid;
+}
+.tori-lp .bx-profile-text b {
+  font-size: 19px;
+}
+.tori-lp .bx-profile-text small {
+  font-size: 11px;
+  color: #6b5a3a;
+}
+.tori-lp .bx-ptabs {
+  position: absolute;
+  inset: 164px 0 auto;
+  display: flex;
+  gap: 18px;
+  padding: 12px 16px 0;
+  background: #fff;
+  font-size: 13px;
+  color: #999;
+  white-space: nowrap;
+}
+.tori-lp .bx-ptabs span {
+  padding-bottom: 10px;
+}
+.tori-lp .bx-ptabs .is-on {
+  font-weight: 700;
+  color: #1c1b1b;
+  box-shadow: inset 0 -3px 0 #e2bd6c;
+}
+
+/* ---------- services ---------- */
+.tori-lp .bx-svc-head {
+  position: absolute;
+  inset: 222px 16px auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.tori-lp .bx-svc-head > span:first-child {
+  display: grid;
+}
+.tori-lp .bx-svc-head b {
+  font-size: 21px;
+}
+.tori-lp .bx-svc-head small {
+  font-size: 12px;
+  color: #888;
+}
+.tori-lp .bx-svc {
+  position: relative;
+  top: 300px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 12px 12px;
+  padding: 14px;
+  border-radius: 20px;
+  background: #fff;
+  color: #555;
+}
+.tori-lp .bx-trash {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: #ff3b30;
+  color: #fff;
+}
+.tori-lp .bx-svc-text {
+  flex: 1;
+  display: grid;
+  gap: 6px;
+  color: #1c1b1b;
+}
+.tori-lp .bx-svc-text b {
+  font-size: 15px;
+}
+.tori-lp .bx-svc-text span {
+  display: flex;
+  gap: 6px;
+}
+.tori-lp .bx-svc-text i {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: #efefef;
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 600;
+  color: #555;
+}
+
+/* ---------- settings ---------- */
+.tori-lp .bx-settings {
+  inset: 218px 12px auto;
+}
+.tori-lp .bx-settings .bx-row {
+  padding: 11px 12px;
+}
+.tori-lp .bx-settings .bx-row b {
+  font-size: 13.5px;
+}
+.tori-lp .bx-end {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #999;
+}
+.tori-lp .bx-end .bx-round {
+  width: 28px;
+  height: 28px;
+  background: #f1f1f1;
+  color: #666;
+}
+.tori-lp .bx-pill {
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #efefef;
+  font-style: normal;
+  font-size: 10px;
+  color: #555;
+}
+.tori-lp .bx-row.is-danger b,
+.tori-lp .bx-row.is-danger .bx-ico {
+  color: #e5372c;
+}

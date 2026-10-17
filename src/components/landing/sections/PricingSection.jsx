@@ -221,7 +221,7 @@ export default function PricingSection({ monthlyPrice = 299 }) {
                   <circle cx="12" cy="12" r="10"></circle>
                   <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
-                {"חוזרים אליכם תוך שעה · באוויר תוך 72 שעות"}
+                {"חוזרים אליכם תוך שעה · עובדים מהיום הראשון"}
               </span>
             </div>
             <div style={{ flex: "0 1 470px", minWidth: "0", display: "grid" }}>

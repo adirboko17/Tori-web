@@ -280,8 +280,8 @@ export default function CompareSection() {
                   </svg>
                 </span>
                 <span className="tori-vs-text">
-                  <span className="tori-vs-feat">{"הקמה תוך 72 שעות"}</span>
-                  <span className="tori-vs-note">{"אנחנו מקימים, לא אתם"}</span>
+                  <span className="tori-vs-feat">{"עובדים מהיום הראשון"}</span>
+                  <span className="tori-vs-note">{"אתר זמני שנראה כמו האפליקציה"}</span>
                 </span>
               </div>
             </div>
@@ -495,7 +495,7 @@ export default function CompareSection() {
                   </svg>
                 </span>
                 <span className="tori-vs-text">
-                  <span className="tori-vs-feat">{"הקמה תוך 72 שעות"}</span>
+                  <span className="tori-vs-feat">{"עובדים מהיום הראשון"}</span>
                 </span>
               </div>
             </div>

@@ -60,7 +60,6 @@ export default function TopSection() {
             {"אפליקציה ממותגת אישית לעסק שלך"}
             <Store name="apple" prefix="ב־" />
             <Store name="google" prefix="וב־" />
-            {" תוך 72 שעות."}
           </p>
           <div
             style={{

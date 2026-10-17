@@ -372,7 +372,7 @@ function LoginForm({
       chip: "ברוכים הבאים לתורי",
       title: (
         <>
-          התחברות <span className="auth-word">לאזור האישי</span>
+          הרשמה <span className="auth-word">או כניסה</span>
         </>
       ),
       lead: "מזינים את מספר הנייד ונשלח לכם קוד כניסה ב-SMS.",

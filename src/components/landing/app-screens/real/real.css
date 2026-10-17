@@ -1,0 +1,620 @@
+/* tori app screens rebuilt from the real screenshots. Each screen is drawn at
+   iPhone size (375 × 810) and scaled into the 250px-wide phone screen. */
+
+.tori-lp .rx {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 375px;
+  height: 810px;
+  transform: scale(calc(250 / 375));
+  transform-origin: top right;
+  overflow: hidden;
+  font-family: "Rubik", system-ui, sans-serif;
+  color: #1c1b1b;
+  text-align: center;
+  direction: rtl;
+}
+.tori-lp .rx b,
+.tori-lp .rx strong {
+  font-weight: 700;
+}
+
+/* ---------- status bar ---------- */
+.tori-lp .rx-status {
+  position: absolute;
+  z-index: 6;
+  inset: 0 0 auto;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px 0 34px;
+  font-size: 16px;
+}
+.tori-lp .rx-status span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tori-lp .rx-batt {
+  display: inline-grid;
+  place-items: center;
+  min-width: 26px;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: 5px;
+  background: #1c1b1b;
+  color: #fff;
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 700;
+}
+.tori-lp .rx-green .rx-batt,
+.tori-lp .bx-home-screen .rx-batt {
+  color: #1c1b1b;
+  background: #fff;
+}
+.tori-lp .rx-green .rx-status {
+  color: #fff;
+}
+
+/* ---------- customer: the green booking flow ---------- */
+.tori-lp .rx-green {
+  background: linear-gradient(180deg, #1de7b4 0%, #12c99b 55%, #0ea37f 100%);
+}
+.tori-lp .rx-back {
+  position: absolute;
+  z-index: 5;
+  top: 56px;
+  left: 14px;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.24);
+  color: #fff;
+}
+.tori-lp .rx-head {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  padding-top: 64px;
+  color: #fff;
+}
+.tori-lp .rx-head b {
+  font-size: 24px;
+}
+.tori-lp .rx-head small {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+/* service step */
+.tori-lp .rx-service {
+  position: absolute;
+  inset: 120px 0 auto;
+  display: grid;
+  justify-items: center;
+  gap: 24px;
+}
+.tori-lp .rx-svc-card {
+  width: 325px;
+  border-radius: 26px;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 60, 40, 0.18);
+}
+.tori-lp .rx-svc {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 14px;
+  border-top: 1.5px dashed #e3e8e6;
+  text-align: start;
+}
+.tori-lp .rx-svc:first-child {
+  border-top: 0;
+}
+.tori-lp .rx-svc.is-on {
+  background: #e8fbf4;
+}
+.tori-lp .rx-svc-ico {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #dff5ed;
+  color: #0e8f6c;
+}
+.tori-lp .rx-svc-text {
+  flex: 1;
+  display: grid;
+}
+.tori-lp .rx-svc-text b {
+  font-size: 16px;
+}
+.tori-lp .rx-svc.is-on .rx-svc-text b {
+  color: #0e8f6c;
+}
+.tori-lp .rx-svc-text small {
+  font-size: 12px;
+  color: #8a8f8d;
+}
+.tori-lp .rx-svc-price {
+  min-width: 56px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #e6f8f1;
+  color: #0e8f6c;
+  font-size: 14px;
+  font-weight: 700;
+}
+.tori-lp .rx-svc.is-on .rx-svc-price {
+  background: #1de7b4;
+  color: #0b3d2f;
+}
+.tori-lp .rx-next {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 28px;
+  border-radius: 999px;
+  background: #fff;
+  color: #0e8f6c;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* time step */
+.tori-lp .rx-times {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  padding: 16px 12px 0;
+}
+.tori-lp .rx-part {
+  justify-self: start;
+  padding: 4px 6px 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+}
+.tori-lp .rx-part.is-line {
+  justify-self: stretch;
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  text-align: start;
+}
+.tori-lp .rx-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.tori-lp .rx-grid span {
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: #f0fdf8;
+  font-size: 17px;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(0, 60, 40, 0.12);
+}
+.tori-lp .rx-grid .is-on {
+  background: #17c497;
+  color: #08382b;
+}
+.tori-lp .rx-wait {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  margin-top: 28px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+}
+.tori-lp .rx-wait span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 20px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(0, 70, 50, 0.35);
+  color: #0b5a45;
+  font-weight: 600;
+}
+
+/* the booking summary sheet */
+.tori-lp .rx-sum {
+  position: absolute;
+  inset: auto 0 0;
+  height: 118px;
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: 14px;
+  padding-top: 26px;
+  border-radius: 26px 26px 0 0;
+  background: #fff;
+}
+.tori-lp .rx-sum > b,
+.tori-lp .rx-sheet-title {
+  font-size: 15px;
+  color: #0e8f6c;
+}
+.tori-lp .rx-sum-toggle {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-left: -18px;
+  border-radius: 50%;
+  background: #dcf8ee;
+  color: #0e8f6c;
+  box-shadow: 0 0 0 5px #fff;
+}
+.tori-lp .rx-sum-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.tori-lp .rx-sum-row > span + span {
+  padding-inline-start: 8px;
+  border-inline-start: 1px solid #e3e3e3;
+}
+.tori-lp .rx-sum-staff {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.tori-lp .rx-sum-staff img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.tori-lp .rx-sum-row .rx-sum-price {
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 0;
+  background: #dff8ef;
+  color: #0e8f6c;
+  font-weight: 700;
+}
+.tori-lp .rx-sum-date,
+.tori-lp .rx-sum-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #6c7270;
+}
+.tori-lp .rx-sum-row .rx-sum-chip {
+  padding: 3px 8px;
+  border: 1px dashed #c9cfcd;
+  border-radius: 8px;
+}
+
+/* expanded sheets */
+.tori-lp .rx-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 30, 25, 0.28);
+}
+.tori-lp .rx-sheet {
+  position: absolute;
+  inset: auto 0 0;
+  display: grid;
+  justify-items: center;
+  border-radius: 28px 28px 0 0;
+  background: #fff;
+}
+.tori-lp .rx-confirm {
+  top: 440px;
+  align-content: start;
+  padding: 26px 16px 0;
+}
+.tori-lp .rx-step {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 4px;
+  border-top: 1.5px dashed #e6e9e8;
+  text-align: start;
+}
+.tori-lp .rx-sheet-title + .rx-step {
+  margin-top: 8px;
+  border-top: 0;
+}
+.tori-lp .rx-step-ico {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #dff8ef;
+  color: #0e8f6c;
+}
+.tori-lp .rx-step-ico img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.tori-lp .rx-step-text {
+  flex: 1;
+  display: grid;
+}
+.tori-lp .rx-step-text small {
+  font-size: 11px;
+  color: #8a8f8d;
+}
+.tori-lp .rx-step-text b {
+  font-size: 15px;
+}
+.tori-lp .rx-step-back {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  color: #9aa09e;
+}
+.tori-lp .rx-step-back i {
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: #f1f2f2;
+  font-style: normal;
+  font-size: 9px;
+}
+.tori-lp .rx-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 46px;
+  border-radius: 23px;
+  background: #1de7b4;
+  color: #08382b;
+  font-size: 16px;
+  font-weight: 700;
+}
+.tori-lp .rx-confirm .rx-cta {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* booked */
+.tori-lp .rx-booked {
+  top: 330px;
+  align-content: start;
+  gap: 8px;
+  padding: 34px 16px 0;
+}
+.tori-lp .rx-done {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: #d9f6ec;
+}
+.tori-lp .rx-done i {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #0d8a68;
+  color: #fff;
+}
+.tori-lp .rx-booked-title {
+  margin-top: 6px;
+  font-size: 21px;
+  color: #0d7a5c;
+}
+.tori-lp .rx-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: #e3f9f1;
+  color: #0d7a5c;
+  font-size: 13px;
+  font-weight: 700;
+}
+.tori-lp .rx-booked-box {
+  width: 100%;
+  display: grid;
+  gap: 2px;
+  margin-top: 4px;
+  padding: 12px 16px;
+  border-radius: 24px;
+  background: #f2f3f3;
+}
+.tori-lp .rx-booked-box small {
+  font-size: 11px;
+  color: #8a8f8d;
+}
+.tori-lp .rx-booked-box b {
+  font-size: 16px;
+}
+.tori-lp .rx-booked-box hr {
+  width: 85%;
+  margin: 6px auto;
+  border: 0;
+  border-top: 1px solid #e1e3e3;
+}
+.tori-lp .rx-booked-btns {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 18px;
+}
+.tori-lp .rx-cta.is-soft {
+  background: #e3f9f1;
+  color: #0d7a5c;
+}
+
+/* my appointments */
+.tori-lp .rx-mine {
+  background: #f4f4f4;
+}
+.tori-lp .rx-mosaic {
+  position: absolute;
+  inset: -30px -60px auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  transform: rotate(-4deg);
+  opacity: 0.55;
+}
+.tori-lp .rx-mosaic img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 10px;
+}
+.tori-lp .rx-mine-logo {
+  position: absolute;
+  z-index: 5;
+  top: 56px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transform: translateX(-50%);
+}
+.tori-lp .rx-mine-logo img:first-child {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+}
+.tori-lp .rx-mine-logo img:last-child {
+  height: 40px;
+}
+.tori-lp .rx-mine-sheet {
+  top: 478px;
+  align-content: start;
+  padding: 14px 14px 0;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
+}
+.tori-lp .rx-handle {
+  width: 36px;
+  height: 5px;
+  border-radius: 3px;
+  background: #d6d6d6;
+}
+.tori-lp .rx-mine-head {
+  position: relative;
+  width: 100%;
+  margin-top: 26px;
+}
+.tori-lp .rx-mine-head b {
+  font-size: 23px;
+}
+.tori-lp .rx-mine-head span {
+  position: absolute;
+  top: -2px;
+  left: 4px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #eeeeee;
+  color: #777;
+}
+.tori-lp .rx-mine-day {
+  justify-self: stretch;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 22px 0 14px;
+  font-size: 14px;
+  color: #555;
+}
+.tori-lp .rx-mine-day::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid #dcdcdc;
+}
+.tori-lp .rx-appt {
+  position: relative;
+  width: 100%;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.1);
+}
+.tori-lp .rx-appt-top {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 12px;
+  color: #444;
+}
+.tori-lp .rx-appt-top .is-ok {
+  color: #0e8f6c;
+}
+.tori-lp .rx-appt-body {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px 26px;
+  text-align: start;
+}
+.tori-lp .rx-appt-body img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.tori-lp .rx-appt-body span {
+  flex: 1;
+  display: grid;
+}
+.tori-lp .rx-appt-body b {
+  font-size: 16px;
+}
+.tori-lp .rx-appt-body small {
+  font-size: 12px;
+  color: #8a8f8d;
+}
+.tori-lp .rx-appt-body strong {
+  padding-inline-start: 18px;
+  border-inline-start: 1px solid #e6f6f0;
+  font-size: 30px;
+  color: #0e8f6c;
+}
+.tori-lp .rx-appt-btns {
+  position: absolute;
+  bottom: -14px;
+  left: 50%;
+  display: flex;
+  gap: 10px;
+  transform: translateX(-50%);
+}
+.tori-lp .rx-appt-btns span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.tori-lp .rx-appt-btns .is-swap {
+  background: #1de7b4;
+  color: #08382b;
+}
+.tori-lp .rx-appt-btns .is-cancel {
+  background: #ff3b30;
+  color: #fff;
+}
