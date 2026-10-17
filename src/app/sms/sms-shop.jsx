@@ -709,7 +709,7 @@ export function SmsShop() {
               </Cta>
               <PaymentTrust />
               <p className="sms-legal">
-                <Link href="/terms">תנאי שימוש</Link>
+                <Link href="/terms">תקנון</Link>
                 <span aria-hidden="true">·</span>
                 <Link href="/privacy">מדיניות פרטיות</Link>
               </p>
