@@ -9,6 +9,14 @@ export type PrivacyPolicyApp = {
 
 const BUNDLE_PATTERN = /^[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z][A-Za-z0-9_]*)+$/;
 
+export const DEVELOPER_ACCOUNT_NAME = "itay ben yair";
+
+export const FALLBACK_PRIVACY_APPS = [
+  { id: "amitsenior", name: "Amit senior | עמית סניור", bundle_id: "com.amitsenior.app" },
+  { id: "linbitton", name: "Lin Bitton | לין ביטון", bundle_id: "com.linbitton.tori" },
+  { id: "shirlvay", name: "Shir Lvay | שיר לביא", bundle_id: "com.shirlvay.app" },
+];
+
 export function parsePrivacyAppInput(name: unknown, bundleId: unknown) {
   const cleanName = String(name ?? "")
     .trim()

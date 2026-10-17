@@ -1,14 +1,12 @@
 import { LegalPage } from "@/components/legal-page";
-import { listPrivacyPolicyApps } from "@/lib/admin/privacy-apps";
+import {
+  DEVELOPER_ACCOUNT_NAME,
+  FALLBACK_PRIVACY_APPS,
+  listPrivacyPolicyApps,
+} from "@/lib/admin/privacy-apps";
 
 export const metadata = { title: "מדיניות פרטיות – אפליקציות Tori" };
 export const dynamic = "force-dynamic";
-
-const FALLBACK_APPS = [
-  { id: "amitsenior", name: "Amit senior | עמית סניור", bundle_id: "com.amitsenior.app" },
-  { id: "linbitton", name: "Lin Bitton | לין ביטון", bundle_id: "com.linbitton.tori" },
-  { id: "shirlvay", name: "Shir Lvay | שיר לביא", bundle_id: "com.shirlvay.app" },
-];
 
 const listStyle = {
   margin: 0,
@@ -19,11 +17,11 @@ const listStyle = {
 } as const;
 
 export default async function AppPrivacyPage() {
-  let apps = FALLBACK_APPS;
+  let apps: { id: string; name: string; bundle_id: string }[] = FALLBACK_PRIVACY_APPS;
   try {
     apps = await listPrivacyPolicyApps();
   } catch {
-    apps = FALLBACK_APPS;
+    apps = FALLBACK_PRIVACY_APPS;
   }
 
   return (
@@ -33,7 +31,7 @@ export default async function AppPrivacyPage() {
         <p>
           מדיניות פרטיות זו חלה על אפליקציות קביעת התורים הממותגות המופעלות
           באמצעות פלטפורמת Tori ומפורסמות ב-App Store וב-Google Play תחת
-          חשבון המפתח itay ben yair.
+          חשבון המפתח {DEVELOPER_ACCOUNT_NAME}.
         </p>
         <p>בין האפליקציות שעליהן חלה מדיניות זו:</p>
         <ul style={listStyle}>
