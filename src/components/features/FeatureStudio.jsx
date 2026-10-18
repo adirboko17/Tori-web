@@ -9,7 +9,6 @@ import { SIDES, featuresOf } from "./features-data";
 
 const MOBILE = "(max-width: 900px)";
 const DEMOS = "/assets/demos/";
-const NAV_CLEARANCE = 76; // the floating site bar covers the top of the screen
 
 function useMobile() {
   const [mobile, setMobile] = useState(false);
@@ -51,8 +50,13 @@ function DemoVideo({ demo }) {
       </video>
       {!ready && (
         <span className="tf-loading">
-          <i />
-          טוען הדגמה…
+          <span className="tf-loading-ring">
+            <i />
+            <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.4-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z" fill="currentColor" />
+            </svg>
+          </span>
+          <b>טוען הדגמה</b>
         </span>
       )}
     </>
@@ -104,8 +108,8 @@ function fromHash() {
   return null;
 }
 
-/** On the phone, keeps the tapped row under the finger while the row above it
-    closes, then brings the opened row up if its demo would run off screen. */
+/** On the phone, keeps the tapped row exactly under the finger while the
+    open row above it closes. Nothing else moves the page. */
 function useSteadyAccordion(activeId) {
   const tapped = useRef(null);
   useLayoutEffect(() => {
@@ -113,16 +117,14 @@ function useSteadyAccordion(activeId) {
     tapped.current = null;
     if (!t) return;
     const row = document.querySelector(`[data-row="${t.id}"]`);
-    if (!row) return;
-    const shift = row.getBoundingClientRect().top - t.top;
-    if (shift) window.scrollTo({ top: window.scrollY + shift, behavior: "instant" });
-    if (t.id !== activeId) return;
-    const panel = row.parentElement.querySelector(".tf-panel-inner");
-    const top = row.getBoundingClientRect().top;
-    const bottom = top + row.offsetHeight + panel.scrollHeight;
-    if (bottom > window.innerHeight) {
-      window.scrollTo({ top: window.scrollY + top - NAV_CLEARANCE, behavior: "smooth" });
-    }
+    const shift = row ? row.getBoundingClientRect().top - t.top : 0;
+    if (Math.abs(shift) < 1) return;
+    // the page scrolls smoothly by default; this correction must land at once
+    const root = document.documentElement;
+    const behavior = root.style.scrollBehavior;
+    root.style.scrollBehavior = "auto";
+    window.scrollTo(0, window.scrollY + shift);
+    root.style.scrollBehavior = behavior;
   }, [activeId]);
   return (id, el) => {
     tapped.current = { id, top: el.getBoundingClientRect().top };
