@@ -1226,6 +1226,37 @@ body {
   gap: 18px;
   position: relative;
 }
+.tori-lp .tori-feats-all-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 46px;
+}
+.tori-lp .tori-feats-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 54px;
+  padding: 0 12px 0 24px;
+  border-radius: 13px;
+  background: var(--ink-900);
+  color: var(--white);
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.tori-lp .tori-feats-all:hover {
+  background: var(--ink-700);
+}
+.tori-lp .tori-feats-all span {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--gradient-brand);
+  color: var(--ink-900);
+}
 .tori-lp .tori-feats-nav {
   display: none;
 }

@@ -5,7 +5,7 @@ const NAV_ITEMS = [
   { id: "pain", label: "למה תורי", hint: "הכאב שאנחנו פותרים" },
   { id: "brand", label: "מיתוג", hint: "האפליקציה בצבעים שלכם" },
   { id: "process", label: "איך זה עובד", hint: "שישה צעדים פשוטים" },
-  { id: "capabilities", label: "יכולות", hint: "מה תורי יודעת לעשות" },
+  { id: "capabilities", label: "יכולות", hint: "כל מה שתורי יודעת לעשות", href: "/features" },
   { id: "compare", label: "השוואה", hint: "תורי מול הדרך הישנה" },
   { id: "pricing", label: "מחיר", hint: "מחיר אחד, הכל כלול" },
   { id: "faq", label: "שאלות", hint: "כל מה ששאלתם" },
@@ -68,7 +68,8 @@ function useLensSize() {
   return { glassRef, lensRef };
 }
 
-export default function ToriNavSection() {
+/** The site bar and menu. `base` prefixes the section links ("/" off the homepage). */
+export default function ToriNavSection({ base = "" }) {
   const { glassRef, lensRef } = useLensSize();
   const markVideoRef = useRef(null);
   // the animated mark shows only where its transparency really renders
@@ -148,7 +149,7 @@ export default function ToriNavSection() {
         <div className="tori-nav-glass tori-nav-glass-tint" aria-hidden="true" />
         <div className="tori-nav-glass tori-nav-glass-shine" aria-hidden="true" />
         <a
-          href="#top"
+          href={base || "#top"}
           className="tori-nav-logo"
           style={{
             display: "inline-flex",
@@ -195,8 +196,8 @@ export default function ToriNavSection() {
           {NAV_ITEMS.map((item) => (
             <a
               key={item.id}
-              href={item.href ?? "#" + item.id}
-              data-nav={item.href ? undefined : item.id}
+              href={item.href ?? base + "#" + item.id}
+              data-nav={item.href || base ? undefined : item.id}
               style={{ fontWeight: "500", borderRadius: "5px" }}
             >
               {item.label}
@@ -279,8 +280,8 @@ export default function ToriNavSection() {
           {NAV_ITEMS.map((item, i) => (
             <a
               key={item.id}
-              href={item.href ?? "#" + item.id}
-              data-menu-link={item.href ? undefined : item.id}
+              href={item.href ?? base + "#" + item.id}
+              data-menu-link={item.href || base ? undefined : item.id}
               data-act="closeMenu"
               style={{ "--i": i }}
             >

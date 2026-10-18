@@ -1,0 +1,486 @@
+/* ============================================================
+   /features — every tori capability with its phone demo.
+   Desktop: a typographic index beside a quiet pinned phone.
+   Phone: the index becomes an accordion that holds the demo.
+   ============================================================ */
+
+.tori-lp .tf {
+  background: var(--white);
+  padding: 0 24px;
+}
+
+/* ---------- hero ---------- */
+.tori-lp .tf-hero {
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  padding: 150px 0 56px;
+  text-align: center;
+}
+.tori-lp .tf-hero h1 {
+  margin: 0;
+  font-family: inherit;
+  font-size: clamp(40px, 6vw, 78px);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  color: var(--ink-900);
+}
+.tori-lp .tf-hero p {
+  margin: 0;
+  max-width: 44ch;
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--ink-600);
+}
+
+/* the side switch: the two sides as big words, like the index below them;
+   the chosen side carries the site highlighter, drawn in when it is picked */
+.tori-lp .tf-tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(22px, 3vw, 36px);
+  margin-bottom: -8px;
+}
+.tori-lp .tf-tabs button {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: clamp(32px, 3.6vw, 46px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--ink-300);
+  cursor: pointer;
+  transition: color 0.3s;
+}
+.tori-lp .tf-tabs button:hover {
+  color: var(--ink-500);
+}
+.tori-lp .tf-tabs button[aria-selected="true"] {
+  color: var(--ink-900);
+  cursor: default;
+}
+.tori-lp .tf-tabs button:focus-visible {
+  outline: 2px solid var(--green-700);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+.tori-lp .tf-tab-word {
+  padding: 0 2px;
+  background-image: linear-gradient(100deg, #bfff51, #6bff85, #0cffbe);
+  background-repeat: no-repeat;
+  background-position: 100% 100%;
+  background-size: 0% 38%;
+  transition: background-size 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.tori-lp .tf-tabs button[aria-selected="true"] .tf-tab-word {
+  background-size: 100% 38%;
+}
+.tori-lp .tf-tabs small {
+  margin-top: 0.3em;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--ink-400);
+  font-variant-numeric: tabular-nums;
+}
+
+/* changing sides turns the phone around */
+.tori-lp .tf-flip {
+  perspective: 1400px;
+  animation: tf-flip 0.75s cubic-bezier(0.22, 1.1, 0.36, 1) both;
+}
+@keyframes tf-flip {
+  from {
+    opacity: 0;
+    transform: perspective(1400px) rotateY(-75deg) scale(0.92);
+  }
+}
+
+/* ---------- the studio ---------- */
+.tori-lp .tf-studio {
+  max-width: 1160px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  grid-template-areas: "index stage";
+  align-items: start;
+  gap: clamp(40px, 7vw, 110px);
+  padding: 10px 0 120px;
+}
+
+/* the pinned phone and a light caption under it */
+.tori-lp .tf-stage {
+  grid-area: stage;
+  position: sticky;
+  top: 96px;
+  display: grid;
+  justify-items: center;
+  gap: 20px;
+}
+.tori-lp .tf-phone .tori-brand-device {
+  zoom: 1.04;
+  animation: none;
+  box-shadow:
+    0 24px 50px -18px rgba(23, 22, 22, 0.35),
+    0 0 0 1px rgba(23, 22, 22, 0.06);
+}
+.tori-lp .tf-screen {
+  height: 540px;
+  background: var(--ink-100);
+}
+.tori-lp .tf-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: tf-in 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+/* until a demo is recorded: the capability, on its side's app colors */
+.tori-lp .tf-soon {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  padding: 0 26px;
+  text-align: center;
+  animation: tf-in 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.tori-lp .tf-soon.is-customer {
+  background: linear-gradient(180deg, #1de7b4 0%, #12c99b 55%, #0ea37f 100%);
+  color: #fff;
+}
+.tori-lp .tf-soon.is-business {
+  background: linear-gradient(160deg, #f1cf85 0%, #f8e3b4 60%, #fbefd3 100%);
+  color: #2b2414;
+}
+.tori-lp .tf-soon-ico {
+  display: grid;
+  place-items: center;
+  width: 78px;
+  height: 78px;
+  border-radius: 24px;
+  background: #fff;
+  color: var(--ink-900);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+}
+.tori-lp .tf-soon b {
+  font-size: 20px;
+  line-height: 1.25;
+}
+.tori-lp .tf-soon small {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.tori-lp .tf-now {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  max-width: 320px;
+  text-align: center;
+  animation: tf-in 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.tori-lp .tf-now-group {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink-400);
+}
+.tori-lp .tf-now-title {
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--ink-900);
+}
+.tori-lp .tf-now-text {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink-600);
+}
+
+/* ---------- the index ---------- */
+.tori-lp .tf-index {
+  grid-area: index;
+  display: grid;
+  gap: 40px;
+}
+.tori-lp .tf-group {
+  display: grid;
+  gap: 4px;
+}
+.tori-lp .tf-group-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--ink-900);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-900);
+}
+.tori-lp .tf-group-title small {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-400);
+}
+.tori-lp .tf-group ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.tori-lp .tf-group li {
+  position: relative;
+  border-bottom: 1px solid var(--ink-200);
+}
+.tori-lp .tf-group li > button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 15px 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: start;
+  color: var(--ink-400);
+  cursor: pointer;
+  transition: color 0.25s;
+}
+.tori-lp .tf-group li > button:hover,
+.tori-lp .tf-group li.is-on > button {
+  color: var(--ink-900);
+}
+.tori-lp .tf-group li > button:focus-visible {
+  outline: 2px solid var(--green-700);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+.tori-lp .tf-row-ico {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid var(--ink-200);
+  color: currentColor;
+  transition:
+    background 0.25s,
+    border-color 0.25s,
+    transform 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+.tori-lp .tf-group li.is-on .tf-row-ico {
+  border-color: transparent;
+  background: var(--gradient-brand);
+  transform: rotate(-6deg) scale(1.06);
+}
+.tori-lp .tf-row-title {
+  flex: 1;
+  font-size: clamp(19px, 1.9vw, 25px);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+}
+/* how far the demo has played, along the active row */
+.tori-lp .tf-group li::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 -1px;
+  height: 2px;
+  background: var(--ink-900);
+  transform: scaleX(0);
+  transform-origin: right;
+}
+.tori-lp .tf-group li.is-on::after {
+  transform: scaleX(var(--p, 0));
+}
+
+/* ---------- closing call to action ---------- */
+.tori-lp .tf-end {
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  padding: 90px 24px 110px;
+  background: var(--ink-50);
+  border-top: 1px solid var(--line-subtle);
+  text-align: center;
+}
+.tori-lp .tf-end h2 {
+  margin: 0;
+  font-family: inherit;
+  font-size: clamp(32px, 4.4vw, 56px);
+  font-weight: 700;
+  line-height: 1.06;
+  color: var(--ink-900);
+}
+.tori-lp .tf-end p {
+  margin: 0;
+  max-width: 40ch;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--ink-600);
+}
+.tori-lp .tf-end-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 56px;
+  margin-top: 10px;
+  padding: 0 13px 0 26px;
+  border-radius: 13px;
+  background: var(--ink-900);
+  color: var(--white);
+  font-size: 17px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.tori-lp .tf-end-cta span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--gradient-brand);
+  color: var(--ink-900);
+}
+
+/* the pinned phone and its caption always fit the screen height */
+@media (max-height: 860px) {
+  .tori-lp .tf-phone .tori-brand-device {
+    zoom: 0.92;
+  }
+}
+@media (max-height: 760px) {
+  .tori-lp .tf-phone .tori-brand-device {
+    zoom: 0.8;
+  }
+}
+
+@keyframes tf-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* ---------- phone: an accordion, the demo opens inside the row ---------- */
+@media (max-width: 900px) {
+  .tori-lp .tf-studio {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "index";
+    padding-top: 0;
+  }
+  .tori-lp .tf-index {
+    gap: 30px;
+  }
+  .tori-lp .tf-group li > button {
+    gap: 12px;
+    padding: 14px 0;
+  }
+  .tori-lp .tf-row-ico {
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
+  }
+  .tori-lp .tf-row-title {
+    font-size: 17px;
+  }
+  .tori-lp .tf-group li.is-on .tf-row-ico {
+    transform: none;
+  }
+  .tori-lp .tf-group li::after {
+    display: none;
+  }
+  /* the plus turns into a minus when the row is open */
+  .tori-lp .tf-row-plus {
+    position: relative;
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+  }
+  .tori-lp .tf-row-plus::before,
+  .tori-lp .tf-row-plus::after {
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: 0;
+    width: 14px;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+    transition: transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  .tori-lp .tf-row-plus::after {
+    transform: rotate(90deg);
+  }
+  .tori-lp .tf-group li.is-on .tf-row-plus::after {
+    transform: rotate(0deg);
+  }
+  .tori-lp .tf-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  .tori-lp .tf-group li.is-on .tf-panel {
+    grid-template-rows: 1fr;
+  }
+  .tori-lp .tf-panel-inner {
+    min-height: 0;
+    overflow: hidden;
+    display: grid;
+    justify-items: center;
+    gap: 18px;
+  }
+  .tori-lp .tf-group li.is-on .tf-panel-inner {
+    padding-bottom: 24px;
+  }
+  .tori-lp .tf-panel-text {
+    justify-self: stretch;
+    margin: 0 !important;
+    padding-inline-start: 48px;
+    font-size: 14.5px !important;
+    line-height: 1.6 !important;
+    color: var(--ink-600);
+    text-align: start !important;
+  }
+  .tori-lp .tf-panel .tori-brand-device {
+    zoom: 0.72;
+  }
+}
+@media (max-width: 760px) {
+  .tori-lp .tf {
+    padding-inline: var(--m-gutter) !important;
+  }
+  .tori-lp .tf-hero {
+    padding: 112px 0 30px;
+  }
+  .tori-lp .tf-hero p {
+    font-size: 16px !important;
+  }
+  .tori-lp .tf-tabs button {
+    font-size: 30px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tori-lp .tf-video,
+  .tori-lp .tf-soon,
+  .tori-lp .tf-now,
+  .tori-lp .tf-flip {
+    animation: none;
+  }
+  .tori-lp .tf-tab-word {
+    transition: none;
+  }
+  .tori-lp .tf-panel {
+    transition: none;
+  }
+}
