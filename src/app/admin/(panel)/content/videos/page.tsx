@@ -84,6 +84,12 @@ function videoVisible(video: HelpVideo, category: HelpCategory, filter: VideoFil
   return audience === filter || audience === "all";
 }
 
+function categoryVisible(category: HelpCategory, filter: VideoFilter) {
+  if (filter === "all") return true;
+  if (category.audience === filter || category.audience === "all") return true;
+  return category.videos.some((video) => videoVisible(video, category, filter));
+}
+
 function videoAudienceText(video: HelpVideo, category: HelpCategory) {
   if (!video.audience) return `כמו הקטגוריה (${audienceLabel(category.audience)})`;
   return AUDIENCE_LIST[video.audience];
@@ -695,8 +701,8 @@ export default function VideosPage() {
     ),
   };
   const visible = categories.flatMap((category) => {
+    if (!categoryVisible(category, filter)) return [];
     const videos = category.videos.filter((video) => videoVisible(video, category, filter));
-    if (filter !== "all" && videos.length === 0) return [];
     return [{ category, videos }];
   });
 
