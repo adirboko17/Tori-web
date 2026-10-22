@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { adminJson } from "@/lib/superadmin/browser";
 import { formatDurationSeconds } from "@/lib/superadmin/format";
-import { HELP_AUDIENCES, HELP_ICONS, isHelpSlug, slugifyHelp } from "@/lib/superadmin/help-shared";
+import { HELP_AUDIENCES, isHelpSlug, slugifyHelp, type HelpIconName } from "@/lib/superadmin/help-shared";
 import type { HelpAudience, HelpCategory, HelpI18n, HelpVideo } from "@/lib/superadmin/types";
 import { Drawer } from "../../../_ui/drawer";
 import { useConfirm, useToast } from "../../../_ui/feedback";
-import { Icon } from "../../../_ui/icon";
-import { Badge, EmptyState, ErrorState, Field, SkeletonRows, Switch } from "../../../_ui/parts";
+import { Icon, type IconName } from "../../../_ui/icon";
+import { Badge, EmptyState, ErrorState, Field, FilterChips, SkeletonRows, Switch } from "../../../_ui/parts";
 import { UploadTile } from "../../../_ui/upload-tile";
 import { useAdminData } from "../../../_ui/use-admin-data";
 
@@ -23,6 +23,66 @@ const AUDIENCE_LIST: Record<HelpAudience, string> = {
   client: "מיועד ללקוח",
   all: "מיועד לכולם",
 };
+
+type VideoFilter = "all" | "client" | "admin";
+
+/** App icon keys, drawn with the closest glyph so the picker shows the shape. */
+const HELP_ICON_OPTIONS: { key: HelpIconName; glyph: IconName; label: string }[] = [
+  { key: "appointments", glyph: "calendar-days", label: "תורים" },
+  { key: "calendar", glyph: "calendar", label: "יומן" },
+  { key: "clock", glyph: "clock", label: "שעון" },
+  { key: "time", glyph: "timer", label: "זמן" },
+  { key: "users", glyph: "users", label: "משתמשים" },
+  { key: "clients", glyph: "user-round", label: "לקוחות" },
+  { key: "employees", glyph: "user", label: "עובדים" },
+  { key: "user-plus", glyph: "user-plus", label: "לקוח חדש" },
+  { key: "settings", glyph: "settings", label: "הגדרות" },
+  { key: "palette", glyph: "palette", label: "צבעים" },
+  { key: "design", glyph: "sliders-horizontal", label: "עיצוב" },
+  { key: "bell", glyph: "bell", label: "פעמון" },
+  { key: "notifications", glyph: "bell-ring", label: "התראות" },
+  { key: "image", glyph: "image", label: "תמונה" },
+  { key: "gallery", glyph: "layout-grid", label: "גלריה" },
+  { key: "repeat", glyph: "repeat", label: "חזרה" },
+  { key: "recurring", glyph: "refresh-cw", label: "מחזורי" },
+  { key: "help", glyph: "info", label: "עזרה" },
+  { key: "book", glyph: "bookmark", label: "ספר" },
+  { key: "book-open", glyph: "book-open", label: "ספר פתוח" },
+  { key: "scissors", glyph: "scissors", label: "מספריים" },
+  { key: "services", glyph: "clipboard-list", label: "שירותים" },
+  { key: "wallet", glyph: "wallet", label: "ארנק" },
+  { key: "finance", glyph: "banknote", label: "כספים" },
+  { key: "store", glyph: "store", label: "חנות" },
+  { key: "branches", glyph: "building-2", label: "סניפים" },
+  { key: "message", glyph: "message-square", label: "הודעה" },
+  { key: "message-circle", glyph: "message-circle", label: "צ׳אט" },
+  { key: "headphones", glyph: "headset", label: "אוזניות" },
+  { key: "support", glyph: "phone-call", label: "תמיכה" },
+  { key: "phone", glyph: "phone", label: "טלפון" },
+  { key: "star", glyph: "star", label: "כוכב" },
+  { key: "home", glyph: "house", label: "בית" },
+  { key: "shield", glyph: "shield", label: "מגן" },
+  { key: "sparkles", glyph: "sparkles", label: "נצנוץ" },
+  { key: "layout", glyph: "layout-dashboard", label: "פריסה" },
+  { key: "layout-grid", glyph: "layout-grid", label: "רשת" },
+  { key: "mail", glyph: "mail", label: "דואר" },
+];
+
+const HELP_GLYPH = Object.fromEntries(HELP_ICON_OPTIONS.map((item) => [item.key, item.glyph])) as Record<string, IconName>;
+
+function helpGlyph(name: string | null | undefined): IconName {
+  return (name && HELP_GLYPH[name]) || "book-open";
+}
+
+function effectiveAudience(video: HelpVideo, category: HelpCategory): HelpAudience {
+  return video.audience ?? category.audience;
+}
+
+function videoVisible(video: HelpVideo, category: HelpCategory, filter: VideoFilter) {
+  if (filter === "all") return true;
+  const audience = effectiveAudience(video, category);
+  return audience === filter || audience === "all";
+}
 
 function videoAudienceText(video: HelpVideo, category: HelpCategory) {
   if (!video.audience) return `כמו הקטגוריה (${audienceLabel(category.audience)})`;
@@ -190,25 +250,33 @@ function CategoryDrawer({
       <Field label="תיאור" hint="לא חובה">
         <textarea className="ad-textarea" rows={2} value={description} onChange={(event) => setDescription(event.target.value)} />
       </Field>
-      <div className="ad-form-grid">
-        <Field label="למי זה מיועד">
-          <select className="ad-select" value={audience} onChange={(event) => setAudience(event.target.value as HelpAudience)}>
-            {HELP_AUDIENCES.map((item) => (
-              <option key={item.value} value={item.value}>
-                {item.label}
-              </option>
-            ))}
-          </select>
-        </Field>
-        <Field label="אייקון באפליקציה">
-          <select className="ad-select" dir="ltr" value={icon} onChange={(event) => setIcon(event.target.value)}>
-            {HELP_ICONS.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
-        </Field>
+      <Field label="למי זה מיועד">
+        <select className="ad-select" value={audience} onChange={(event) => setAudience(event.target.value as HelpAudience)}>
+          {HELP_AUDIENCES.map((item) => (
+            <option key={item.value} value={item.value}>
+              {item.label}
+            </option>
+          ))}
+        </select>
+      </Field>
+      <div className="ad-field">
+        <span className="ad-field-label">אייקון באפליקציה</span>
+        <div className="ad-icon-picker" role="group" aria-label="אייקון באפליקציה">
+          {HELP_ICON_OPTIONS.map((item) => (
+            <button
+              key={item.key}
+              type="button"
+              className="ad-icon-option"
+              aria-pressed={icon === item.key}
+              aria-label={item.label}
+              title={item.label}
+              onClick={() => setIcon(item.key)}
+            >
+              <Icon name={item.glyph} size={22} />
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
       </div>
       <Switch checked={published} onChange={setPublished} label="מפורסמת באפליקציות" />
       <details className="ad-details" open={Boolean(slugError) || undefined}>
@@ -460,12 +528,14 @@ function VideoDrawer({
 
 function CategoryCard({
   category,
+  videos,
   onEdit,
   onAddVideo,
   onEditVideo,
   onChange,
 }: {
   category: HelpCategory;
+  videos: HelpVideo[];
   onEdit: () => void;
   onAddVideo: () => void;
   onEditVideo: (video: HelpVideo) => void;
@@ -516,12 +586,12 @@ function CategoryCard({
       <div className="ad-card-head">
         <div>
           <h2>
-            <Icon name="book-open" />
+            <Icon name={helpGlyph(category.icon)} />
             {category.title}
             {category.is_published ? null : <Badge>טיוטה</Badge>}
           </h2>
           <p>
-            {AUDIENCE_LIST[category.audience]} · {category.videos.length} סרטונים
+            {AUDIENCE_LIST[category.audience]} · {videos.length} סרטונים
           </p>
         </div>
         <span className="ad-row">
@@ -534,11 +604,11 @@ function CategoryCard({
           </button>
         </span>
       </div>
-      {category.videos.length === 0 ? (
+      {videos.length === 0 ? (
         <div className="ad-card-body ad-small ad-muted">אין סרטונים בקטגוריה הזו עדיין.</div>
       ) : (
         <div className="ad-list">
-          {category.videos.map((video) => (
+          {videos.map((video) => (
             <div key={video.id} className="ad-list-item">
               <span
                 className="ad-list-icon"
@@ -611,19 +681,46 @@ type Editing =
 export default function VideosPage() {
   const { data, error, loading, reload } = useAdminData<{ categories: HelpCategory[] }>("/api/admin/help");
   const [editing, setEditing] = useState<Editing>(null);
+  const [filter, setFilter] = useState<VideoFilter>("all");
   const categories = data?.categories ?? [];
+  const counts = {
+    all: categories.reduce((sum, category) => sum + category.videos.length, 0),
+    client: categories.reduce(
+      (sum, category) => sum + category.videos.filter((video) => videoVisible(video, category, "client")).length,
+      0,
+    ),
+    admin: categories.reduce(
+      (sum, category) => sum + category.videos.filter((video) => videoVisible(video, category, "admin")).length,
+      0,
+    ),
+  };
+  const visible = categories.flatMap((category) => {
+    const videos = category.videos.filter((video) => videoVisible(video, category, filter));
+    if (filter !== "all" && videos.length === 0) return [];
+    return [{ category, videos }];
+  });
 
   return (
     <>
-      <div className="ad-row">
-        <span className="ad-small ad-muted">
-          תוכן גלובלי לכל העסקים. הקבצים נשמרים באחסון של מרכז העזרה.
-        </span>
-        <span className="ad-spacer" />
-        <button type="button" className="ad-btn is-primary is-sm" onClick={() => setEditing({ kind: "category", category: null })}>
-          <Icon name="plus" size={16} />
-          קטגוריה חדשה
-        </button>
+      <div className="ad-stack">
+        <div className="ad-row">
+          <FilterChips
+            label="סינון סרטונים"
+            value={filter}
+            onChange={setFilter}
+            options={[
+              { value: "all", label: "כולם", count: loading ? undefined : counts.all },
+              { value: "client", label: "לקוח", count: loading ? undefined : counts.client },
+              { value: "admin", label: "מנהל", count: loading ? undefined : counts.admin },
+            ]}
+          />
+          <span className="ad-spacer" />
+          <button type="button" className="ad-btn is-primary is-sm" onClick={() => setEditing({ kind: "category", category: null })}>
+            <Icon name="plus" size={16} />
+            קטגוריה חדשה
+          </button>
+        </div>
+        <p className="ad-small ad-muted">תוכן גלובלי לכל העסקים. הקבצים נשמרים באחסון של מרכז העזרה.</p>
       </div>
 
       {error && !data ? (
@@ -638,11 +735,20 @@ export default function VideosPage() {
         <div className="ad-card">
           <EmptyState icon="video" title="אין קטגוריות עדיין" body="צרו קטגוריה ראשונה ואז הוסיפו לה סרטונים." />
         </div>
+      ) : visible.length === 0 ? (
+        <div className="ad-card">
+          <EmptyState
+            icon="video"
+            title={filter === "client" ? "אין סרטונים ללקוח" : "אין סרטונים למנהל"}
+            body="סרטונים שמיועדים לכולם מופיעים גם בסינון של לקוח וגם בסינון של מנהל."
+          />
+        </div>
       ) : (
-        categories.map((category) => (
+        visible.map(({ category, videos }) => (
           <CategoryCard
             key={category.id}
             category={category}
+            videos={videos}
             onEdit={() => setEditing({ kind: "category", category })}
             onAddVideo={() => setEditing({ kind: "video", category, video: null })}
             onEditVideo={(video) => setEditing({ kind: "video", category, video })}

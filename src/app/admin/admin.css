@@ -1102,6 +1102,47 @@
   font-variant-numeric: tabular-nums;
 }
 
+.ad-icon-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+  gap: 8px;
+}
+
+.ad-icon-option {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 6px;
+  min-height: 72px;
+  padding: 8px 4px;
+  border: 1px solid var(--ink-200);
+  border-radius: 12px;
+  background: var(--white);
+  color: var(--ink-700);
+  cursor: pointer;
+  transition: var(--transition-control);
+}
+
+.ad-icon-option span {
+  max-width: 100%;
+  padding-inline: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--weight-medium) 11px/1.2 var(--font-ui);
+}
+
+.ad-icon-option:hover {
+  border-color: var(--ink-400);
+  color: var(--ink-900);
+}
+
+.ad-icon-option[aria-pressed="true"] {
+  border-color: var(--ink-900);
+  background: var(--lime-100);
+  color: var(--ink-900);
+}
+
 .ad-avatar {
   width: 36px;
   height: 36px;
