@@ -1,12 +1,13 @@
 import { writeAccountSession } from "@/lib/account/session";
 import { startSubscriptionCheckout } from "@/lib/account/start-checkout";
-import { paidAccounts, payableAccounts } from "@/lib/account/profile";
+import { checkoutIdOf, paidAccounts, payableAccounts } from "@/lib/account/profile";
 import {
   clearOtpPending,
   readOtpPending,
   writeSignupPhone,
 } from "@/lib/account/phone-ticket";
-import { listAccountsByPhone } from "@/lib/account/store";
+import { resumePaidSignup } from "@/lib/account/resume-paid";
+import { listAccountsByPhone, type CustomerAccount } from "@/lib/account/store";
 import {
   CONFIG_ERRORS,
   sessionSigningConfigured,
@@ -62,13 +63,30 @@ export async function POST(request: Request) {
 
     if (pending.flow === "pay") {
       const account = payableAccounts(found.accounts).find(
-        (row) => row.businessId === pending.businessId,
+        (row) => checkoutIdOf(row) === pending.businessId,
       );
-      if (!account?.businessId) {
+      if (!account) {
         return jsonError("התשלום עדיין לא זמין למספר הזה.", 400);
       }
+      const checkoutId = checkoutIdOf(account);
+
+      // The payment may already have gone through (e.g. the PayPlus callback was
+      // missed). Enter the account instead of opening a second checkout.
+      const resumed = await resumePaidSignup({
+        phone: found.phone,
+        checkoutId,
+        returning: true,
+      });
+      if (resumed.status === "ready") {
+        if (await enterPaidAccount(resumed.account)) {
+          return jsonOk({ next: "account", paid: true });
+        }
+        return jsonError("התשלום נקלט, אבל פתיחת האזור האישי נכשלה. נסו שוב.", 502);
+      }
+      if (resumed.status === "failed") return jsonError(resumed.error, 502);
+
       const checkout = await startSubscriptionCheckout(request, {
-        businessId: account.businessId,
+        businessId: checkoutId,
         customerName: account.fullName,
         phone: account.phone,
       });
@@ -85,17 +103,23 @@ export async function POST(request: Request) {
       return jsonError("המספר לא משויך ללקוח ששילם.", 403);
     }
 
-    await writeAccountSession({
-      accountId: account.id,
-      userId: account.userId,
-      businessId: account.businessId,
-      phone: account.phone,
-      name: account.fullName,
-      businessName: account.businessName,
-    });
+    await enterPaidAccount(account);
     return jsonOk({ next: "account" });
   } catch (error) {
     const message = error instanceof Error ? error.message : "אימות הקוד נכשל.";
     return jsonError(message, 500);
   }
+}
+
+async function enterPaidAccount(account: CustomerAccount) {
+  if (!account.userId || !account.businessId) return false;
+  await writeAccountSession({
+    accountId: account.id,
+    userId: account.userId,
+    businessId: account.businessId,
+    phone: account.phone,
+    name: account.fullName,
+    businessName: account.businessName,
+  });
+  return true;
 }

@@ -57,22 +57,39 @@ export function paidAccounts<T extends {
 
 export type AccountEntry = "login" | "pay" | "signup";
 
-export function payableAccounts<T extends {
+export type PayableAccountShape = {
+  id: string;
+  fullName: string;
   paidAt: string | null;
   businessId: string | null;
   userId: string | null;
-}>(accounts: T[]) {
-  return accounts.filter(
-    (account) => !account.paidAt && account.businessId && account.userId,
-  );
+};
+
+/**
+ * The id PayPlus stores on the charge: the business when one exists, otherwise the
+ * signup row itself (its id becomes the business id once the payment is confirmed).
+ */
+export function checkoutIdOf(account: { id: string; businessId: string | null }) {
+  return account.businessId ?? account.id;
+}
+
+/**
+ * Accounts that filled in the details form but have not paid yet:
+ * a new signup that has no business until payment, or an older signup whose
+ * business was opened before paying.
+ */
+export function payableAccounts<T extends PayableAccountShape>(accounts: T[]) {
+  return accounts.filter((account) => {
+    if (account.paidAt) return false;
+    if (account.businessId) return Boolean(account.userId);
+    return account.fullName.trim().length >= 2;
+  });
 }
 
 /** Paid phones enter the personal area. A started signup continues to payment. */
-export function entryForAccounts<T extends {
-  paidAt: string | null;
-  businessId: string | null;
-  userId: string | null;
-}>(accounts: T[]): AccountEntry {
+export function entryForAccounts<T extends PayableAccountShape>(
+  accounts: T[],
+): AccountEntry {
   if (paidAccounts(accounts).length > 0) return "login";
   if (payableAccounts(accounts).length > 0) return "pay";
   return "signup";
