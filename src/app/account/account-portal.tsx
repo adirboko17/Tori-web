@@ -69,6 +69,7 @@ async function api(url: string, body: unknown) {
     phone?: string;
     flow?: "login" | "pay" | "signup";
     next?: "account" | "details" | "pay";
+    paid?: boolean;
     url?: string;
     needsBusiness?: boolean;
     businesses?: BusinessChoice[];
@@ -325,7 +326,7 @@ function LoginForm({
         setLoading(false);
         return;
       }
-      window.location.assign("/account");
+      window.location.assign(data.paid ? "/account?paid=1" : "/account");
     } catch (err) {
       setError(err instanceof Error ? err.message : "אימות הקוד נכשל.");
       setCode("");

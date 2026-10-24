@@ -2,8 +2,10 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { hashManagerPassword } from "../src/lib/account/password.ts";
 import {
+  checkoutIdOf,
   entryForAccounts,
   paidAccounts,
+  payableAccounts,
   validateAccountProfile,
 } from "../src/lib/account/profile.ts";
 import {
@@ -83,20 +85,42 @@ test("only a paid account linked to a user can sign in", () => {
 });
 
 test("a new phone signs up, an unpaid user pays, and a paid user enters", () => {
-  const fresh = {
+  const row = {
+    id: "signup-1",
+    fullName: "דנה לוי",
     paidAt: null,
     businessId: null,
     userId: null,
   };
-  assert.equal(entryForAccounts([fresh]), "signup");
+  assert.equal(entryForAccounts([]), "signup");
+  assert.equal(entryForAccounts([{ ...row, fullName: "" }]), "signup");
   assert.equal(
-    entryForAccounts([{ paidAt: null, businessId: "biz", userId: "user" }]),
+    entryForAccounts([{ ...row, businessId: "biz", userId: "user" }]),
     "pay",
   );
   assert.equal(
-    entryForAccounts([{ paidAt: "2026-10-02T00:00:00Z", businessId: "biz", userId: "user" }]),
+    entryForAccounts([
+      { ...row, paidAt: "2026-10-02T00:00:00Z", businessId: "biz", userId: "user" },
+    ]),
     "login",
   );
+});
+
+test("a signup that filled in details but left before paying continues to payment", () => {
+  const pending = {
+    id: "signup-1",
+    fullName: "דנה לוי",
+    paidAt: null,
+    businessId: null,
+    userId: null,
+  };
+  assert.equal(entryForAccounts([pending]), "pay");
+  assert.deepEqual(payableAccounts([pending]), [pending]);
+  // PayPlus stored the signup row id on the charge; it becomes the business id once paid.
+  assert.equal(checkoutIdOf(pending), "signup-1");
+  assert.equal(checkoutIdOf({ ...pending, businessId: "biz" }), "biz");
+  // An older signup whose business exists but has no admin user cannot be charged yet.
+  assert.equal(entryForAccounts([{ ...pending, businessId: "biz" }]), "signup");
 });
 
 test("a returning purchase is matched by the signup id and the same mobile", () => {

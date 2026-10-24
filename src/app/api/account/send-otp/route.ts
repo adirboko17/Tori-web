@@ -1,4 +1,5 @@
 import {
+  checkoutIdOf,
   entryForAccounts,
   paidAccounts,
   payableAccounts,
@@ -43,13 +44,13 @@ export async function POST(request: Request) {
           needsBusiness: true,
           flow,
           businesses: pool.map((account) => ({
-            id: account.businessId,
+            id: checkoutIdOf(account),
             name: account.businessName,
           })),
         });
       }
       const account = pickAccount(pool, businessId);
-      if (!account?.businessId) {
+      if (!account) {
         return jsonError("העסק שנבחר אינו משויך למספר זה.");
       }
       const { sent, senderId, purpose } = await sendPlatformOtp(found.phone);
@@ -58,7 +59,9 @@ export async function POST(request: Request) {
       }
       await writeOtpPending({
         phone: found.phone,
-        businessId: account.businessId,
+        // For a paid account this is the business; for a pending signup it is the
+        // signup row id that PayPlus stores on the charge.
+        businessId: checkoutIdOf(account),
         senderId,
         purpose,
         flow,
@@ -99,7 +102,7 @@ async function sendPlatformOtp(phone: string) {
   return { sent, senderId, purpose };
 }
 
-function pickAccount(accounts: CustomerAccount[], businessId: string) {
-  if (businessId) return accounts.find((row) => row.businessId === businessId);
+function pickAccount(accounts: CustomerAccount[], checkoutId: string) {
+  if (checkoutId) return accounts.find((row) => checkoutIdOf(row) === checkoutId);
   return accounts[0];
 }
