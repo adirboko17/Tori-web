@@ -5,7 +5,7 @@ const NAV_ITEMS = [
   { id: "pain", label: "למה תורי", hint: "הכאב שאנחנו פותרים" },
   { id: "brand", label: "מיתוג", hint: "האפליקציה בצבעים שלכם" },
   { id: "process", label: "איך זה עובד", hint: "שישה צעדים פשוטים" },
-  { id: "capabilities", label: "יכולות", hint: "כל מה שתורי יודעת לעשות", href: "/features" },
+  { id: "capabilities", label: "יכולות", hint: "כל מה שתורי יודע לעשות", href: "/features" },
   { id: "compare", label: "השוואה", hint: "תורי מול הדרך הישנה" },
   { id: "pricing", label: "מחיר", hint: "מחיר אחד, הכל כלול" },
   { id: "faq", label: "שאלות", hint: "כל מה ששאלתם" },

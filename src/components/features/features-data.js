@@ -79,11 +79,11 @@ export const SIDES = {
         ],
       },
       {
-        title: "Tori, העוזרת החכמה",
+        title: "Tori, העוזר החכם",
         items: [
-          { id: "ai-chat", demo: "business/ai-chat", icon: "sparkles", title: "עוזרת AI בצ׳אט", text: "שואלים את Tori „יש מקום מחר בבוקר?”, והיא מציעה, מאשרת וקובעת." },
-          { id: "ai-voice", demo: "business/ai-voice", icon: "mic", title: "שיחה קולית עם Tori", text: "מדברים עם Tori בקול, והיא מקשיבה ועונה." },
-          { id: "insights", demo: "business/insights", icon: "bulb", title: "תובנות עסקיות", text: "Tori מראה, למשל, לקוחות קבועים שלא חזרו, ומנסחת להם הודעה." },
+          { id: "ai-chat", demo: "business/ai-chat", icon: "sparkles", title: "עוזר AI בצ׳אט", text: "שואלים את Tori „יש מקום מחר בבוקר?”, והוא מציע, מאשר וקובע." },
+          { id: "ai-voice", demo: "business/ai-voice", icon: "mic", title: "שיחה קולית עם Tori", text: "מדברים עם Tori בקול, והוא מקשיב ועונה." },
+          { id: "insights", demo: "business/insights", icon: "bulb", title: "תובנות עסקיות", text: "Tori מראה, למשל, לקוחות קבועים שלא חזרו, ומנסח להם הודעה." },
         ],
       },
       {

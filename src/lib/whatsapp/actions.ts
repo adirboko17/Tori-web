@@ -192,6 +192,35 @@ export async function addManualLead(input: {
   return lead;
 }
 
+/** A lead left on the campaign landing page. A phone that is already in the
+    table is not added again, but the visitor still sees a success. */
+export async function addCampaignLead(input: {
+  name: string;
+  phone: string;
+  business: string;
+  business_type: string;
+  notes: string | null;
+}) {
+  const phoneNorm = normalizePhone(input.phone);
+  if (!phoneNorm) throw new Error("מספר טלפון לא תקין");
+  const existing = await getExistingLeadPhones();
+  if (existing.has(phoneNorm)) return null;
+  const business = input.business || input.name;
+  const lead = await createLead({
+    name: input.name,
+    business,
+    phone: phoneNorm,
+    business_type: input.business_type,
+    notes: input.notes,
+    source: "campaign",
+    message_name: extractMessageName(business),
+  });
+  queueAdminPush(
+    adminPushEvents.whatsappLead({ leadId: lead.id, name: lead.name, business }),
+  );
+  return lead;
+}
+
 export async function importLeadFile(buffer: Buffer, businessType: string, sendOpeningFlag: boolean) {
   const { leads, errors } = parseExcelBuffer(buffer, { businessType });
   const existing = await getExistingLeadPhones();
