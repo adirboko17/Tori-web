@@ -108,7 +108,7 @@ export const SIDES = {
           { id: "health-forms", demo: "business/health-forms", icon: "clipboard", title: "בונה הצהרת בריאות", text: "בונים שאלון מבלוקים ומחברים אותו לשירות." },
           { id: "services", demo: "business/services", icon: "tag", title: "שירותים ומחירים", text: "מוסיפים שירות עם שם, מחיר ומשך, והוא מופיע ללקוחות." },
           { id: "staff", demo: "business/staff", icon: "users", title: "ניהול עובדים", text: "מוסיפים עובדת עם מספר הטלפון שלה, והיא מקבלת יומן ושירותים משלה." },
-          { id: "branches", icon: "map", title: "סניפים", text: "כמה סניפים תחת אפליקציה אחת, ומשייכים כל עובדת לסניף שלה." },
+          { id: "branches", demo: "business/branches", icon: "map", title: "סניפים", text: "מוסיפים סניף עם שם, כתובת וטלפון, ומשייכים אליו את הצוות." },
         ],
       },
     ],
