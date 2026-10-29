@@ -18,6 +18,20 @@ const timeFormat = new Intl.DateTimeFormat("he-IL", {
   minute: "2-digit",
 });
 
+const israelDateFormat = new Intl.DateTimeFormat("he-IL", {
+  timeZone: "Asia/Jerusalem",
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+});
+
+const israelTimeFormat = new Intl.DateTimeFormat("he-IL", {
+  timeZone: "Asia/Jerusalem",
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+});
+
 const monthFormat = new Intl.DateTimeFormat("en-CA", {
   timeZone: "Asia/Jerusalem",
   year: "numeric",
@@ -55,6 +69,12 @@ export function formatDate(value: string | null | undefined) {
 export function formatDateTime(value: string | null | undefined) {
   const date = toDate(value);
   return date ? `${dateFormat.format(date)}, ${timeFormat.format(date)}` : "—";
+}
+
+/** Same clock, always Asia/Jerusalem, even if the browser is in another zone. */
+export function formatIsraelDateTime(value: string | null | undefined) {
+  const date = toDate(value);
+  return date ? `${israelDateFormat.format(date)}, ${israelTimeFormat.format(date)}` : "—";
 }
 
 /** "היום 14:05" / "אתמול" / "לפני 3 ימים" / "12 בספט׳". */

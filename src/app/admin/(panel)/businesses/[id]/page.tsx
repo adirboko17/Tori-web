@@ -14,6 +14,7 @@ import { SubscriptionBadge } from "../_parts";
 import { BillingTab } from "./_tabs/billing";
 import { BrandingTab } from "./_tabs/branding";
 import { OverviewTab } from "./_tabs/overview";
+import { DevicesTab } from "./_tabs/devices";
 import { PeopleTab } from "./_tabs/people";
 import { SettingsTab } from "./_tabs/settings";
 import { SmsTab } from "./_tabs/sms";
@@ -23,6 +24,7 @@ const TABS = [
   { key: "billing", label: "מנוי וחיובים", icon: "credit-card" },
   { key: "sms", label: "SMS", icon: "message-square" },
   { key: "people", label: "משתמשים ושירותים", icon: "users" },
+  { key: "devices", label: "מכשירים", icon: "smartphone" },
   { key: "branding", label: "מיתוג", icon: "palette" },
   { key: "settings", label: "הגדרות", icon: "settings" },
 ] as const satisfies readonly { key: string; label: string; icon: IconName }[];
@@ -177,6 +179,7 @@ function BusinessDetail() {
       ) : null}
       {tab === "sms" ? <SmsTab businessId={id} name={name} pulseemReady={pulseemReady} /> : null}
       {tab === "people" ? <PeopleTab businessId={id} details={data} onChange={details.reload} /> : null}
+      {tab === "devices" ? <DevicesTab businessId={id} /> : null}
       {tab === "branding" ? <BrandingTab businessId={id} details={data} onChange={details.reload} /> : null}
       {tab === "settings" ? (
         <SettingsTab businessId={id} name={name} brandingFolder={clientName} pulseemUserId={pulseemUserId} />
