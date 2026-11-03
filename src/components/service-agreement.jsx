@@ -1,3 +1,4 @@
+import { DEFAULT_MONTHLY_PRICE_ILS, FIRST_MONTH_PRICE_ILS } from "@/lib/subscription";
 import "./service-agreement.css";
 
 export default function ServiceAgreement() {
@@ -55,7 +56,7 @@ export default function ServiceAgreement() {
         <h2 className="tori-agreement-h2">{"4. מחיר ותשלום"}</h2>
         <p className="tori-agreement-p">
           {
-            "המחיר הוא המחיר החודשי שמוצג במסך התשלום בעת ההצטרפות, בתוספת מע״מ כדין. אין דמי הקמה ואין עמלה על תורים."
+            `בחודש הראשון משלמים מחיר הצטרפות מוזל, ומהחודש השני את המחיר החודשי הרגיל, כפי שהם מוצגים במסך התשלום בעת ההצטרפות. נכון להיום: ${FIRST_MONTH_PRICE_ILS} ₪ לחודש הראשון ו־${DEFAULT_MONTHLY_PRICE_ILS} ₪ לכל חודש שאחריו. כל המחירים בתוספת מע״מ כדין. דמי ההקמה הם 0 ₪, ואין עמלה על תורים.`
           }
         </p>
         <p className="tori-agreement-p">

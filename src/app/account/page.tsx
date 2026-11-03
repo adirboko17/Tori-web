@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { priceSummary } from "@/lib/booking";
+import { subscriptionPriceLabel } from "@/lib/subscription";
 import { loadMonthlyPriceIls } from "@/lib/admin/catalog";
 import { readSignupPhone } from "@/lib/account/phone-ticket";
 import { clearAccountSession, readAccountSession } from "@/lib/account/session";
@@ -50,8 +50,7 @@ export default async function AccountPage() {
 
   let priceLabel = "";
   try {
-    const summary = priceSummary(await loadMonthlyPriceIls());
-    priceLabel = `${summary.total.toLocaleString("he-IL")} ₪ לחודש, כולל מע״מ`;
+    priceLabel = subscriptionPriceLabel(await loadMonthlyPriceIls());
   } catch (error) {
     console.error("account price failed", error);
   }

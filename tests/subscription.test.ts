@@ -11,16 +11,20 @@ import {
   parseSubscriptionMoreInfo,
   SUBSCRIPTION_ITEM_NAME,
   SUBSCRIPTION_PLAN,
+  FIRST_MONTH_PRICE_ILS,
   subscriptionChargeIls,
   subscriptionMoreInfo,
+  subscriptionPriceLabel,
 } from "../src/lib/subscription.ts";
 
-test("monthly subscription charge is 299 plus VAT", () => {
+test("monthly subscription charge is 249 plus VAT, after a first month of 99", () => {
   const summary = priceSummary();
-  assert.equal(summary.subtotal, 299);
-  assert.equal(summary.vat, 53.82);
-  assert.equal(summary.total, 352.82);
-  assert.equal(subscriptionChargeIls(), 352.82);
+  assert.equal(summary.subtotal, 249);
+  assert.equal(summary.vat, 44.82);
+  assert.equal(summary.total, 293.82);
+  assert.equal(subscriptionChargeIls(), 293.82);
+  assert.equal(subscriptionChargeIls(FIRST_MONTH_PRICE_ILS), 116.82);
+  assert.match(subscriptionPriceLabel(), /116\.82 ₪ בחודש הראשון, ואחר כך 293\.82 ₪ לחודש/);
   assert.equal(SUBSCRIPTION_PLAN, "monthly");
   assert.match(SUBSCRIPTION_ITEM_NAME, /מנוי/);
 });

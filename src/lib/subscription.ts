@@ -1,12 +1,20 @@
 export const SUBSCRIPTION_MORE_INFO_PREFIX = "sub:";
 export const SUBSCRIPTION_PLAN = "monthly";
 export const SUBSCRIPTION_ITEM_NAME = "מנוי חודשי tori";
-export const DEFAULT_MONTHLY_PRICE_ILS = 299;
+export const DEFAULT_MONTHLY_PRICE_ILS = 249;
+/** The joining price of the first month, before VAT. */
+export const FIRST_MONTH_PRICE_ILS = 99;
 
 export function subscriptionChargeIls(
   monthlyPriceIls = DEFAULT_MONTHLY_PRICE_ILS,
 ) {
   return Math.round(monthlyPriceIls * 118) / 100;
+}
+
+/** The price line shown before paying, with VAT, e.g. "116.82 ₪ בחודש הראשון, ואחר כך 293.82 ₪ לחודש, כולל מע״מ". */
+export function subscriptionPriceLabel(monthlyPriceIls = DEFAULT_MONTHLY_PRICE_ILS) {
+  const ils = (price: number) => subscriptionChargeIls(price).toLocaleString("he-IL");
+  return `${ils(FIRST_MONTH_PRICE_ILS)} ₪ בחודש הראשון, ואחר כך ${ils(monthlyPriceIls)} ₪ לחודש, כולל מע״מ`;
 }
 
 export function subscriptionMoreInfo(businessId: string) {

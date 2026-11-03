@@ -8,6 +8,7 @@ import {
   payplusReturnDecision,
   readPayplusReturnFields,
 } from "@/lib/payplus-return";
+import { FIRST_MONTH_PRICE_ILS } from "@/lib/subscription";
 
 const CLAIM_ATTEMPTS = 4;
 const CLAIM_RETRY_MS = 2500;
@@ -96,7 +97,7 @@ export function SubscribeSuccess({ monthlyPrice }: { monthlyPrice: number }) {
       <Image src="/assets/brand/tori-app-icon.png" width={72} height={72} alt="tori" />
       <h1>הוראת הקבע נקלטה</h1>
       <p>
-        {`החיוב החודשי של ${monthlyPrice} ₪ + מע״מ נקלט. באזור האישי מתחברים עם הנייד שאיתו שילמתם, ומקבלים קוד ב-SMS.`}
+        {`הוראת הקבע נקלטה: ${FIRST_MONTH_PRICE_ILS} ₪ + מע״מ בחודש הראשון, ואחר כך ${monthlyPrice} ₪ + מע״מ לחודש. באזור האישי מתחברים עם הנייד שאיתו שילמתם, ומקבלים קוד ב-SMS.`}
       </p>
       <Link className="tori-btn tori-btn--secondary" href="/account">
         להשלמת הפרטים

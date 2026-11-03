@@ -1,4 +1,5 @@
-export default function PainSection({ monthlyPrice = 299 }) {
+import { DEFAULT_MONTHLY_PRICE_ILS } from "@/lib/subscription";
+export default function PainSection({ monthlyPrice = DEFAULT_MONTHLY_PRICE_ILS }) {
   return (
     <section
       id="pain"

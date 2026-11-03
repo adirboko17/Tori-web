@@ -8,11 +8,12 @@ import { allowSiteChat, parseChatMessages } from "../src/lib/chat/messages.ts";
 
 test("site chat keeps the current price and Luna model", () => {
   assert.equal(DEFAULT_SITE_CHAT_MODEL, "openai/gpt-6-luna");
-  assert.match(SITE_CHAT_SYSTEM_PROMPT, /299 ש״ח לחודש לפני מע״מ/);
-  assert.match(SITE_CHAT_SYSTEM_PROMPT, /352\.82 ש״ח כולל מע״מ/);
+  assert.match(SITE_CHAT_SYSTEM_PROMPT, /249 ש״ח לחודש לפני מע״מ/);
+  assert.match(SITE_CHAT_SYSTEM_PROMPT, /293\.82 ש״ח כולל מע״מ/);
+  assert.match(SITE_CHAT_SYSTEM_PROMPT, /החודש הראשון עולה 99 ש״ח/);
   assert.match(SITE_CHAT_SYSTEM_PROMPT, /ב-1 לחודש/);
   assert.match(SITE_CHAT_SYSTEM_PROMPT, /7 ימי עסקים/);
-  assert.doesNotMatch(SITE_CHAT_SYSTEM_PROMPT, /249/);
+  assert.doesNotMatch(SITE_CHAT_SYSTEM_PROMPT, /299/);
   assert.match(SITE_CHAT_SYSTEM_PROMPT, /אין תשלום על תור באפליקציה/);
   assert.doesNotMatch(SITE_CHAT_SYSTEM_PROMPT, /לגבות תשלום מראש/);
 });

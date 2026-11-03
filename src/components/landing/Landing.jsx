@@ -1,4 +1,5 @@
 "use client";
+import { DEFAULT_MONTHLY_PRICE_ILS } from "@/lib/subscription";
 import { useEffect, useRef } from "react";
 import { initializeLanding } from "./interactions";
 import ToriLoaderSection from "./sections/ToriLoaderSection";
@@ -15,7 +16,7 @@ import FaqSection from "./sections/FaqSection";
 import Footer25Section from "./sections/Footer25Section";
 import ToriA11ySection from "./sections/ToriA11ySection";
 import ToriChatSection from "./sections/ToriChatSection";
-export default function Landing({ monthlyPrice = 299 }) {
+export default function Landing({ monthlyPrice = DEFAULT_MONTHLY_PRICE_ILS }) {
   const rootRef = useRef(null);
   useEffect(() => initializeLanding(rootRef.current), []);
   return (

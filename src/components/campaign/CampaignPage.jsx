@@ -4,6 +4,7 @@ import { AppStoreLogo, GooglePlayLogo } from "@/components/landing/StoreLogos";
 import PhoneVideo, { PhoneStill } from "./PhoneVideo";
 import LeadForm, { ArrowDot } from "./LeadForm";
 import FeatureCarousel from "./FeatureCarousel";
+import { DEFAULT_MONTHLY_PRICE_ILS, FIRST_MONTH_PRICE_ILS } from "@/lib/subscription";
 
 /* The lead campaign page: a hero with the real app, four capabilities that
    play their recordings, and a short form. Built for phones first. */
@@ -13,7 +14,7 @@ const CLIENTS = ["shirlavy", "lb", "as", "te", "lp"];
 
 const PROMISES = [
   ["חוזרים אליכם תוך שעה", "שיחה קצרה, בלי התחייבות"],
-  ["‎299 ₪ לחודש, מחיר קבוע", "בלי דמי הקמה ובלי הפתעות"],
+  [`‎${FIRST_MONTH_PRICE_ILS} ₪ בחודש הראשון`, `ואחר כך ${DEFAULT_MONTHLY_PRICE_ILS} ₪ לחודש + מע״מ, ‎0 ₪ דמי הקמה`],
   ["עובדים כבר מהיום הראשון", "אתר זמני עד שהאפליקציה מאושרת בחנויות"],
 ];
 
@@ -45,7 +46,10 @@ function Hero() {
             <span>אני רוצה אפליקציה כזו</span>
             <ArrowDot />
           </a>
-          <span className="lp-hero-note">‎299 ₪ לחודש · בלי דמי הקמה · בלי התחייבות</span>
+          <span className="lp-hero-note">
+            <span>{`‎${FIRST_MONTH_PRICE_ILS} ₪ בחודש הראשון, ואחר כך ${DEFAULT_MONTHLY_PRICE_ILS} ₪ לחודש`}</span>
+            <span>לא כולל מע״מ · ‎0 ₪ דמי הקמה · בלי התחייבות</span>
+          </span>
           <div className="lp-stores" aria-label="זמינה בחנויות">
             <span className="lp-store" dir="ltr">
               <AppStoreLogo />
@@ -139,12 +143,10 @@ export default function CampaignPage() {
     <div className="lp">
       <a className="lp-skip" href="#lead">דלגו לטופס</a>
       <a className="lp-promo" href="#lead">
-        <strong>‎0 ₪ דמי הקמה</strong>
-        <span>לזמן מוגבל</span>
+        <strong>{`חודש ראשון ב־‎${FIRST_MONTH_PRICE_ILS} ₪`}</strong>
         <span className="lp-promo-dot" aria-hidden="true" />
-        <span>
-          ‎299 ₪ לחודש<span className="lp-promo-more">, ויש לכם אפליקציה משלכם בחנויות</span>
-        </span>
+        <span>‎0 ₪ דמי הקמה</span>
+        <span className="lp-promo-more">{`· ואחר כך ${DEFAULT_MONTHLY_PRICE_ILS} ₪ לחודש, לא כולל מע״מ`}</span>
       </a>
       <header className="lp-bar">
         <a className="lp-logo" href="/" aria-label="תורי, לדף הבית">

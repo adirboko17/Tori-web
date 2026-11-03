@@ -25,7 +25,7 @@ test("booking stores the chosen date, time, price and service", () => {
   assert.deepEqual(result[0], appointment);
 });
 test("monthly totals retain agorot instead of rounding to whole shekels", () => {
-  assert.deepEqual(priceSummary(), { sms: 0, subtotal: 299, vat: 53.82, total: 352.82 });
+  assert.deepEqual(priceSummary(), { sms: 0, subtotal: 249, vat: 44.82, total: 293.82 });
 });
 test("booking dates cross month and year boundaries, excluding Saturday", () => {
   const days = bookingDays(new Date(2026, 11, 30, 12));

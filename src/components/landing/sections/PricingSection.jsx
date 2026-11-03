@@ -1,4 +1,7 @@
-export default function PricingSection({ monthlyPrice = 299 }) {
+import { DEFAULT_MONTHLY_PRICE_ILS, FIRST_MONTH_PRICE_ILS } from "@/lib/subscription";
+
+/** The price block: the first month big, and the regular monthly price after it. */
+export default function PricingSection({ monthlyPrice = DEFAULT_MONTHLY_PRICE_ILS }) {
   return (
     <section
       id="pricing"
@@ -28,7 +31,7 @@ export default function PricingSection({ monthlyPrice = 299 }) {
               margin: "0",
             }}
           >
-            {"מחיר אחד. פשוט."}
+            {"מחיר פשוט."}
             <br />
             {"ללא "}
             <span className="tori-word-line">{"דמי הקמה!"}</span>
@@ -99,7 +102,7 @@ export default function PricingSection({ monthlyPrice = 299 }) {
                   }}
                 >
                   {"‎"}
-                  <span data-count={String(monthlyPrice)}>{String(monthlyPrice)}</span>
+                  <span data-count={String(FIRST_MONTH_PRICE_ILS)}>{String(FIRST_MONTH_PRICE_ILS)}</span>
                 </span>
                 <span
                   style={{ display: "grid", gap: "2px", paddingBottom: "6px" }}
@@ -122,7 +125,7 @@ export default function PricingSection({ monthlyPrice = 299 }) {
                       color: "rgba(255,255,255,.62)",
                     }}
                   >
-                    {"לחודש"}
+                    {"בחודש הראשון"}
                   </span>
                   <span
                     style={{
@@ -144,7 +147,7 @@ export default function PricingSection({ monthlyPrice = 299 }) {
                   maxWidth: "34ch",
                 }}
               >
-                {"מחיר קבוע, בלי דמי הקמה ובלי התחייבות. מתנתקים מתי שרוצים."}
+                {`ואחר כך ${monthlyPrice} ₪ לחודש + מע״מ. בלי התחייבות, ומתנתקים מתי שרוצים.`}
               </p>
               <a
                 href="/onboarding"

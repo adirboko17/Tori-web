@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { priceSummary } from "@/lib/booking";
+import { subscriptionPriceLabel } from "@/lib/subscription";
 import { loadMonthlyPriceIls } from "@/lib/admin/catalog";
 import "./checkout.css";
 
@@ -14,8 +14,7 @@ export const dynamic = "force-dynamic";
 export default async function CheckoutPage() {
   let priceLabel = "";
   try {
-    const summary = priceSummary(await loadMonthlyPriceIls());
-    priceLabel = `${summary.total.toLocaleString("he-IL")} ₪ לחודש, כולל מע״מ`;
+    priceLabel = subscriptionPriceLabel(await loadMonthlyPriceIls());
   } catch (error) {
     console.error("checkout price failed", error);
   }
@@ -29,7 +28,7 @@ export default async function CheckoutPage() {
         <p className="checkout-kicker">תשלום מאובטח</p>
         <h1>מנוי חודשי ל־Tori</h1>
         <p className="checkout-lead">
-          אפליקציית קביעת תורים במותג העסק, הגשה לחנויות, וממשק ניהול. אין דמי
+          אפליקציית קביעת תורים במותג העסק, הגשה לחנויות, וממשק ניהול. ‎0 ₪ דמי
           הקמה ואין התחייבות.
         </p>
 

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 import ServiceAgreement from "@/components/service-agreement";
+import { DEFAULT_MONTHLY_PRICE_ILS, FIRST_MONTH_PRICE_ILS } from "@/lib/subscription";
 import { initializeOnboarding } from "./interactions";
 
 export default function Onboarding() {
@@ -116,7 +117,7 @@ export default function Onboarding() {
                 </span>
               </label>
               <p style={{ margin: "0", fontSize: "13.5px", lineHeight: "1.5", color: "#5C5A58" }}>
-                299 ₪ לחודש + מע״מ, כהוראת קבע. התשלום מתבצע בדף מאובטח, בלי לשמור פרטי כרטיס אצלנו.
+                {`${FIRST_MONTH_PRICE_ILS} ₪ בחודש הראשון, ואחר כך ${DEFAULT_MONTHLY_PRICE_ILS} ₪ לחודש, לא כולל מע״מ. ‎0 ₪ דמי הקמה.`} כהוראת קבע. התשלום מתבצע בדף מאובטח, בלי לשמור פרטי כרטיס אצלנו.
               </p>
             </div>
             <div style={{ display: "grid", gap: "10px" }}>

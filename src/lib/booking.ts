@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DEFAULT_MONTHLY_PRICE_ILS } from "./subscription.ts";
 
 export const phoneSchema = z
   .string()
@@ -92,7 +93,7 @@ export function cancelAppointment(appointments: Appointment[], id: string) {
     a.id === id ? { ...a, status: "cancelled" as const } : a,
   );
 }
-export function priceSummary(monthlyPriceIls = 299) {
+export function priceSummary(monthlyPriceIls = DEFAULT_MONTHLY_PRICE_ILS) {
   const sms = 0;
   const subtotal = monthlyPriceIls;
   return {
