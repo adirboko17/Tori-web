@@ -1,10 +1,16 @@
-import { loadMonthlyPriceIls } from "@/lib/admin/catalog";
-import { priceSummary } from "@/lib/booking";
 import { SUBSCRIPTION_RETURN_PATH } from "@/lib/payplus-return";
 import {
+  FIRST_MONTH_PRICE_ILS,
   SUBSCRIPTION_ITEM_NAME,
+  subscriptionChargeIls,
   subscriptionMoreInfo,
 } from "@/lib/subscription";
+import {
+  nextRecurringStartDate,
+  recurringRenewalUpdate,
+  renewalItemPrice,
+  shouldRaiseRecurringAmount,
+} from "./payplus-renewal";
 import {
   payplusBaseUrl,
   payplusCallbackUrl,
@@ -129,7 +135,9 @@ export async function generatePayplusSubscriptionLink(
     return { ok: false as const, message: "סליקת המנוי החודשי עדיין לא הוגדרה." };
   }
   const appUrl = checkoutReturnUrl(input.request);
-  const amount = priceSummary(await loadMonthlyPriceIls()).total;
+  // The page charges the joining price. After PayPlus confirms it, the standing
+  // order is raised to the monthly price so later months are not discounted.
+  const amount = subscriptionChargeIls(FIRST_MONTH_PRICE_ILS);
   const customer: Record<string, string> = {
     customer_name: input.customer.customer_name,
     phone: input.customer.phone,
@@ -348,6 +356,96 @@ export async function viewPayplusRecurring(recurringUid: string) {
     return { ok: false as const, error: "הוראת הקבע לא נמצאה ב-PayPlus." };
   }
   return { ok: true as const, recurring, terminalUid };
+}
+
+function asRecord(value: unknown) {
+  return value && typeof value === "object" ? (value as Record<string, unknown>) : null;
+}
+
+async function readRecurringDetail(recurringUid: string, terminalUid: string) {
+  const response = await fetch(
+    `${payplusBaseUrl()}/RecurringPayments/${recurringUid}/ViewRecurring?terminal_uid=${encodeURIComponent(terminalUid)}`,
+    {
+      headers: payplusAuthHeaders(),
+      signal: AbortSignal.timeout(8000),
+    },
+  );
+  const json = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+  const data = asRecord(json.data ?? json);
+  if (!response.ok || !data) return null;
+  return data;
+}
+
+/** Points later charges at the monthly price. The first charge has already happened. */
+export async function raiseSubscriptionToMonthly(input: {
+  recurringUid: string;
+  terminalUid?: string | null;
+  beforeVat: number;
+  withVat: number;
+}) {
+  const terminalUid = String(input.terminalUid ?? "").trim() || payplusTerminalUid();
+  if (!terminalUid) {
+    return { ok: false as const, error: "חסר מזהה מסוף PayPlus." };
+  }
+  const data = await readRecurringDetail(input.recurringUid, terminalUid);
+  if (!data) {
+    return { ok: false as const, error: "הוראת הקבע לא נמצאה ב-PayPlus." };
+  }
+  const current = Number(data.amount ?? data.each_payment_amount ?? 0);
+  if (!shouldRaiseRecurringAmount(current, input.withVat)) {
+    return { ok: true as const, skipped: true as const };
+  }
+  const items = Array.isArray(data.items) ? data.items : [];
+  const item = asRecord(items[0]);
+  const productUid = String(item?.product_uid ?? "").trim();
+  const cardToken = String(data.card_token ?? "").trim();
+  const customerUid = String(data.customer_uid ?? "").trim();
+  const cashierUid = String(data.cashier_uid ?? "").trim();
+  if (!productUid || !cardToken || !customerUid || !cashierUid) {
+    return { ok: false as const, error: "חסרים פרטים לעדכון הוראת הקבע." };
+  }
+  const body = recurringRenewalUpdate({
+    terminalUid,
+    customerUid,
+    cardToken,
+    cashierUid,
+    currencyCode: String(data.currency_code ?? "ILS"),
+    recurringType: Number(data.recurring_type ?? 2),
+    recurringRange: Number(data.recurring_range ?? 1) || 1,
+    numberOfCharges: Number(data.number_of_charges ?? 0),
+    startDate: nextRecurringStartDate(String(data.start_date ?? "")),
+    productUid,
+    price: renewalItemPrice(Number(item?.vat_type ?? 0), input.beforeVat, input.withVat),
+    successfulInvoice: Boolean(data.successful_invoice),
+    customerFailureEmail: data.customer_failure_email !== false,
+    sendCustomerSuccessEmail: data.send_customer_success_email !== false,
+    extraInfo: String(data.extra_info ?? ""),
+  });
+  const response = await fetch(
+    `${payplusBaseUrl()}/RecurringPayments/Update/${input.recurringUid}`,
+    {
+      method: "POST",
+      headers: payplusAuthHeaders(),
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(8000),
+    },
+  );
+  const json = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+  const result = asRecord(json.result ?? json.results) ?? {};
+  const status = String(result.status ?? "").toLowerCase();
+  const code = Number(result.code ?? -1);
+  if (response.ok && (status === "success" || code === 0)) {
+    return { ok: true as const, skipped: false as const };
+  }
+  const description = String(result.description ?? json.message ?? "");
+  console.error("payplus recurring amount update failed", {
+    status: response.status,
+    description,
+  });
+  return {
+    ok: false as const,
+    error: description || "עדכון סכום הוראת הקבע נכשל.",
+  };
 }
 
 export async function deletePayplusRecurring(input: {

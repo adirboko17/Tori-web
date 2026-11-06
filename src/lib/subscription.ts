@@ -11,6 +11,20 @@ export function subscriptionChargeIls(
   return Math.round(monthlyPriceIls * 118) / 100;
 }
 
+/** A confirmed subscription charge is either the joining price or the ongoing price. */
+export function isSubscriptionPaymentAmount(
+  amount: number,
+  monthlyPriceIls = DEFAULT_MONTHLY_PRICE_ILS,
+) {
+  const charged = Number(amount);
+  if (!Number.isFinite(charged)) return false;
+  const accepted = [
+    subscriptionChargeIls(FIRST_MONTH_PRICE_ILS),
+    subscriptionChargeIls(monthlyPriceIls),
+  ];
+  return accepted.some((expected) => Math.abs(charged - expected) <= 0.05);
+}
+
 /** The price line shown before paying, with VAT, e.g. "116.82 ₪ בחודש הראשון, ואחר כך 293.82 ₪ לחודש, כולל מע״מ". */
 export function subscriptionPriceLabel(monthlyPriceIls = DEFAULT_MONTHLY_PRICE_ILS) {
   const ils = (price: number) => subscriptionChargeIls(price).toLocaleString("he-IL");

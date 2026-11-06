@@ -16,6 +16,7 @@ import {
 } from "@/lib/sms/payplus";
 import { loadMonthlyPriceIls } from "@/lib/admin/catalog";
 import {
+  FIRST_MONTH_PRICE_ILS,
   parseSubscriptionMoreInfo,
   subscriptionChargeIls,
 } from "@/lib/subscription";
@@ -177,10 +178,8 @@ async function handleCallback(request: Request) {
     const paidSubscriptionId = parseSubscriptionMoreInfo(payment.moreInfo);
     if (
       paidSubscriptionId &&
-      isConfirmedPayplusPayment(
-        payment,
-        subscriptionChargeIls(await loadMonthlyPriceIls()),
-      )
+      (isConfirmedPayplusPayment(payment, subscriptionChargeIls(FIRST_MONTH_PRICE_ILS)) ||
+        isConfirmedPayplusPayment(payment, subscriptionChargeIls(await loadMonthlyPriceIls())))
     ) {
       const result = await completeConfirmedSubscription({
         businessId: paidSubscriptionId,

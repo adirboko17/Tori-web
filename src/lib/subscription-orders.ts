@@ -3,12 +3,14 @@ import { markAccountPaid } from "@/lib/account/store";
 import { loadMonthlyPriceIls } from "@/lib/admin/catalog";
 import { savePayplusSubscription } from "@/lib/admin/payplus-subscriptions";
 import { priceSummary } from "@/lib/booking";
-import { amountsMatch } from "@/lib/sms/payplus";
+import { raiseSubscriptionToMonthly } from "@/lib/sms/payplus";
 import { adminPushEvents, queueAdminPush } from "@/lib/admin/push";
 import { notifyNewAppPayment } from "@/lib/sms/purchase-notify";
 import { getServiceSupabase } from "@/lib/sms/supabase-admin";
 import {
+  FIRST_MONTH_PRICE_ILS,
   SUBSCRIPTION_PLAN,
+  isSubscriptionPaymentAmount,
   subscriptionChargeIls,
 } from "@/lib/subscription";
 
@@ -61,7 +63,8 @@ export async function fulfillPaidSubscription(input: {
   customerUid?: string | null;
   transactionUid?: string | null;
 }) {
-  if (!amountsMatch(input.amount, subscriptionChargeIls(await loadMonthlyPriceIls()))) {
+  const monthlyPriceIls = await loadMonthlyPriceIls();
+  if (!isSubscriptionPaymentAmount(input.amount, monthlyPriceIls)) {
     return { ok: false as const, message: "סכום התשלום אינו תואם למנוי." };
   }
   // The business is opened here, only after the payment was confirmed.
@@ -89,6 +92,19 @@ export async function fulfillPaidSubscription(input: {
     } catch (error) {
       console.error("payplus recurring save failed", error);
     }
+    try {
+      const raised = await raiseSubscriptionToMonthly({
+        recurringUid: input.recurringUid,
+        terminalUid: input.terminalUid,
+        beforeVat: monthlyPriceIls,
+        withVat: subscriptionChargeIls(monthlyPriceIls),
+      });
+      if (!raised.ok) console.error("payplus recurring amount update failed", raised.error);
+    } catch (error) {
+      console.error("payplus recurring amount update failed", error);
+    }
+  } else if (Math.abs(input.amount - subscriptionChargeIls(FIRST_MONTH_PRICE_ILS)) <= 0.05) {
+    console.error("subscription intro payment missing recurring uid", input.businessId);
   }
   try {
     const business = await loadBusinessForSubscription(businessId);
@@ -103,7 +119,7 @@ export async function fulfillPaidSubscription(input: {
       .from("businesses")
       .update({
         plan: SUBSCRIPTION_PLAN,
-        price: String(subscriptionChargeIls(await loadMonthlyPriceIls())),
+        price: String(subscriptionChargeIls(monthlyPriceIls)),
         commitment: "paid",
       })
       .eq("id", businessId)

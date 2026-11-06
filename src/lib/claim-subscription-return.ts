@@ -11,6 +11,7 @@ import {
   lookupPayplusPayment,
 } from "@/lib/sms/payplus";
 import {
+  FIRST_MONTH_PRICE_ILS,
   parseSubscriptionMoreInfo,
   subscriptionChargeIls,
 } from "@/lib/subscription";
@@ -73,8 +74,11 @@ export async function claimPaidSubscriptionReturn(fields: PayplusReturnFields) {
     return { ok: false as const, reason: "declined" as const };
   }
 
-  const expected = subscriptionChargeIls(await loadMonthlyPriceIls());
-  if (!isConfirmedPayplusPayment(payment, expected)) {
+  const monthlyPriceIls = await loadMonthlyPriceIls();
+  if (
+    !isConfirmedPayplusPayment(payment, subscriptionChargeIls(FIRST_MONTH_PRICE_ILS)) &&
+    !isConfirmedPayplusPayment(payment, subscriptionChargeIls(monthlyPriceIls))
+  ) {
     return { ok: false as const, reason: "declined" as const };
   }
 

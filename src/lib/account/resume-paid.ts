@@ -14,9 +14,11 @@ import {
   isConfirmedPayplusPayment,
   listPayplusRecurrings,
   lookupPayplusPayment,
+  type PayplusIpnPayment,
 } from "@/lib/sms/payplus";
 import { normalizeIsraeliMobile, phoneLastNine } from "@/lib/sms/phone";
 import {
+  FIRST_MONTH_PRICE_ILS,
   parseSubscriptionMoreInfo,
   subscriptionChargeIls,
   subscriptionMoreInfo,
@@ -109,12 +111,19 @@ async function finishConfirmed(input: {
   return { status: "ready", account };
 }
 
-async function confirmedByMoreInfo(businessId: string, expected: number) {
+function matchesSubscriptionCharge(payment: PayplusIpnPayment, monthlyPriceIls: number) {
+  return (
+    isConfirmedPayplusPayment(payment, subscriptionChargeIls(FIRST_MONTH_PRICE_ILS)) ||
+    isConfirmedPayplusPayment(payment, subscriptionChargeIls(monthlyPriceIls))
+  );
+}
+
+async function confirmedByMoreInfo(businessId: string, monthlyPriceIls: number) {
   try {
     const payment = await lookupPayplusPayment({
       moreInfo: subscriptionMoreInfo(businessId),
     });
-    if (!payment || !isConfirmedPayplusPayment(payment, expected)) return null;
+    if (!payment || !matchesSubscriptionCharge(payment, monthlyPriceIls)) return null;
     const paidFor = parseSubscriptionMoreInfo(payment.moreInfo);
     if (paidFor && paidFor !== businessId) return null;
     return payment;
@@ -124,7 +133,7 @@ async function confirmedByMoreInfo(businessId: string, expected: number) {
   }
 }
 
-async function confirmedByPhone(phone: string, expected: number) {
+async function confirmedByPhone(phone: string, monthlyPriceIls: number) {
   const search = phoneLastNine(phone);
   try {
     const listed = await listPayplusRecurrings(search);
@@ -138,7 +147,7 @@ async function confirmedByPhone(phone: string, expected: number) {
     const payment = await lookupPayplusPayment({
       moreInfo: subscriptionMoreInfo(businessId),
     });
-    if (!payment || !isConfirmedPayplusPayment(payment, expected)) return null;
+    if (!payment || !matchesSubscriptionCharge(payment, monthlyPriceIls)) return null;
     return { businessId, payment };
   } catch (error) {
     console.error("payplus phone purchase lookup failed", error);
@@ -168,10 +177,10 @@ export async function resumePaidSignup(input: {
     checkoutId: input.checkoutId,
     accounts: found.accounts,
   });
-  const expected = subscriptionChargeIls(await loadMonthlyPriceIls());
+  const monthlyPriceIls = await loadMonthlyPriceIls();
 
   for (const businessId of candidates) {
-    const payment = await confirmedByMoreInfo(businessId, expected);
+    const payment = await confirmedByMoreInfo(businessId, monthlyPriceIls);
     if (!payment) continue;
     return finishConfirmed({
       businessId,
@@ -183,7 +192,7 @@ export async function resumePaidSignup(input: {
     });
   }
 
-  const byPhone = await confirmedByPhone(phone, expected);
+  const byPhone = await confirmedByPhone(phone, monthlyPriceIls);
   if (!byPhone) return { status: "unpaid" };
   return finishConfirmed({
     businessId: byPhone.businessId,
