@@ -31,7 +31,11 @@ const BUSINESS_KEYS = ["company_name", "business_name", "שם_העסק", "שם_�
 const TYPE_KEYS = ["business_type", "תחום", "תחום_העסק", "סוג_עסק"];
 
 function text(value: unknown, max: number) {
-  return String(value ?? "").trim().slice(0, max);
+  return String(value ?? "")
+    .replace(/_/g, " ")
+    .replace(/ {2,}/g, " ")
+    .trim()
+    .slice(0, max);
 }
 
 export function tokensMatch(expected: string, received: string) {
@@ -84,6 +88,8 @@ function take(map: Map<string, string>, keys: string[]) {
 
 function takeIncludes(map: Map<string, string>, parts: string[]) {
   for (const [key, value] of map) {
+    // A full question can mention the word without being the business name.
+    if (key.length > 24) continue;
     if (parts.some((part) => key.includes(part))) {
       map.delete(key);
       return value;
@@ -137,7 +143,7 @@ export function mapFacebookLead(fieldData: unknown, context: FacebookLeadContext
     labeled("קמפיין", context.campaignName, context.campaignId),
     labeled("מודעה", context.adName, context.adId),
     labeled("טופס", "", context.formId),
-    ...[...map].map(([key, value]) => `${key}: ${value}`),
+    ...[...map].map(([key, value]) => `${text(key, 160)}: ${text(value, 200)}`),
   ].filter(Boolean);
   return {
     name: text(name, 80),
