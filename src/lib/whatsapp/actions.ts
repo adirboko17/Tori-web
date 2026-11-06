@@ -1,10 +1,13 @@
 import {
   canSendFirstMessage,
+  DEFAULT_OUTBOUND_OPENING,
   firstLeadTemplateOptions,
   getFirstLeadMessage,
   getOpeningMessage,
   isDefaultNailLeadMessage,
+  renderOutboundOpening,
 } from "@/lib/whatsapp/copy";
+import { getWhatsappSupabase } from "@/lib/whatsapp/client";
 import {
   bulkInsertLeads,
   createLead,
@@ -146,18 +149,54 @@ export async function sendFirstLeadMessage(id: string, customMessage?: string) {
   return { success: true, phone, message: text };
 }
 
-async function sendOpening(phone: string, name: string) {
+async function sendOpening(phone: string, name: string, openingText?: string) {
   const normalized = normalizePhone(phone);
   if (!normalized) throw new Error("מספר טלפון לא תקין");
-  if (!shouldSendOpening(normalized)) return { skipped: true };
+  if (!shouldSendOpening(normalized)) return { skipped: true, reason: "recent" as const };
   const existing = await getMessages(normalized);
-  if (existing.length > 0) return { skipped: true };
-  const opening = getOpeningMessage(name || "");
+  if (existing.length > 0) return { skipped: true, reason: "has_messages" as const };
+  const opening = openingText ?? getOpeningMessage(name || "");
   await upsertConversation(normalized, name || "");
   await markConversationProactive(normalized);
   await sendProactiveMessage(normalized, name || "");
   await saveMessage(normalized, "bot", opening);
-  return { skipped: false };
+  return { skipped: false, reason: null };
+}
+
+async function outboundOpeningText(name: string) {
+  let template = DEFAULT_OUTBOUND_OPENING;
+  try {
+    const db = getWhatsappSupabase();
+    const { data, error } = await db
+      .from("app_settings")
+      .select("value")
+      .eq("key", "ai_agent_config")
+      .maybeSingle();
+    if (!error) {
+      const stored = (data?.value as { outbound?: { firstMessageTemplate?: unknown } } | null)?.outbound
+        ?.firstMessageTemplate;
+      if (typeof stored === "string" && stored.trim()) template = stored;
+    }
+  } catch (error) {
+    console.error("outbound opening template unavailable", error);
+  }
+  return renderOutboundOpening(name, template);
+}
+
+/** Sends the bot's approved opener and marks the chat proactive, so the next
+    customer reply continues as the outbound sales conversation. */
+export async function deliverFormLeadOpening(lead: {
+  id: string;
+  phone: string;
+  name: string;
+  message_name: string;
+}) {
+  const name = String(lead.message_name || lead.name || "").trim();
+  const result = await sendOpening(lead.phone, name, await outboundOpeningText(name));
+  if (!result.skipped || result.reason === "has_messages") {
+    await updateLead(lead.id, { status: "message_sent" });
+  }
+  return result;
 }
 
 export async function addManualLead(input: {
@@ -219,6 +258,11 @@ export async function addCampaignLead(input: {
   queueAdminPush(
     adminPushEvents.whatsappLead({ leadId: lead.id, name: lead.name, business }),
   );
+  try {
+    await deliverFormLeadOpening(lead);
+  } catch (error) {
+    console.error("form lead whatsapp opening failed", error);
+  }
   return lead;
 }
 

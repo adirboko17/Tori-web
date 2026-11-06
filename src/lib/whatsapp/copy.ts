@@ -4,6 +4,18 @@ export function getOpeningMessage(name: string) {
   return `${greeting}, אני אליה מצוות טורי 🙂 ראיתי שהשארת פרטים והתעניינת באפליקציה. מאיזה תחום אתה מגיע?`;
 }
 
+/** Same opener the WhatsApp bot stores when it starts an outbound sales chat. */
+export const DEFAULT_OUTBOUND_OPENING =
+  "היי {name}, כאן אליה מ-Tori 👋 ראיתי שהשארת פרטים לגבי אפליקציה אישית לניהול תורים לעסק. אשמח להסביר בקצרה איך זה עובד — מה סוג העסק שלך?";
+
+export function renderOutboundOpening(name: string, template = DEFAULT_OUTBOUND_OPENING) {
+  const clean = String(name || "").trim();
+  const greeting = clean ? `היי ${clean}` : "היי";
+  return String(template || DEFAULT_OUTBOUND_OPENING)
+    .replace(/\{name\}/g, clean)
+    .replace(/\{greeting\}/g, greeting);
+}
+
 export const LEAD_BUSINESS_TYPES = ["סלון ציפורניים", "ספר", "ספרית", "עיצוב גבות"] as const;
 
 const NAIL_ROLE = "את בונת ציפורניים";

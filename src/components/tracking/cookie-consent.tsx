@@ -80,8 +80,9 @@ function ensureGoogle(primaryId: string) {
   window.dataLayer = window.dataLayer || [];
   window.gtag =
     window.gtag ||
-    function gtag(...args: unknown[]) {
-      window.dataLayer?.push(args);
+    function gtag() {
+      // The Google tag runs queued commands only when they are pushed as `arguments`.
+      window.dataLayer?.push(arguments as unknown as unknown[]);
     };
   window.gtag("js", new Date());
   const script = document.createElement("script");
@@ -122,7 +123,9 @@ function trackPage(pathname: string) {
       adsConfigured = true;
     }
   }
-  if (GTM_ID) {
+  // gtag.js and gtm.js share one Google runtime. Loading both drops Analytics hits,
+  // so Tag Manager is only used when the site is not sending Analytics or Ads directly.
+  if (GTM_ID && !GA_ID && !ADS_ID) {
     installGtm(GTM_ID);
     window.dataLayer?.push({ event: "page_view", page_path: pathname });
   }
