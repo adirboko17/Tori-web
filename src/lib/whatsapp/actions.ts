@@ -200,6 +200,7 @@ export async function addCampaignLead(input: {
   business: string;
   business_type: string;
   notes: string | null;
+  source?: string;
 }) {
   const phoneNorm = normalizePhone(input.phone);
   if (!phoneNorm) throw new Error("מספר טלפון לא תקין");
@@ -212,7 +213,7 @@ export async function addCampaignLead(input: {
     phone: phoneNorm,
     business_type: input.business_type,
     notes: input.notes,
-    source: "campaign",
+    source: input.source || "campaign",
     message_name: extractMessageName(business),
   });
   queueAdminPush(

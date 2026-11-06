@@ -1,3 +1,4 @@
+import { adminPushEvents, queueAdminPush } from "@/lib/admin/push";
 import { getWhatsappSupabase } from "@/lib/whatsapp/client";
 import { extractMessageName } from "@/lib/whatsapp/message-name";
 import { isLeadStatus, type LeadStatus } from "@/lib/whatsapp/copy";
@@ -174,11 +175,38 @@ export async function markConversationProactive(phone: string) {
   if (error && !missingColumn(error, "proactive")) throw new Error(error.message);
 }
 
+const PUSH_MESSAGE_ROLES = new Set(["user", "bot", "human_agent"]);
+
+async function conversationName(phone: string) {
+  const { data } = await getWhatsappSupabase()
+    .from("conversations")
+    .select("name")
+    .eq("phone", phone)
+    .maybeSingle();
+  return String(data?.name ?? "").trim();
+}
+
 export async function saveMessage(phone: string, role: string, content: string) {
   const db = getWhatsappSupabase();
   const text = String(content);
-  const { error: insErr } = await db.from("messages").insert({ phone, role, content: text });
+  const { data: inserted, error: insErr } = await db
+    .from("messages")
+    .insert({ phone, role, content: text })
+    .select("id")
+    .single();
   if (insErr) throw new Error(insErr.message);
+  if (inserted?.id && PUSH_MESSAGE_ROLES.has(role) && text.trim()) {
+    const name = await conversationName(phone).catch(() => "");
+    queueAdminPush(
+      adminPushEvents.whatsappMessage({
+        id: String(inserted.id),
+        phone,
+        name,
+        text,
+        role,
+      }),
+    );
+  }
   const convUpdate: Record<string, string> = {
     last_message_at: new Date().toISOString(),
     last_message: text.slice(0, 2000),

@@ -98,10 +98,7 @@ export function normalizePreferences(row: {
       ? (row.types as Record<string, unknown>)
       : {};
   const types = Object.fromEntries(
-    ADMIN_PUSH_TYPES.map((type) => [
-      type,
-      type === "whatsapp_message" || type === "whatsapp_lead" ? stored[type] === true : stored[type] !== false,
-    ]),
+    ADMIN_PUSH_TYPES.map((type) => [type, stored[type] !== false]),
   ) as Record<AdminPushType, boolean>;
   const saleSound = row?.saleSound ?? row?.sale_sound;
   return {
@@ -295,11 +292,18 @@ export const adminPushEvents = {
       url: `/chat/${input.phone}`,
     };
   },
-  whatsappMessage(input: { phone: string; name: string; text: string; at: string }): AdminPushEvent {
+  whatsappMessage(input: {
+    id: string;
+    phone: string;
+    name: string;
+    text: string;
+    role: string;
+  }): AdminPushEvent {
+    const incoming = input.role === "user";
     return {
-      key: `whatsapp_message:${input.phone}:${input.at}`,
+      key: `whatsapp_message:${input.id}`,
       type: "whatsapp_message",
-      title: "הודעת וואטסאפ",
+      title: incoming ? "הודעת וואטסאפ נכנסת" : "הודעה נשלחה ללקוח",
       body: `${input.name || input.phone} · ${input.text}`.slice(0, 180),
       url: `/chat/${input.phone}`,
     };

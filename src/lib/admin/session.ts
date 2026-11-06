@@ -13,7 +13,12 @@ import {
 
 export const ADMIN_SESSION_COOKIE = "tori_admin_session";
 export const ADMIN_OTP_COOKIE = "tori_admin_otp";
-export const ADMIN_SESSION_TTL_SECONDS = 12 * 60 * 60;
+/**
+ * 400 days. Chrome drops a cookie after that, which is the longest the web
+ * admin login can live. The phone app stores the same signed token and renews
+ * it on open, so an unused login ends after 400 days and an active one continues.
+ */
+export const ADMIN_SESSION_TTL_SECONDS = 400 * 24 * 60 * 60;
 export const ADMIN_OTP_TTL_SECONDS = 10 * 60;
 
 export type { AdminOtpPending, AdminSession, AdminSessionInput };

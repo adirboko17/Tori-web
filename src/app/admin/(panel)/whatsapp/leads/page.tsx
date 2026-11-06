@@ -44,6 +44,7 @@ function sourceLabel(source: string | null) {
   if (source === "manual") return "הוספה ידנית";
   if (source === "excel-import") return "ייבוא מאקסל";
   if (source === "campaign") return "דף נחיתה";
+  if (source === "facebook") return "פייסבוק";
   return source || "—";
 }
 

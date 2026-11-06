@@ -46,6 +46,8 @@ test("push preferences default to on and ignore unknown stored keys", () => {
   assert.equal(prefs.types.new_business, true);
   assert.equal(wantsPush(prefs, "new_client"), false);
   assert.equal(wantsPush(prefs, "whatsapp_human"), true);
+  assert.equal(prefs.types.whatsapp_message, true);
+  assert.equal(prefs.types.whatsapp_lead, true);
   assert.equal(normalizePreferences(null).enabled, true);
   assert.equal(normalizePreferences(null).saleSound, "register");
   assert.equal(normalizePreferences({ sale_sound: "bell" }).saleSound, "bell");

@@ -49,6 +49,26 @@ async function handleNewClient(row: Record<string, unknown>) {
   );
 }
 
+const MESSAGE_ID_RE = /^[A-Za-z0-9_.:-]{8,80}$/;
+
+async function handleWhatsappMessage(row: Record<string, unknown>) {
+  const id = String(row.id ?? "");
+  const phone = String(row.phone ?? "");
+  const role = String(row.role ?? "");
+  const text = String(row.content ?? "").trim();
+  if (!MESSAGE_ID_RE.test(id) || !PHONE_RE.test(phone) || !text) return;
+  if (role !== "user" && role !== "bot" && role !== "human_agent") return;
+  await sendAdminPush(
+    adminPushEvents.whatsappMessage({
+      id,
+      phone,
+      name: String(row.name ?? "").trim(),
+      text,
+      role,
+    }),
+  );
+}
+
 async function handleWhatsappHuman(row: Record<string, unknown>, at: unknown) {
   const phone = String(row.phone ?? "");
   if (!PHONE_RE.test(phone)) return;
@@ -75,9 +95,11 @@ export async function POST(request: Request) {
       ? () => handleNewClient(row)
       : type === "whatsapp_human"
         ? () => handleWhatsappHuman(row, body.at)
-        : type === "balance_check"
-          ? () => runBalanceSweep()
-          : null;
+        : type === "whatsapp_message"
+          ? () => handleWhatsappMessage(row)
+          : type === "balance_check"
+            ? () => runBalanceSweep()
+            : null;
   if (!task) return jsonError("unknown event");
 
   after(async () => {
