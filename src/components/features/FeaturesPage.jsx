@@ -6,6 +6,8 @@ import Footer25Section from "../landing/sections/Footer25Section";
 import ToriA11ySection from "../landing/sections/ToriA11ySection";
 import ToriChatSection from "../landing/sections/ToriChatSection";
 import FeatureStudio from "./FeatureStudio";
+import { FIRST_MONTH_PRICE_ILS } from "@/lib/subscription";
+import BlackFridayPopup from "@/components/promo/BlackFridayPopup";
 
 /** /features: every tori capability with its phone demo, in the site's frame. */
 export default function FeaturesPage() {
@@ -13,7 +15,7 @@ export default function FeaturesPage() {
   useEffect(() => initializeLanding(rootRef.current), []);
   return (
     <div className="tori-lp" dir="rtl" lang="he" ref={rootRef}>
-      <div className="tori-promo">ללא דמי הקמה - ללא התחייבות</div>
+      <div className="tori-promo">{`חודש ראשון ב־${FIRST_MONTH_PRICE_ILS} ₪ • 0 ₪ דמי הקמה • ללא התחייבות`}</div>
       <ToriNavSection base="/" />
       <main>
         <FeatureStudio />
@@ -37,6 +39,7 @@ export default function FeaturesPage() {
       <Footer25Section />
       <ToriA11ySection />
       <ToriChatSection />
+      <BlackFridayPopup />
     </div>
   );
 }

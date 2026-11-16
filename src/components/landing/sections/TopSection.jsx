@@ -1,7 +1,8 @@
 import { Store } from "../StoreLogos";
 import { Tori3D } from "@/components/tori3d/Tori3D";
+import { DEFAULT_MONTHLY_PRICE_ILS, FIRST_MONTH_PRICE_ILS } from "@/lib/subscription";
 
-export default function TopSection() {
+export default function TopSection({ monthlyPrice = DEFAULT_MONTHLY_PRICE_ILS }) {
   return (
     <section
       id="top"
@@ -165,6 +166,10 @@ export default function TopSection() {
               </span>
               {"\nאיך זה עובד\n"}
             </a>
+          </div>
+          <div className="tori-hero-price">
+            <strong>{`‎${FIRST_MONTH_PRICE_ILS} ₪ בחודש הראשון`}</strong>
+            <span>{`ואחר כך ${monthlyPrice} ₪ לחודש + מע״מ · ‎0 ₪ דמי הקמה`}</span>
           </div>
         </div>
         {/* Tori in 3D, the app's features floating around him */}

@@ -1,5 +1,5 @@
 "use client";
-import { DEFAULT_MONTHLY_PRICE_ILS } from "@/lib/subscription";
+import { DEFAULT_MONTHLY_PRICE_ILS, FIRST_MONTH_PRICE_ILS } from "@/lib/subscription";
 import { useEffect, useRef } from "react";
 import { initializeLanding } from "./interactions";
 import ToriLoaderSection from "./sections/ToriLoaderSection";
@@ -16,6 +16,7 @@ import FaqSection from "./sections/FaqSection";
 import Footer25Section from "./sections/Footer25Section";
 import ToriA11ySection from "./sections/ToriA11ySection";
 import ToriChatSection from "./sections/ToriChatSection";
+import BlackFridayPopup from "@/components/promo/BlackFridayPopup";
 export default function Landing({ monthlyPrice = DEFAULT_MONTHLY_PRICE_ILS }) {
   const rootRef = useRef(null);
   useEffect(() => initializeLanding(rootRef.current), []);
@@ -33,9 +34,9 @@ export default function Landing({ monthlyPrice = DEFAULT_MONTHLY_PRICE_ILS }) {
       ref={rootRef}
     >
       <ToriLoaderSection />
-      <div className="tori-promo">ללא דמי הקמה - ללא התחייבות</div>
+      <div className="tori-promo">{`חודש ראשון ב־${FIRST_MONTH_PRICE_ILS} ₪ • 0 ₪ דמי הקמה • ללא התחייבות`}</div>
       <ToriNavSection />
-      <TopSection />
+      <TopSection monthlyPrice={monthlyPrice} />
       <CapabilitiesSection />
       <PainSection monthlyPrice={monthlyPrice} />
       <ProcessSection />
@@ -47,6 +48,7 @@ export default function Landing({ monthlyPrice = DEFAULT_MONTHLY_PRICE_ILS }) {
       <Footer25Section />
       <ToriA11ySection />
       <ToriChatSection />
+      <BlackFridayPopup />
     </div>
   );
 }

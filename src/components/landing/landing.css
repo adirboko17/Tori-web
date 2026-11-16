@@ -1657,3 +1657,33 @@ body {
     height: 74px !important;
   }
 }
+
+/* the joining offer under the hero buttons */
+.tori-lp .tori-hero-price {
+  display: grid;
+  gap: 3px;
+  margin-top: 18px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink-600);
+}
+.tori-lp .tori-hero-price strong {
+  justify-self: start;
+  padding: 0 6px;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink-900);
+  background-image: linear-gradient(100deg, #bfff51, #6bff85, #0cffbe);
+  background-repeat: no-repeat;
+  background-position: 0 90%;
+  background-size: 100% 40%;
+}
+@media (max-width: 900px) {
+  .tori-lp .tori-hero-price {
+    justify-items: center;
+    text-align: center;
+  }
+  .tori-lp .tori-hero-price strong {
+    justify-self: center;
+  }
+}

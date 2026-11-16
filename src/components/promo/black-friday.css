@@ -1,0 +1,168 @@
+/* The Black Friday popup: a black card, the price on the brand highlighter,
+   and four boxes counting down. Laid out for a phone first. */
+
+.bf-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(15, 14, 14, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: bf-fade 0.3s ease-out both;
+}
+.bf-card {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  width: min(100%, 420px);
+  box-sizing: border-box;
+  padding: 34px 22px 22px;
+  border-radius: 28px;
+  background: #171616;
+  color: #fff;
+  font-family: "Google Sans", "Open Sans", system-ui, sans-serif;
+  text-align: center;
+  outline: none;
+  box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.6);
+  animation: bf-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.bf-close {
+  position: absolute;
+  top: 12px;
+  inset-inline-end: 12px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  cursor: pointer;
+}
+.bf-close:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+.bf-tag {
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: linear-gradient(100deg, #bfff51, #6bff85, #0cffbe);
+  color: #171616;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.bf-title {
+  margin: 4px 0 0;
+  font-family: inherit;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #fff;
+}
+.bf-price {
+  display: inline-block;
+  font-size: 56px;
+  line-height: 1;
+  color: #bfff51;
+  white-space: nowrap;
+}
+.bf-per {
+  font-size: 22px;
+  color: rgba(255, 255, 255, 0.8);
+}
+.bf-text {
+  max-width: 30ch;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.72);
+}
+.bf-until {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+}
+.bf-clock {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  width: 100%;
+  direction: rtl;
+}
+.bf-unit {
+  display: grid;
+  gap: 2px;
+  padding: 12px 4px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+}
+.bf-unit b {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+}
+.bf-unit small {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+.bf-cta {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 56px;
+  margin-top: 6px;
+  border-radius: 16px;
+  background: linear-gradient(100deg, #bfff51, #6bff85, #0cffbe);
+  color: #171616 !important;
+  font-size: 17px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.16s cubic-bezier(0.34, 1.42, 0.64, 1);
+}
+.bf-cta:hover {
+  transform: translateY(-2px);
+}
+.bf-later {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 0;
+  background: none;
+  color: rgba(255, 255, 255, 0.6);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.bf-later:hover {
+  color: #fff;
+}
+.bf-card :focus-visible {
+  outline: 3px solid #0cffbe;
+  outline-offset: 3px;
+}
+
+@keyframes bf-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes bf-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bf-backdrop,
+  .bf-card {
+    animation: none;
+  }
+}
