@@ -1,142 +1,372 @@
-/* The Black Friday popup: a black card, the price on the brand highlighter,
-   and four boxes counting down. Laid out for a phone first. */
+/* The Black Friday popup. A black card with a lime ticker running across its
+   top, Tori bouncing in, the old price struck out while the new one rolls into
+   place, a -40% stamp that lands with a thud, and a flip clock. Phone first. */
 
 .bf-backdrop {
+  --lime: #bfff51;
+  --mint: #0cffbe;
+  --hl: linear-gradient(100deg, #bfff51, #6bff85, #0cffbe);
   position: fixed;
   inset: 0;
   z-index: 1000;
   display: grid;
   place-items: center;
   padding: 16px;
-  background: rgba(15, 14, 14, 0.55);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  animation: bf-fade 0.3s ease-out both;
+  background: rgba(8, 8, 8, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-family: "Google Sans", "Open Sans", system-ui, sans-serif;
+  animation: bf-fade 0.35s ease-out both;
+  perspective: 1200px;
 }
+.bf-backdrop.is-closing {
+  animation: bf-fade-out 0.26s ease-in both;
+}
+.bf-backdrop.is-closing .bf-card {
+  animation: bf-drop 0.26s ease-in both;
+}
+
 .bf-card {
   position: relative;
-  display: grid;
-  justify-items: center;
-  gap: 12px;
-  width: min(100%, 420px);
+  width: min(100%, 440px);
+  max-height: calc(100dvh - 32px);
+  overflow-x: hidden;
+  overflow-y: auto;
   box-sizing: border-box;
-  padding: 34px 22px 22px;
-  border-radius: 28px;
-  background: #171616;
+  border-radius: 32px;
+  background:
+    radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1.2px) 0 0 / 14px 14px,
+    #0f0e0e;
   color: #fff;
-  font-family: "Google Sans", "Open Sans", system-ui, sans-serif;
   text-align: center;
   outline: none;
-  box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.6);
-  animation: bf-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.09) inset,
+    0 50px 100px -30px rgba(0, 0, 0, 0.8);
+  scrollbar-width: none;
+  animation:
+    bf-pop 0.8s cubic-bezier(0.16, 1, 0.3, 1) both,
+    bf-thud 0.35s 1.08s ease-out;
 }
+.bf-card::-webkit-scrollbar {
+  display: none;
+}
+
+/* the lime band running across the top */
+.bf-ticker {
+  position: relative;
+  z-index: 1;
+  margin: 18px -40px 0;
+  padding: 9px 0;
+  background: var(--hl);
+  color: #0f0e0e;
+  transform: rotate(-4deg);
+  overflow: hidden;
+  direction: ltr;
+  animation: bf-band 0.7s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.bf-ticker-track {
+  display: flex;
+  width: max-content;
+  direction: ltr;
+  animation: bf-run 16s linear infinite;
+}
+.bf-ticker-track span {
+  padding-inline: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+.bf-ticker-track i {
+  font-style: normal;
+  margin-inline: 8px;
+}
+
 .bf-close {
   position: absolute;
-  top: 12px;
-  inset-inline-end: 12px;
+  top: 14px;
+  inset-inline-end: 14px;
+  z-index: 3;
   display: grid;
   place-items: center;
   width: 40px;
   height: 40px;
   border: 0;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  background: #0f0e0e;
   color: #fff;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16) inset;
   cursor: pointer;
+  transition: transform 0.2s;
 }
 .bf-close:hover {
-  background: rgba(255, 255, 255, 0.18);
+  transform: rotate(90deg);
 }
-.bf-tag {
-  padding: 6px 14px;
-  border-radius: 999px;
-  background: linear-gradient(100deg, #bfff51, #6bff85, #0cffbe);
-  color: #171616;
+
+.bf-body {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 6px 24px 22px;
+}
+
+.bf-mascot {
+  width: 180px;
+  height: 135px;
+  margin: -22px 0 -32px;
+  animation: bf-bounce 0.9s 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.bf-mascot video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* the -40% stamp: slams down from above, rotated, and stays tilted */
+.bf-stamp {
+  position: absolute;
+  top: 2px;
+  inset-inline-end: 22px;
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: var(--lime);
+  color: #0f0e0e;
+  transform: rotate(-14deg);
+  box-shadow: 0 0 0 4px #0f0e0e, 0 0 0 5px rgba(191, 255, 81, 0.5);
+  animation: bf-stamp 0.5s 0.95s cubic-bezier(0.5, 0, 0.75, 0) both;
+}
+.bf-stamp::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1.5px dashed rgba(15, 14, 14, 0.5);
+  border-radius: 50%;
+}
+.bf-stamp b {
+  font-size: 23px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.bf-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  color: var(--lime);
+  letter-spacing: 0.02em;
+}
+.bf-kicker::before,
+.bf-kicker::after {
+  content: "";
+  width: 18px;
+  height: 1.5px;
+  background: currentColor;
+  opacity: 0.6;
 }
 .bf-title {
-  margin: 4px 0 0;
+  margin: 0;
   font-family: inherit;
-  font-size: 26px;
+  font-size: clamp(26px, 7.4vw, 32px);
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
   color: #fff;
 }
+
+/* the old price is struck out, then the new one rolls in beside it */
 .bf-price {
-  display: inline-block;
-  font-size: 56px;
-  line-height: 1;
-  color: #bfff51;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 4px;
+}
+.bf-old {
+  position: relative;
+  font-size: 26px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.45);
   white-space: nowrap;
 }
-.bf-per {
-  font-size: 22px;
-  color: rgba(255, 255, 255, 0.8);
+.bf-old::after {
+  content: "";
+  position: absolute;
+  inset: 50% -4px auto;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--lime);
+  transform: rotate(-8deg) scaleX(0);
+  transform-origin: right;
+  animation: bf-strike 0.4s 0.75s cubic-bezier(0.65, 0, 0.35, 1) forwards;
 }
-.bf-text {
-  max-width: 30ch;
-  margin: 0;
-  font-size: 15px;
-  line-height: 1.55;
-  color: rgba(255, 255, 255, 0.72);
+.bf-new {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--lime);
 }
-.bf-until {
-  margin-top: 6px;
+.bf-roll {
+  display: inline-flex;
+  font-size: clamp(72px, 21vw, 92px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+.bf-reel {
+  display: inline-block;
+  height: 1em;
+  overflow: hidden;
+}
+.bf-reel-strip {
+  display: block;
+  animation: bf-reel 1.25s calc(0.55s + var(--i) * 0.14s) cubic-bezier(0.2, 0.9, 0.25, 1.04) both;
+}
+.bf-reel-strip span {
+  display: block;
+  height: 1em;
+}
+.bf-new-unit {
+  display: grid;
+  justify-items: start;
+  line-height: 1;
+}
+.bf-new-unit b {
+  font-size: 30px;
+  font-weight: 700;
+}
+.bf-new-unit small {
+  margin-top: 4px;
   font-size: 13px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.7);
 }
+.bf-save {
+  margin: 0;
+  font-size: 14.5px;
+  color: rgba(255, 255, 255, 0.7);
+}
+.bf-save strong {
+  padding: 1px 7px;
+  border-radius: 6px;
+  background: rgba(191, 255, 81, 0.16);
+  color: var(--lime);
+  font-weight: 700;
+}
+
+/* flip clock */
 .bf-clock {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
   width: 100%;
-  direction: rtl;
+  margin-top: 8px;
 }
 .bf-unit {
   display: grid;
-  gap: 2px;
-  padding: 12px 4px 10px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.06);
+  justify-items: center;
+  gap: 6px;
+  animation: bf-in 0.5s var(--d) cubic-bezier(0.16, 1, 0.3, 1) both;
 }
-.bf-unit b {
-  font-size: 30px;
+.bf-unit-digits {
+  display: flex;
+  gap: 3px;
+}
+.bf-digit {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: clamp(28px, 8.6vw, 36px);
+  height: clamp(40px, 12vw, 50px);
+  border-radius: 9px;
+  background: linear-gradient(#232121 50%, #1a1919 50%);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.07) inset,
+    0 6px 14px -6px rgba(0, 0, 0, 0.8);
+  perspective: 200px;
+  overflow: hidden;
+}
+.bf-digit::after {
+  content: "";
+  position: absolute;
+  inset: 50% 0 auto;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.7);
+}
+.bf-digit-face {
+  font-size: clamp(24px, 7vw, 30px);
   font-weight: 700;
-  line-height: 1;
   font-variant-numeric: tabular-nums;
   color: #fff;
+  transform-origin: 50% 0;
+  animation: bf-flip 0.42s cubic-bezier(0.3, 1.4, 0.5, 1) both;
 }
 .bf-unit small {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.55);
 }
+
+/* call to action, with a light sweeping across it */
 .bf-cta {
-  display: grid;
-  place-items: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
   width: 100%;
-  min-height: 56px;
-  margin-top: 6px;
-  border-radius: 16px;
-  background: linear-gradient(100deg, #bfff51, #6bff85, #0cffbe);
-  color: #171616 !important;
-  font-size: 17px;
+  min-height: 60px;
+  margin-top: 10px;
+  border-radius: 18px;
+  background: var(--hl);
+  color: #0f0e0e !important;
+  font-size: 18px;
   font-weight: 700;
   text-decoration: none;
-  transition: transform 0.16s cubic-bezier(0.34, 1.42, 0.64, 1);
+  overflow: hidden;
+  isolation: isolate;
+  transition: transform 0.18s cubic-bezier(0.34, 1.42, 0.64, 1);
+}
+.bf-cta::after {
+  content: "";
+  position: absolute;
+  inset: -20% auto -20% -40%;
+  z-index: -1;
+  width: 30%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
+  transform: skewX(-20deg);
+  animation: bf-shine 3.2s 2s ease-in-out infinite;
 }
 .bf-cta:hover {
   transform: translateY(-2px);
+}
+.bf-cta:active {
+  transform: scale(0.97);
+}
+.bf-cta-arrow {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #0f0e0e;
+  color: var(--lime);
+  transition: transform 0.25s;
+}
+.bf-cta:hover .bf-cta-arrow {
+  transform: translateX(-4px);
 }
 .bf-later {
   min-height: 40px;
   padding: 0 14px;
   border: 0;
   background: none;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.5);
   font: inherit;
   font-size: 14px;
   cursor: pointer;
@@ -145,8 +375,34 @@
   color: #fff;
 }
 .bf-card :focus-visible {
-  outline: 3px solid #0cffbe;
+  outline: 3px solid var(--mint);
   outline-offset: 3px;
+}
+
+.bf-in {
+  animation: bf-in 0.55s var(--d, 0s) cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* short phones: tighten so the button stays on screen */
+@media (max-height: 720px) {
+  .bf-mascot {
+    width: 116px;
+    height: 87px;
+    margin: -12px 0 -18px;
+  }
+  .bf-stamp {
+    width: 70px;
+    height: 70px;
+  }
+  .bf-stamp b {
+    font-size: 19px;
+  }
+  .bf-roll {
+    font-size: 66px;
+  }
+  .bf-body {
+    gap: 8px;
+  }
 }
 
 @keyframes bf-fade {
@@ -154,15 +410,142 @@
     opacity: 0;
   }
 }
+@keyframes bf-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes bf-pop {
+  from {
+    opacity: 0;
+    transform: translateY(70px) scale(0.86) rotateX(14deg);
+  }
+}
+@keyframes bf-drop {
+  to {
+    opacity: 0;
+    transform: translateY(30px) scale(0.94);
+  }
+}
+@keyframes bf-thud {
+  40% {
+    transform: translateY(4px) scale(0.995);
+  }
+}
+@keyframes bf-band {
+  from {
+    transform: rotate(-4deg) translateX(-110%);
+  }
+}
+@keyframes bf-run {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes bf-bounce {
+  from {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.5);
+  }
+}
+@keyframes bf-stamp {
+  0% {
+    opacity: 0;
+    transform: rotate(-40deg) scale(3);
+  }
+  80% {
+    opacity: 1;
+    transform: rotate(-14deg) scale(0.9);
+  }
+  100% {
+    transform: rotate(-14deg) scale(1);
+  }
+}
+@keyframes bf-strike {
+  to {
+    transform: rotate(-8deg) scaleX(1);
+  }
+}
+@keyframes bf-reel {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(calc((10 + var(--n)) * -1em));
+  }
+}
+@keyframes bf-flip {
+  from {
+    transform: rotateX(-90deg);
+    opacity: 0.3;
+  }
+}
 @keyframes bf-in {
   from {
     opacity: 0;
-    transform: translateY(24px) scale(0.96);
+    transform: translateY(16px);
   }
 }
+@keyframes bf-shine {
+  0% {
+    left: -40%;
+  }
+  45%,
+  100% {
+    left: 120%;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .bf-backdrop *,
+  .bf-backdrop *::before,
+  .bf-backdrop *::after,
   .bf-backdrop,
   .bf-card {
-    animation: none;
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+  }
+  .bf-ticker-track,
+  .bf-cta::after {
+    animation: none !important;
+  }
+}
+
+/* pieces thrown out of the stamp as it lands */
+.bf-burst {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  pointer-events: none;
+}
+.bf-burst i {
+  position: absolute;
+  width: 7px;
+  height: 12px;
+  border-radius: 2px;
+  background: #bfff51;
+  opacity: 0;
+  animation: bf-piece 0.9s 1.3s cubic-bezier(0.1, 0.7, 0.3, 1) both;
+}
+.bf-burst i:nth-child(3n) {
+  background: #0cffbe;
+}
+.bf-burst i:nth-child(4n) {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+}
+@keyframes bf-piece {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(0) scale(0.4);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y) + 30px)) rotate(var(--r)) scale(1);
   }
 }
