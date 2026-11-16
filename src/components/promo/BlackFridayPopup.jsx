@@ -12,9 +12,8 @@ const DEADLINE = new Date("2026-11-30T23:59:59+02:00").getTime();
 const SEEN_KEY = "tori-bf-2026-seen";
 const OPEN_AFTER_MS = 25000;
 const CLOSE_MS = 320;
-const WHATSAPP =
-  "https://wa.me/972535575303?text=" +
-  encodeURIComponent("היי, אני רוצה את מבצע הבלאק פריידי: מנוי שנתי ב־149 ₪ לחודש");
+// the lead form; the campaign tag lands in the lead's notes in the admin
+const LEAD_FORM = "/start?utm_source=site&utm_campaign=black-friday#lead";
 
 function left(now) {
   const s = Math.max(0, Math.floor((DEADLINE - now) / 1000));
@@ -178,7 +177,7 @@ export default function BlackFridayPopup() {
 
         <Countdown />
 
-        <a className="bf-cta" href={WHATSAPP} target="_blank" rel="noopener noreferrer" onClick={close}>
+        <a className="bf-cta" href={LEAD_FORM}>
           <span>אני רוצה את המבצע</span>
           <span className="bf-cta-arrow" aria-hidden="true">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
