@@ -16,8 +16,7 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   font-family: "Google Sans", "Open Sans", system-ui, sans-serif;
-  animation: bf-fade 0.35s ease-out both;
-  perspective: 1200px;
+  animation: bf-fade 0.7s ease both;
 }
 .bf-backdrop.is-closing {
   animation: bf-fade-out 0.26s ease-in both;
@@ -44,9 +43,7 @@
     0 0 0 1px rgba(255, 255, 255, 0.09) inset,
     0 50px 100px -30px rgba(0, 0, 0, 0.8);
   scrollbar-width: none;
-  animation:
-    bf-pop 0.8s cubic-bezier(0.16, 1, 0.3, 1) both,
-    bf-thud 0.35s 1.08s ease-out;
+  animation: bf-pop 0.9s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .bf-card::-webkit-scrollbar {
   display: none;
@@ -418,18 +415,13 @@
 @keyframes bf-pop {
   from {
     opacity: 0;
-    transform: translateY(70px) scale(0.86) rotateX(14deg);
+    transform: translateY(18px) scale(0.98);
   }
 }
 @keyframes bf-drop {
   to {
     opacity: 0;
     transform: translateY(30px) scale(0.94);
-  }
-}
-@keyframes bf-thud {
-  40% {
-    transform: translateY(4px) scale(0.995);
   }
 }
 @keyframes bf-band {

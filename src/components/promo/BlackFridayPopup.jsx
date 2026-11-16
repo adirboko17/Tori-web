@@ -3,13 +3,13 @@ import { useEffect, useRef, useState } from "react";
 import "./black-friday.css";
 
 /* The Black Friday offer: an annual plan at 149 ILS a month instead of 249,
-   until the end of November. It opens a few seconds after the page loads,
+   until the end of November. It opens about 15 seconds after the page loads,
    once per visit. The old price is struck out, the new one rolls in, a -40%
    stamp lands, and a flip clock counts down. After the deadline it never shows. */
 
 const DEADLINE = new Date("2026-11-30T23:59:59+02:00").getTime();
 const SEEN_KEY = "tori-bf-2026-seen";
-const OPEN_AFTER_MS = 4000;
+const OPEN_AFTER_MS = 15000;
 const CLOSE_MS = 260;
 const WHATSAPP =
   "https://wa.me/972535575303?text=" +
